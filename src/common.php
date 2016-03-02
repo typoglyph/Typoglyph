@@ -1,7 +1,7 @@
 <?php
 
 function getDatabaseConnection() {
-    $dbname = "dot_dash";
+    $dbname = "typoglyph";
     $hostname = "localhost";
     $username = "";
     $password = "";

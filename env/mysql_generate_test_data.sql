@@ -1,4 +1,4 @@
-USE `dot_dash`;
+USE `typoglyph`;
 
 TRUNCATE `puzzles`;
 INSERT INTO `puzzles` (`options`, `sentence`) VALUES
