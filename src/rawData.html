@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+	<meta content="utf-8" http-equiv="encoding">
+	<title>Dot-Dash</title>
+	<style type="text/css">
+	td.centered {
+		text-align:		center;
+	}
+	</style>
+	<script>
+	function displayPuzzles() {		
+		var httpReq = new XMLHttpRequest();
+		httpReq.onreadystatechange = function() {
+			if (httpReq.readyState == 4 && httpReq.status == 200) {
+				var puzzles = JSON.parse(httpReq.responseText);
+				var puzzlesHtml = ''
+				for (puzzle of puzzles) {
+					puzzlesHtml += "<tr>";
+					puzzlesHtml += "<td class='centered'>" + puzzle._id + "</td>";
+					puzzlesHtml += "<td class='centered'>" + puzzle._timestamp + "</td>";
+					puzzlesHtml += "<td>" + puzzle.sentence + "</td>";
+					puzzlesHtml += "<td>" + puzzle.options + "</td>";
+					puzzlesHtml += "</tr>";
+				}
+				
+				var puzzlesTableElement = document.getElementById("puzzlesTable");
+				puzzlesTableElement.innerHTML += puzzlesHtml;
+			}
+		};
+		httpReq.open("GET", "getAllPuzzles.php", true);
+		httpReq.send();
+	}
+	</script>
+</head>
+<body onload="displayPuzzles();">
+	<table id="puzzlesTable" border="1">
+		<tr>
+			<th>_id</th>
+			<th>_timestamp</th>
+			<th>sentence</th>
+			<th>options</th>
+		</tr>
+	</table>
+</body>
+</html>
