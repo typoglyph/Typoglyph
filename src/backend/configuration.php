@@ -4,15 +4,16 @@ class ApplicationConfig {
 	private static $config = Null;
 	
 	function getDatabaseConfig() {
-		$dbConfig = $this->parseConfigFile()["DatabaseConfig"];
+		$dbConfig = $this->parseConfigFile()["DatabaseConnection"];
 		return new DatabaseConfig($dbConfig["PdoConnectionString"], $dbConfig["Username"], $dbConfig["Password"]);
 	}
 	
 	private function parseConfigFile() {
-		if ($this::$config == Null) {
-			$this::$config = parse_ini_file($this::$CONFIG_FILE_PATH, True);
+		if (ApplicationConfig::$config == Null) {
+			$path = ApplicationConfig::$CONFIG_FILE_PATH;
+			ApplicationConfig::$config = parse_ini_file($path, true, INI_SCANNER_TYPED);
 		}
-		return $this::$config;
+		return ApplicationConfig::$config;
 	}
 }
 
