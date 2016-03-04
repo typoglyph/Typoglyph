@@ -1,6 +1,7 @@
 <?php
 require("configuration.php");
 
+
 function getDatabaseConnection() {
 	$dbConfig = (new ApplicationConfig())->getDatabaseConfig();
 	$dbConnString = $dbConfig->getPdoConnectionString();
@@ -36,5 +37,4 @@ function puzzleToJsonObject($puzzle) {
 function puzzlesToJsonArray($puzzles) {
 	return json_encode($puzzles);
 }
-
 ?>

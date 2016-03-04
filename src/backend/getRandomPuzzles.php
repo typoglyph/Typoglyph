@@ -27,5 +27,4 @@ function getRandomPuzzles($dbConnection, $count) {
 	$preparedStatement->execute();
 	return $preparedStatement->fetchAll(PDO::FETCH_OBJ);
 }
-
 ?>

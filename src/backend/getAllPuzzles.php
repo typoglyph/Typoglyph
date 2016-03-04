@@ -19,5 +19,4 @@ function getAllPuzzles($dbConnection) {
 	$preparedStatement->execute();
 	return $preparedStatement->fetchAll(PDO::FETCH_OBJ);
 }
-
 ?>
