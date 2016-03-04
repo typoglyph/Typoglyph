@@ -1,12 +1,13 @@
 <?php
+require("configuration.php");
 
 function getDatabaseConnection() {
-    $dbname = "typoglyph";
-    $hostname = "localhost";
-    $username = "";
-    $password = "";
+	$dbConfig = (new ApplicationConfig())->getDatabaseConfig();
+	$dbConnString = $dbConfig->getPdoConnectionString();
+	$dbUsername = $dbConfig->getUsername();
+	$dbPassword = $dbConfig->getPassword();
 
-    $db = new PDO("mysql:host=$hostname;dbname=$dbname", $username, $password);
+	$db = new PDO($dbConnString, $dbUsername, $dbPassword);
     return $db;
 }
 
