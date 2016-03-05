@@ -1,9 +1,15 @@
 <?php
+require_once("logger.php");
+
+
 class ApplicationConfig {
 	private static $CONFIG_FILE_PATH = "../../config/default.ini";
 	private static $config;
+	private static $logger;
 	
 	static function initStatic() {
+		static::$logger = LoggerFactory::getLogger(__CLASS__);
+		static::$logger->info("Parsing config for the first time: " . static::$CONFIG_FILE_PATH);
 		static::$config = parse_ini_file(static::$CONFIG_FILE_PATH, true, INI_SCANNER_TYPED);
 	}
 	
