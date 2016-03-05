@@ -3,12 +3,13 @@
 <head>
 	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 	<meta content="utf-8" http-equiv="encoding">
-	<title>Dot-Dash</title>
-	<style type="text/css">
-	td.centered {
-		text-align:		center;
-	}
-	</style>
+	
+	<title>Typoglyph</title>
+	<link rel="icon" type="image/ico" href="images/favicon.ico">
+	
+	<link rel="stylesheet" type="text/css" href="styles/common.css">
+	<link rel="stylesheet" type="text/css" href="styles/rawData.css">
+	
 	<script>
 	function displayPuzzles() {		
 		var httpReq = new XMLHttpRequest();
@@ -29,7 +30,7 @@
 				puzzlesTableElement.innerHTML += puzzlesHtml;
 			}
 		};
-		httpReq.open("GET", "getAllPuzzles.php", true);
+		httpReq.open("GET", "backend/getAllPuzzles.php", true);
 		httpReq.send();
 	}
 	</script>

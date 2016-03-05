@@ -1,12 +1,14 @@
 <?php
+require_once("configuration.php");
+
 
 function getDatabaseConnection() {
-    $dbname = "dot_dash";
-    $hostname = "localhost";
-    $username = "";
-    $password = "";
+	$dbConfig = (new ApplicationConfig())->getDatabaseConfig();
+	$dbConnString = $dbConfig->getPdoConnectionString();
+	$dbUsername = $dbConfig->getUsername();
+	$dbPassword = $dbConfig->getPassword();
 
-    $db = new PDO("mysql:host=$hostname;dbname=$dbname", $username, $password);
+	$db = new PDO($dbConnString, $dbUsername, $dbPassword);
     return $db;
 }
 
@@ -35,5 +37,4 @@ function puzzleToJsonObject($puzzle) {
 function puzzlesToJsonArray($puzzles) {
 	return json_encode($puzzles);
 }
-
 ?>

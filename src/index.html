@@ -3,46 +3,13 @@
 <head>
 	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 	<meta content="utf-8" http-equiv="encoding">
-	<title>Dot-Dash</title>
-	<style type="text/css">
-	#nextPuzzle.button {
-		width:			100%;
-	}
 	
-	.correct {
-		color:			green;
-	}
-	.incorrect {
-		color:			red;
-	}
+	<title>Typoglyph</title>
+	<link rel="icon" type="image/ico" href="images/favicon.ico">
 	
-	.blankSpace {
-		display:		inline-block;
-		width:			25px;
-		height:			25px;
-		margin:			2px;
-		border:			1px solid black;
-		text-align:		center;
-		vertical-align:	middle;
-	}
-	.blankSpace.empty {
-		border:			2px solid red;
-	}
+	<link rel="stylesheet" type="text/css" href="styles/common.css">
+	<link rel="stylesheet" type="text/css" href="styles/index.css">
 	
-	.draggableOption {
-		display:		inline-block;
-		width:			20px;
-		height:			20px;
-		background:		#eee;
-		border:			1px solid black;
-		font-weight:	bold;
-		text-align:		center;
-		vertical-align:	middle;
-	}
-	.draggableOption.stored {
-		margin:				3px;
-	}
-	</style>
 	<script>
 	var currentPuzzle = null;
 	var correctAnswers = 0;
@@ -148,7 +115,7 @@
 				document.getElementById("sentence").innerHTML = sentence;
 			}
 		};
-		httpReq.open("GET", "getRandomPuzzles.php?count=1", true);
+		httpReq.open("GET", "backend/getRandomPuzzles.php?count=1", true);
 		httpReq.send();
 	}
 	

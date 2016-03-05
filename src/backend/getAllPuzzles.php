@@ -1,5 +1,5 @@
 <?php
-require("common.php");
+require_once("common.php");
 
 
 try {
@@ -19,5 +19,4 @@ function getAllPuzzles($dbConnection) {
 	$preparedStatement->execute();
 	return $preparedStatement->fetchAll(PDO::FETCH_OBJ);
 }
-
 ?>

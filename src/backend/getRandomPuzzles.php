@@ -1,5 +1,5 @@
 <?php
-require("common.php");
+require_once("common.php");
 
 
 $count = getIntRequestParam("count", True);
@@ -27,5 +27,4 @@ function getRandomPuzzles($dbConnection, $count) {
 	$preparedStatement->execute();
 	return $preparedStatement->fetchAll(PDO::FETCH_OBJ);
 }
-
 ?>

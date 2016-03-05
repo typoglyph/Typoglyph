@@ -1,0 +1,37 @@
+#nextPuzzle.button {
+	width:			100%;
+}
+
+.correct {
+	color:			green;
+}
+.incorrect {
+	color:			red;
+}
+
+.blankSpace {
+	display:		inline-block;
+	width:			25px;
+	height:			25px;
+	margin:			2px;
+	border:			1px solid black;
+	text-align:		center;
+	vertical-align:	middle;
+}
+.blankSpace.empty {
+	border:			2px solid red;
+}
+
+.draggableOption {
+	display:		inline-block;
+	width:			20px;
+	height:			20px;
+	background:		#eee;
+	border:			1px solid black;
+	font-weight:	bold;
+	text-align:		center;
+	vertical-align:	middle;
+}
+.draggableOption.stored {
+	margin:			3px;
+}

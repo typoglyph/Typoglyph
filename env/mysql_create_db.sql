@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS `dot_dash`;
-USE `dot_dash`;
+CREATE DATABASE IF NOT EXISTS `typoglyph`;
+USE `typoglyph`;
 
 DROP TABLE IF EXISTS `puzzles`;
 CREATE TABLE `puzzles` (
