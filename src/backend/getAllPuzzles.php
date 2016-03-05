@@ -1,5 +1,5 @@
 <?php
-require("common.php");
+require_once("common.php");
 
 
 try {

@@ -1,21 +1,19 @@
 <?php
 class ApplicationConfig {
 	private static $CONFIG_FILE_PATH = "../../config/default.ini";
-	private static $config = Null;
+	private static $config;
+	
+	static function initStatic() {
+		static::$config = parse_ini_file(static::$CONFIG_FILE_PATH, true, INI_SCANNER_TYPED);
+	}
 	
 	function getDatabaseConfig() {
-		$dbConfig = $this->parseConfigFile()["DatabaseConnection"];
+		$dbConfig = static::$config["DatabaseConnection"];
 		return new DatabaseConfig($dbConfig["PdoConnectionString"], $dbConfig["Username"], $dbConfig["Password"]);
 	}
-	
-	private function parseConfigFile() {
-		if (ApplicationConfig::$config == Null) {
-			$path = ApplicationConfig::$CONFIG_FILE_PATH;
-			ApplicationConfig::$config = parse_ini_file($path, true, INI_SCANNER_TYPED);
-		}
-		return ApplicationConfig::$config;
-	}
 }
+ApplicationConfig::initStatic();
+
 
 class DatabaseConfig {
 	private $connString;
