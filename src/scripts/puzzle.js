@@ -33,15 +33,15 @@ typoglyph.puzzle.Puzzle = function(sentence, options, gaps) {
 	 * @param {int} optionId
 	 * @return {Option}
 	 */
-	 this.getOptionById = function(optionId) {
-		 var options = _options;
-		 for (i = 0; i < options.length; i++) {
-			 var option = options[i];
-			 if (option.getId() === optionId)
+	this.getOptionById = function(optionId) {
+		var options = _options;
+		for (i = 0; i < options.length; i++) {
+			var option = options[i];
+			if (option.getId() === optionId)
 				return option;
-		 }
-		 return null;
-	 }
+		}
+		return null;
+	}
 	
 	/**
 	 * @return {Array<Gap>}
@@ -54,15 +54,15 @@ typoglyph.puzzle.Puzzle = function(sentence, options, gaps) {
 	 * @param {int} gapId
 	 * @return {Gap}
 	 */
-	 this.getGapById = function(gapId) {
-		 var gaps = _gaps;
-		 for (i = 0; i < gaps.length; i++) {
-			 var gap = gaps[i];
-			 if (gap.getId() === gapId)
-				 return gap;
-		 }
-		 return null;
-	 }
+	this.getGapById = function(gapId) {
+		var gaps = _gaps;
+		for (i = 0; i < gaps.length; i++) {
+			var gap = gaps[i];
+			if (gap.getId() === gapId)
+				return gap;
+		}
+		return null;
+	}
 }
 
 

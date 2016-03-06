@@ -39,11 +39,11 @@ typoglyph.StatisticsTracker = function() {
 	 * @param {typoglyph.puzzle.Puzzle} puzzle
 	 * @param {boolean} correct
 	 */
-	 this.onPuzzleAnswered = function(puzzle, correct) {
-		 if (correct) {
+	this.onPuzzleAnswered = function(puzzle, correct) {
+		if (correct) {
 			_correctPuzzles++;
-		 }
+		}
 		_answeredPuzzles++;
 		_latestResult = correct;
-	 }
+	}
 }
