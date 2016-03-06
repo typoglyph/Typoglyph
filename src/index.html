@@ -71,8 +71,11 @@
 			renderStatistics();
 			renderCurrentPuzzle();
 		} else {
-			// All puzzles have been completed - just reload the page for now
-			window.location.reload(false);
+			// All puzzles have been completed
+			// Load the results page
+			var correct = stats.getCorrectlyAnsweredPuzzlesCount();
+			var total = stats.getAnsweredPuzzlesCount();
+			window.location.href = "results.html?correct=" + correct + "&total=" + total;
 		}
 	}
 	
