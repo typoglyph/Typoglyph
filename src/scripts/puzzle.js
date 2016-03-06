@@ -35,7 +35,7 @@ typoglyph.puzzle.Puzzle = function(sentence, options, gaps) {
 	 */
 	this.getOptionById = function(optionId) {
 		var options = _options;
-		for (i = 0; i < options.length; i++) {
+		for (var i = 0; i < options.length; i++) {
 			var option = options[i];
 			if (option.getId() === optionId)
 				return option;
@@ -56,7 +56,7 @@ typoglyph.puzzle.Puzzle = function(sentence, options, gaps) {
 	 */
 	this.getGapById = function(gapId) {
 		var gaps = _gaps;
-		for (i = 0; i < gaps.length; i++) {
+		for (var i = 0; i < gaps.length; i++) {
 			var gap = gaps[i];
 			if (gap.getId() === gapId)
 				return gap;
@@ -71,8 +71,8 @@ typoglyph.puzzle.Puzzle = function(sentence, options, gaps) {
 		var str = "";
 		var sentence = _sentence;
 		var gaps = _gaps;
-		for (i = 0; i <= sentence.length; i++) {
-			for (j = 0; j < gaps.length; j++) {
+		for (var i = 0; i <= sentence.length; i++) {
+			for (var j = 0; j < gaps.length; j++) {
 				// Is the gap at the current position?
 				if (gaps[j].getPosition() === i) {
 					str += gaps[j];
@@ -99,7 +99,7 @@ typoglyph.puzzle.Puzzle = function(sentence, options, gaps) {
 				return (a === b);
 			if (a.length !== b.length)
 				return false;
-			for (i = 0; i < a.length; i++) {
+			for (var i = 0; i < a.length; i++) {
 				if (a[i] === null) {
 					if (b[i] !== null) {
 						return false;

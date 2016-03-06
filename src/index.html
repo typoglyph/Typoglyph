@@ -167,9 +167,9 @@
 		var html = "";
 		var sentence = puzzle.getSentence();
 		var gaps = puzzle.getGaps();
-		for (i = 0; i < sentence.length + 1; i++) {
+		for (var i = 0; i < sentence.length + 1; i++) {
 			// see if there is a gap which is supposed to go in this position
-			for (j = 0; j < gaps.length; j++) {
+			for (var j = 0; j < gaps.length; j++) {
 				var gap = gaps[j];
 				if (gap.getPosition() === i) {
 					html += renderPuzzleGapHtml(gap);
@@ -206,7 +206,7 @@
 	function renderPuzzleOptionsHtml(puzzle) {
 		var html = "";
 		var options = puzzle.getOptions();
-		for (i = 0; i < options.length; i++) {
+		for (var i = 0; i < options.length; i++) {
 			var option = options[i];
 			html += renderPuzzleOptionHtml(option);
 		}
@@ -234,7 +234,7 @@
 	function checkPuzzleAnswer(puzzle) {
 		var result = PUZZLE_ANSWER_CORRECT;
 		var gaps = puzzle.getGaps();
-		for (i = 0; i < gaps.length; i++) {
+		for (var i = 0; i < gaps.length; i++) {
 			var gap = gaps[i];
 			if (!gap.hasCurrentChoice()) {
 				// Gap was not filled
@@ -274,7 +274,7 @@
 			[ new Gap(5, new Option(",")), new Gap(21, new Option(".")), new Gap(39, new Option("?")) ] ];
 		
 		var puzzles = [];
-		for (i = 0; i < Math.min(sentences.length, count); i++) {
+		for (var i = 0; i < Math.min(sentences.length, count); i++) {
 			var puzzle = new Puzzle(sentences[i], options, gaps[i]);
 			puzzles.push(puzzle);
 		}
