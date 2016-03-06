@@ -220,7 +220,7 @@
 	function renderPuzzleOptionHtml(option) {
 		var html = "";
 		var ondragstart = "onStartDraggingOption(event, this, " + option.getId() + ");";
-		html += "<span class='draggableOption stored' draggable='true' ondragstart='" + ondragstart + "'>";
+		html += "<span class='draggableOption' draggable='true' ondragstart='" + ondragstart + "'>";
 		html += option.getValue();
 		html += "</span>";
 		return html;
