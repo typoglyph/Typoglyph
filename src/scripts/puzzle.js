@@ -30,11 +30,39 @@ typoglyph.puzzle.Puzzle = function(sentence, options, gaps) {
 	}
 	
 	/**
+	 * @param {int} optionId
+	 * @return {Option}
+	 */
+	 this.getOptionById = function(optionId) {
+		 var options = _options;
+		 for (i = 0; i < options.length; i++) {
+			 var option = options[i];
+			 if (option.getId() === optionId)
+				return option;
+		 }
+		 return null;
+	 }
+	
+	/**
 	 * @return {Array<Gap>}
 	 */
 	this.getGaps = function() {
 		return _gaps;
 	}
+	
+	/**
+	 * @param {int} gapId
+	 * @return {Gap}
+	 */
+	 this.getGapById = function(gapId) {
+		 var gaps = _gaps;
+		 for (i = 0; i < gaps.length; i++) {
+			 var gap = gaps[i];
+			 if (gap.getId() === gapId)
+				 return gap;
+		 }
+		 return null;
+	 }
 }
 
 
@@ -45,9 +73,17 @@ typoglyph.puzzle.Puzzle = function(sentence, options, gaps) {
  * @author jakemarsden
  */
 typoglyph.puzzle.Gap = function(position, solution) {
+	/** @private */ var _id = typoglyph.puzzle.Gap._nextId++;
 	/** @private */ var _position = position;
 	/** @private */ var _solution = solution;
 	/** @private */ var _currentChoice = null;
+	
+	/**
+	 * @return {int}
+	 */
+	this.getId = function() {
+		return _id;
+	}
 	
 	/**
 	 * Returns where abouts this gap lies in a puzzle's sentence:
@@ -82,6 +118,7 @@ typoglyph.puzzle.Gap = function(position, solution) {
 		_currentChoice = newChoice;
 	}
 }
+/** @private */ typoglyph.puzzle.Gap._nextId = 0;
 
 
 /**
@@ -90,7 +127,15 @@ typoglyph.puzzle.Gap = function(position, solution) {
  * @author jakemarsden
  */
 typoglyph.puzzle.Option = function(value) {
+	/** @private */ var _id = typoglyph.puzzle.Option._nextId++;
 	/** @private */ var _value = value;
+	
+	/**
+	 * @return {int}
+	 */
+	this.getId = function() {
+		return _id;
+	}
 	
 	/**
 	 * @return {String}
@@ -99,3 +144,4 @@ typoglyph.puzzle.Option = function(value) {
 		return _value;
 	}
 }
+/** @private */ typoglyph.puzzle.Option._nextId = 0;
