@@ -57,7 +57,6 @@
 		var stats = statistics;
 		
 		var result = checkPuzzleAnswer(answeredPuzzle);
-		console.log("Result: " + result);
 		if (result == PUZZLE_ANSWER_INCOMPLETE) {
 			// User hasn't actually completed the puzzle yet, despite clicking the "next puzzle" button
 			// Make them fully finish the puzzle before moving on
@@ -237,19 +236,16 @@
 		var gaps = puzzle.getGaps();
 		for (i = 0; i < gaps.length; i++) {
 			var gap = gaps[i];
-			var option = gap.getCurrentChoice();
-			var solution = gap.getSolution();
-			
-			if (option === null) {
+			if (!gap.hasCurrentChoice()) {
 				// Gap was not filled
 				return (result = PUZZLE_ANSWER_INCOMPLETE);
-			} else if (option.getValue() !== solution.getValue()) {
+			} else if (!gap.getCurrentChoice().equals(gap.getSolution())) {
 				// Gap was filled incorrectly
 				result = PUZZLE_ANSWER_INCORRECT;
 			}
 		}
 		
-		// All gaps were filled correctly
+		// All gaps were filled
 		return result;
 	}
 	
@@ -283,6 +279,9 @@
 			puzzles.push(puzzle);
 		}
 		
+		for (var i = 0; i < puzzles.length; i++) {
+			console.log("    " + puzzles[i]);
+		}
 		return puzzles;
 	}
 	
