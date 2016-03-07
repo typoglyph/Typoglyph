@@ -22,12 +22,6 @@
 	var StatisticsTracker	= typoglyph.StatisticsTracker;
 	
 	
-	// Constants
-	var PUZZLE_ANSWER_CORRECT		= 100;
-	var PUZZLE_ANSWER_INCORRECT		= 200;
-	var PUZZLE_ANSWER_INCOMPLETE	= 300;
-	
-	
 	// Global variables
 	var puzzleSet = null;
 	var currentPuzzleIndex = null;
@@ -53,17 +47,10 @@
 	function onNextPuzzleButtonClicked(event, element) {
 		console.log("onNextPuzzleButtonClicked: event=" + event + ", element=" + element);
 		
-		var answeredPuzzle = puzzleSet[currentPuzzleIndex];
+		var puzzle = puzzleSet[currentPuzzleIndex];
 		var stats = statistics;
-		
-		var result = checkPuzzleAnswer(answeredPuzzle);
-		if (result == PUZZLE_ANSWER_INCOMPLETE) {
-			// User hasn't actually completed the puzzle yet, despite clicking the "next puzzle" button
-			// Make them fully finish the puzzle before moving on
-			return;
-		}
-		
-		stats.onPuzzleAnswered(answeredPuzzle, (result === PUZZLE_ANSWER_CORRECT));
+				
+		stats.onPuzzleAnswered(puzzle, isPuzzleFilledCorrectly(puzzle));
 		currentPuzzleIndex++;
 		if (currentPuzzleIndex < (puzzleSet.length)) {
 			// Not all puzzles have yet been completed
@@ -169,13 +156,11 @@
 		var gaps = puzzle.getGaps();
 		for (var i = 0; i < sentence.length + 1; i++) {
 			// see if there is a gap which is supposed to go in this position
-			for (var j = 0; j < gaps.length; j++) {
-				var gap = gaps[j];
-				if (gap.getPosition() === i) {
-					html += renderPuzzleGapHtml(gap);
-					break;
-				}
+			var gap = puzzle.getGapAtPosition(i);
+			if (gap !== null) {
+				html += renderPuzzleGapHtml(gap);
 			}
+			
 			html += sentence.charAt(i);
 		}
 		return html;
@@ -220,7 +205,7 @@
 	function renderPuzzleOptionHtml(option) {
 		var html = "";
 		var ondragstart = "onStartDraggingOption(event, this, " + option.getId() + ");";
-		html += "<span class='draggableOption stored' draggable='true' ondragstart='" + ondragstart + "'>";
+		html += "<span class='draggableOption' draggable='true' ondragstart='" + ondragstart + "'>";
 		html += option.getValue();
 		html += "</span>";
 		return html;
@@ -229,24 +214,10 @@
 	
 	/**
 	 * @param {Puzzle} puzzle
-	 * @return {int} PUZZLE_ANSWER_CORRECT, PUZZLE_ANSWER_INCORRECT or PUZZLE_ANSWER_INCOMPLETE
+	 * @return {boolean}
 	 */
-	function checkPuzzleAnswer(puzzle) {
-		var result = PUZZLE_ANSWER_CORRECT;
-		var gaps = puzzle.getGaps();
-		for (var i = 0; i < gaps.length; i++) {
-			var gap = gaps[i];
-			if (!gap.hasCurrentChoice()) {
-				// Gap was not filled
-				return (result = PUZZLE_ANSWER_INCOMPLETE);
-			} else if (!gap.getCurrentChoice().equals(gap.getSolution())) {
-				// Gap was filled incorrectly
-				result = PUZZLE_ANSWER_INCORRECT;
-			}
-		}
-		
-		// All gaps were filled
-		return result;
+	function isPuzzleFilledCorrectly(puzzle) {
+		return puzzle.areAllGapsFilledCorrectly();
 	}
 	
 	
@@ -276,6 +247,7 @@
 		var puzzles = [];
 		for (var i = 0; i < Math.min(sentences.length, count); i++) {
 			var puzzle = new Puzzle(sentences[i], options, gaps[i]);
+			fillMissingGaps(puzzle);
 			puzzles.push(puzzle);
 		}
 		
@@ -283,6 +255,24 @@
 			console.log("    " + puzzles[i]);
 		}
 		return puzzles;
+	}
+	
+	/**
+	 * Adds a gap with a null solution just before every space in the sentence, assuming no gap has
+	 * already been added in that position.
+	 * 
+	 * @param {Puzzle} puzzle
+	 */
+	function fillMissingGaps(puzzle) {
+		var sentence = puzzle.getSentence();
+		for (var i = 0; i <= sentence.length; i++) {
+			if (sentence.charAt(i) === ' ' || i === sentence.length) {
+				if (puzzle.getGapAtPosition(i) === null) {
+					// Puzzle doesn't yet have a gap in this position
+					puzzle.getGaps().push(new Gap(i, null));
+				}
+			}
+		}
 	}
 	
 	

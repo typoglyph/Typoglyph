@@ -65,6 +65,46 @@ typoglyph.puzzle.Puzzle = function(sentence, options, gaps) {
 	}
 	
 	/**
+	 * @param {int} position
+	 * @reutrn {Gap}
+	 */
+	this.getGapAtPosition = function(position) {
+		var gaps = _gaps;
+		for (var i = 0; i < gaps.length; i++) {
+			var gap = gaps[i];
+			if (gap.getPosition() === position)
+				return gap;
+		}
+		return null;
+	}
+	
+	/**
+	 * @return {boolean}
+	 */
+	this.areAllGapsFilled = function() {
+		var gaps = _gaps;
+		for (var i = 0; i < gaps.length; i++) {
+			if (!gaps[i].isFilled()) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * @return {boolean}
+	 */
+	this.areAllGapsFilledCorrectly = function() {
+		var gaps = _gaps;
+		for (var i = 0; i < gaps.length; i++) {
+			if (!gaps[i].isFilledCorrectly()) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	/**
 	 * @return {String}
 	 */
 	this.toString = function() {
@@ -121,7 +161,8 @@ typoglyph.puzzle.Puzzle = function(sentence, options, gaps) {
 
 /**
  * @param {int} position
- * @param {Option} solution
+ * @param {Option} solution The option needed to make this gap considered "filled correctly", or
+ *     null if the gap should be considered "filled correctly" when unfilled.
  * @constructor
  * @author jakemarsden
  */
@@ -158,13 +199,6 @@ typoglyph.puzzle.Gap = function(position, solution) {
 	}
 	
 	/**
-	 * @return {boolean}
-	 */
-	this.hasCurrentChoice = function() {
-		return (_currentChoice !== null);
-	}
-	
-	/**
 	 * @return {Option}
 	 */
 	this.getCurrentChoice = function() {
@@ -176,6 +210,21 @@ typoglyph.puzzle.Gap = function(position, solution) {
 	 */
 	this.setCurrentChoice = function(newChoice) {
 		_currentChoice = newChoice;
+	}
+	
+	/**
+	 * @return {boolean}
+	 */
+	this.isFilled = function() {
+		return (_currentChoice !== null);
+	}
+	
+	/**
+	 * @return {boolean}
+	 */
+	this.isFilledCorrectly = function() {
+		return (_currentChoice === null) ? (_solution === null)
+			: _currentChoice.equals(solution);
 	}
 	
 	/**
