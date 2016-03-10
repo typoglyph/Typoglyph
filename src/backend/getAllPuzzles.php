@@ -8,7 +8,7 @@ try {
 } finally {
     $db = Null;
 }
-$json = puzzlesToJsonArray($puzzles);
+$json = toJson($puzzles, False);
 print($json);
 
 

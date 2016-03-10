@@ -30,11 +30,25 @@ function getIntRequestParam($name, $required) {
 	return (int) $value;
 }
 
-function puzzleToJsonObject($puzzle) {
-	return json_encode($puzzle);
+/**
+ * @param mixed $value
+ * @param boolean $prettyHtml
+ * @return string
+ */
+function toJson($value, $prettyHtml) {
+	$json = $prettyHtml ? json_encode($value, JSON_PRETTY_PRINT) : json_encode($value);
+	if ($prettyHtml) {
+		$json = str_replace(" ", "&nbsp;", $json);
+		$json = nl2br($json);
+	}
+	return $json;
 }
 
-function puzzlesToJsonArray($puzzles) {
-	return json_encode($puzzles);
+/**
+ * @param string $json
+ * @return mixed
+ */
+function fromJson($json) {
+	return json_decode($json);
 }
 ?>
