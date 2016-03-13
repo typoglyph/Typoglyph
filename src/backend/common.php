@@ -1,5 +1,6 @@
 <?php
 require_once("configuration.php");
+require_once("databaseio.php");
 
 
 function getDatabaseConnection() {
@@ -7,9 +8,7 @@ function getDatabaseConnection() {
 	$dbConnString = $dbConfig->getPdoConnectionString();
 	$dbUsername = $dbConfig->getUsername();
 	$dbPassword = $dbConfig->getPassword();
-
-	$db = new PDO($dbConnString, $dbUsername, $dbPassword);
-    return $db;
+	return new DatabaseWrapper($dbConnString, $dbUsername, $dbPassword);
 }
 
 function getStringRequestParam($name, $required) {
