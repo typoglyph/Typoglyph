@@ -1,4 +1,5 @@
 <?php
+require_once("logger.php");
 require_once("puzzle.php");
 
 
@@ -6,7 +7,13 @@ require_once("puzzle.php");
  * 
  */
 class DatabaseWrapper {
+	private static $logger;
+	private $connectionString;
 	private $connection;
+	
+	static function staticInit() {
+		static::$logger = LoggerFactory::getLogger(__CLASS__);
+	}
 	
 	/**
 	 * @param string $connectionString
@@ -14,6 +21,8 @@ class DatabaseWrapper {
 	 * @param string $password
 	 */
 	function __construct($connectionString, $username, $password) {
+		static::$logger->info("Connecting to database: '$connectionString'");
+		$this->connectionString = $connectionString;
 		$this->connection = new PDO($connectionString, $username, $password);
 		$this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	}
@@ -26,6 +35,7 @@ class DatabaseWrapper {
 		$statement = $this->connection->prepare('
 			SELECT *
 			FROM `puzzles`;');
+		static::$logger->debug("Executing statement on '{$this->connectionString}': {$statement->queryString}");
 		$statement->execute();
 		$puzzles = $statement->fetchAll(PDO::FETCH_OBJ);
 		return $this->parsePuzzles($puzzles);
@@ -44,6 +54,7 @@ class DatabaseWrapper {
 			ORDER BY RAND()
 			LIMIT ?;');
 		$statement->bindParam(1, $count, PDO::PARAM_INT);
+		static::$logger->debug("Executing statement on '{$this->connectionString}': {$statement->queryString}");
 		$statement->execute();
 		$puzzles = $statement->fetchAll(PDO::FETCH_OBJ);
 		return $this->parsePuzzles($puzzles);
@@ -133,4 +144,5 @@ class DatabaseWrapper {
 		return $puzzle;
 	}
 }
+DatabaseWrapper::staticInit();
 ?>

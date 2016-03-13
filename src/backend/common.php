@@ -3,6 +3,9 @@ require_once("configuration.php");
 require_once("databaseio.php");
 
 
+/**
+ * @return DatabaseWrapper
+ */
 function getDatabaseConnection() {
 	$dbConfig = (new ApplicationConfig())->getDatabaseConfig();
 	$dbConnString = $dbConfig->getPdoConnectionString();
@@ -11,6 +14,11 @@ function getDatabaseConnection() {
 	return new DatabaseWrapper($dbConnString, $dbUsername, $dbPassword);
 }
 
+/**
+ * @param string $name
+ * @param boolean $required
+ * @return string
+ */
 function getStringRequestParam($name, $required) {
 	$value = $_REQUEST[$name];
 	if ($value == Null || $value == "") {
@@ -22,6 +30,11 @@ function getStringRequestParam($name, $required) {
 	return $value;
 }
 
+/**
+ * @param string $name
+ * @param boolean $required
+ * @return int
+ */
 function getIntRequestParam($name, $required) {
 	$value = getStringRequestParam($name, $required);
 	if ($value != Null && !is_numeric($value))
