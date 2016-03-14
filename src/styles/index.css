@@ -26,3 +26,10 @@
 .blankSpace .draggableOption {
 	margin:			0px;
 }
+
+#completion_graphic {
+	position:		absolute;
+	height:			70px;
+	padding:		5px;
+	pointer-events:	none; /* Allow clicking through the image */
+}

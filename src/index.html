@@ -10,15 +10,19 @@
 	<link rel="stylesheet" type="text/css" href="styles/common.css">
 	<link rel="stylesheet" type="text/css" href="styles/index.css">
 	
+	<script type="text/javascript" src="scripts/util.js"></script>
 	<script type="text/javascript" src="scripts/puzzle.js"></script>
+	<script type="text/javascript" src="scripts/anim.js"></script>
 	<script type="text/javascript" src="scripts/statistics.js"></script>
 	<script>
 	
 	
 	// Imports
+	var util	= typoglyph.util;
 	var Gap		= typoglyph.puzzle.Gap;
 	var Option	= typoglyph.puzzle.Option;
 	var Puzzle	= typoglyph.puzzle.Puzzle;
+	var Animation			= typoglyph.anim.Animation;
 	var StatisticsTracker	= typoglyph.StatisticsTracker;
 	
 	
@@ -26,6 +30,7 @@
 	var puzzleSet = null;
 	var currentPuzzleIndex = null;
 	var statistics = new StatisticsTracker();
+	var completionGraphic = null;
 	
 	
 	// Event handlers
@@ -46,6 +51,7 @@
 		
 		console.log("onLoad");
 		fetchPuzzlesFromBackend(5, true, onPuzzlesLoaded);
+		completionGraphic = new Animation(document.getElementById("completion_graphic"), 1000);
 	}
 	
 	/**
@@ -57,10 +63,39 @@
 		
 		var puzzle = puzzleSet[currentPuzzleIndex];
 		var stats = statistics;
-				
-		stats.onPuzzleAnswered(puzzle, isPuzzleFilledCorrectly(puzzle));
+		var isAnsweredCorrectly = isPuzzleFilledCorrectly(puzzle);
+		
+		stats.onPuzzleAnswered(puzzle, isAnsweredCorrectly);
 		currentPuzzleIndex++;
-		if (currentPuzzleIndex < (puzzleSet.length)) {
+		
+		// Cancel any currently visible graphic
+		completionGraphic.cancel();
+		completionGraphic.onPreStart = function(e) {
+			console.log("completionGraphic.onPreStart: e=" + e);
+			
+			fetchCompletionGraphics(isAnsweredCorrectly, false, function(graphics) {
+				e.src = util.randomElement(graphics);
+			});
+			util.setImageRotation(e, util.randomInt(-50, 50));
+			
+			// Get the size *after* we set the image and rotation as it may change
+			var ew = util.getElementWidth(e);
+			var eh = util.getElementHeight(e);
+			
+			// Position the center of the image where the mouse was clicked, or as close as
+			// possible if the click was near the edge of the viewport
+			e.style.left = Math.min(util.getViewportWidth() - ew, Math.max(0, event.pageX - 0.5 * ew)) + "px";
+			e.style.top = Math.min(util.getViewportHeight() - eh, Math.max(0, event.pageY - 0.5 * eh)) + "px";
+		}
+		completionGraphic.onPostStop = function(e) {
+			console.log("completionGraphic.onPostStop e=" + e);
+		}
+		
+		// Show the completion graphic
+		completionGraphic.start();
+		
+		// Move on to the next puzzle
+		if (currentPuzzleIndex < puzzleSet.length) {
 			// Not all puzzles have yet been completed
 			renderStatistics();
 			renderCurrentPuzzle();
@@ -229,6 +264,7 @@
 	}
 	
 	
+	// Functions which call the backend	
 	/**
 	 * Fetches the specified number of puzzles from the backend, and then passes them to a
 	 * specified callback function. Puzzles can be fetched asynchronously if required.
@@ -251,6 +287,27 @@
 			}
 		};
 		req.open("GET", "backend/getRandomPuzzles.php?count=" + count, async);
+		req.send();
+	}
+	
+	/**
+	 * @param {boolean} correct True if you want to fetch graphics representing a correct answer or
+	 *     false if you want to fetch graphics representing an incorrect answer
+	 * @param {boolean} async True if you want the graphics to be fetched asynchronously
+	 * @param {function(Array<String>)} callback The function to call when the graphics have been
+	 *     fetched
+	 * @return {Array<String>}
+	 */
+	function fetchCompletionGraphics(correct, async, callback) {
+		var req = new XMLHttpRequest();
+		req.onreadystatechange = function() {
+			if (req.readyState === 4 && req.status === 200) {
+				var resp = req.responseText;
+				var paths = JSON.parse(resp);
+				callback(paths);
+			}
+		}
+		req.open("GET", "backend/getCompletionGraphics.php?correct_answer=" + (correct ? "true" : "false"), async);
 		req.send();
 	}
 	
@@ -277,6 +334,9 @@
 	</script>
 </head>
 <body onload="onLoad();">
+	<!-- starts hidden, but will be shown briefly after user finishes each puzzle -->
+	<image id="completion_graphic" style="visibility: hidden;"/>
+	
 	<table>
 		<tr>
 			<td>Previous puzzle:</td>
