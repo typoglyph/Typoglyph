@@ -170,14 +170,8 @@
 	 * 
 	 */
 	function renderStatistics() {
-		var stats = statistics;
-		var latestAnswer = stats.wasLatestAnswerCorrect();
-		document.getElementById("answer").innerHTML = (latestAnswer == null) ? "N/A" : (latestAnswer ? "Correct" : "Incorrect");
-		document.getElementById("correctAnswers").innerHTML = stats.getCorrectlyAnsweredPuzzlesCount();
-		document.getElementById("totalAnswers").innerHTML = stats.getAnsweredPuzzlesCount();
-		
-		document.getElementById("puzzleNumber").innerHTML = (currentPuzzleIndex + 1);
-		document.getElementById("totalPuzzles").innerHTML = puzzleSet.length;
+		document.getElementById("progressBar").value = currentPuzzleIndex;
+		document.getElementById("progressBar").max = puzzleSet.length;
 	}
 	
 	/**
@@ -336,20 +330,9 @@
 <body onload="onLoad();">
 	<!-- starts hidden, but will be shown briefly after user finishes each puzzle -->
 	<image id="completionGraphic" style="visibility: hidden;"/>
+	<progress id="progressBar" value="0"></progress>
 	
 	<table>
-		<tr>
-			<td>Previous puzzle:</td>
-			<td><span id="answer"/></td>
-		</td>
-		<tr>
-			<td>Score:</td>
-			<td><span id="correctAnswers"></span> / <span id="totalAnswers"></span></td>
-		</tr>
-		<tr>
-			<td>Puzzle:</td>
-			<td><span id="puzzleNumber"></span> / <span id="totalPuzzles"></span></td>
-		</tr>
 		<tr>
 			<td>Options:</td>
 			<td><span id="options"/></td>
