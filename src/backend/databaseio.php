@@ -96,6 +96,7 @@ class DatabaseWrapper {
 		// For each character
 		$escaped = False;
 		$gap = Null;
+		$specialChars = 0;
 		foreach (str_split($dbPuzzle->sentence) as $i=>$char) {
 			// str_split returns an array containing only "" when given "" as parameter
 			if (strlen($char) === 0)
@@ -104,6 +105,7 @@ class DatabaseWrapper {
 			// Set the flag so that the next character is properly escaped
 			if (!$escaped && $char === "\\") {
 				$escaped = True;
+				$specialChars++;
 				
 			} elseif (!$escaped && $char === "{") {
 				if ($gap !== Null) {
@@ -112,13 +114,16 @@ class DatabaseWrapper {
 				}
 				// We have hit the start of a gap - create an object to represent it
 				$gap = new Gap();
-				$gap->position = $i;
+				$gap->position = ($i - $specialChars);
+				$specialChars++;
 				
 			} elseif (!$escaped && $char === "}") {
 				if ($gap === Null) {
 					// The input was something like "Hello {}} world" instead of "Hello {\}} world", or maybe "Hello } world" instead of "Hello \} world"
 					throw new Exception("Char<$i>: Non-escaped '}' found before any '{' was opened: '{$dbPuzzle->sentence}'");
 				}
+				$specialChars++;
+				
 				// We have reached the end of a gap - add it to the puzzle and clear our reference of it
 				array_push($puzzle->gaps, $gap);
 				$gap = Null;
@@ -133,6 +138,7 @@ class DatabaseWrapper {
 					if ($gap->solution === Null) {
 						$gap->solution = new Option();
 						$gap->solution->value = "";
+						$specialChars++;
 					}
 					$gap->solution->value .= $char;
 				}
