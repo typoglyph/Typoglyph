@@ -8,7 +8,7 @@ require_once("databaseio.php");
  */
 function getDatabaseConnection() {
 	$dbConfig = (new ApplicationConfig())->getDatabaseConfig();
-	$dbConnString = $dbConfig->getPdoConnectionString();
+	$dbConnString = $dbConfig->getConnectionString();
 	$dbUsername = $dbConfig->getUsername();
 	$dbPassword = $dbConfig->getPassword();
 	return new DatabaseWrapper($dbConnString, $dbUsername, $dbPassword);

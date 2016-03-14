@@ -15,7 +15,7 @@ class ApplicationConfig {
 	
 	function getDatabaseConfig() {
 		$dbConfig = static::$config["DatabaseConnection"];
-		return new DatabaseConfig($dbConfig["PdoConnectionString"], $dbConfig["Username"], $dbConfig["Password"]);
+		return new DatabaseConfig($dbConfig["ConnectionString"], $dbConfig["Username"], $dbConfig["Password"]);
 	}
 }
 ApplicationConfig::initStatic();
@@ -32,7 +32,7 @@ class DatabaseConfig {
 		$this->pword = $pword;
 	}
 	
-	function getPdoConnectionString() {
+	function getConnectionString() {
 		return $this->connString;
 	}
 	

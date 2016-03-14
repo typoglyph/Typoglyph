@@ -1,5 +1,2 @@
-# Ignore everything in this directory
-*
-
-# Except for this file
-!.gitignore
+# Ignore all configuration files
+*.ini

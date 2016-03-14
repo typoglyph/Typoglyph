@@ -1,0 +1,11 @@
+; This file is never used by the application itself but serves as a template for writing your own
+; "default.ini" configuration file.
+
+; It should be updated to contain all properties available in the "real" configuration file, but
+; the values of all options should be replaced with the default value, or should be left blank if
+; there is no default.
+
+[DatabaseConnection]
+ConnectionString=
+Username=
+Password=
