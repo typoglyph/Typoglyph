@@ -26,8 +26,24 @@ function getStringRequestParam($name, $required) {
 function getIntRequestParam($name, $required) {
 	$value = getStringRequestParam($name, $required);
 	if ($value != Null && !is_numeric($value))
-		throw new Exception("The '$name' argument must be an integer");
+		throw new Exception("The '$name' argument must be an integer: $value");
 	return (int) $value;
+}
+
+/**
+ * @param string $name
+ * @param boolean $required
+ * @return boolean
+ */
+function getBooleanRequestParam($name, $required) {
+	$value = getStringRequestParam($name, $required);
+	if ($value === Null)
+		return Null;
+	if (strcasecmp($value, "true") === 0)
+		return True;
+	if (strcasecmp($value, "false") === 0)
+		return False;
+	throw new Exception("The '$name' argument must be a boolean: $value");
 }
 
 function puzzleToJsonObject($puzzle) {
