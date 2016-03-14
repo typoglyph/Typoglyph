@@ -1,30 +1,19 @@
 <?php
 require_once("common.php");
 
-
+// Parse query parameters
 $count = getIntRequestParam("count", True);
 if ($count < 0)
 	throw new Exception("Invalid 'count' parameter: $count");
 
+
 try {
     $db = getDatabaseConnection();
-    $puzzles = getRandomPuzzles($db, $count);
+    $puzzles = $db->fetchRandomPuzzles($count);
 } finally {
     $db = Null;
 }
 
-$json = puzzlesToJsonArray($puzzles);
+$json = toJson($puzzles, False);
 print($json);
-
-
-function getRandomPuzzles($dbConnection, $count) {
-	$preparedStatement = $dbConnection->prepare('
-		SELECT *
-		FROM `puzzles`
-		ORDER BY RAND()
-		LIMIT ?');
-	$preparedStatement->bindParam(1, $count, PDO::PARAM_INT);
-	$preparedStatement->execute();
-	return $preparedStatement->fetchAll(PDO::FETCH_OBJ);
-}
 ?>

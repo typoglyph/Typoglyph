@@ -1,17 +1,24 @@
 <?php
 require_once("configuration.php");
+require_once("databaseio.php");
 
 
+/**
+ * @return DatabaseWrapper
+ */
 function getDatabaseConnection() {
 	$dbConfig = (new ApplicationConfig())->getDatabaseConfig();
 	$dbConnString = $dbConfig->getPdoConnectionString();
 	$dbUsername = $dbConfig->getUsername();
 	$dbPassword = $dbConfig->getPassword();
-
-	$db = new PDO($dbConnString, $dbUsername, $dbPassword);
-    return $db;
+	return new DatabaseWrapper($dbConnString, $dbUsername, $dbPassword);
 }
 
+/**
+ * @param string $name
+ * @param boolean $required
+ * @return string
+ */
 function getStringRequestParam($name, $required) {
 	$value = $_REQUEST[$name];
 	if ($value == Null || $value == "") {
@@ -23,6 +30,11 @@ function getStringRequestParam($name, $required) {
 	return $value;
 }
 
+/**
+ * @param string $name
+ * @param boolean $required
+ * @return int
+ */
 function getIntRequestParam($name, $required) {
 	$value = getStringRequestParam($name, $required);
 	if ($value != Null && !is_numeric($value))
@@ -30,11 +42,25 @@ function getIntRequestParam($name, $required) {
 	return (int) $value;
 }
 
-function puzzleToJsonObject($puzzle) {
-	return json_encode($puzzle);
+/**
+ * @param mixed $value
+ * @param boolean $prettyHtml
+ * @return string
+ */
+function toJson($value, $prettyHtml) {
+	$json = $prettyHtml ? json_encode($value, JSON_PRETTY_PRINT) : json_encode($value);
+	if ($prettyHtml) {
+		$json = str_replace(" ", "&nbsp;", $json);
+		$json = nl2br($json);
+	}
+	return $json;
 }
 
-function puzzlesToJsonArray($puzzles) {
-	return json_encode($puzzles);
+/**
+ * @param string $json
+ * @return mixed
+ */
+function fromJson($json) {
+	return json_decode($json);
 }
 ?>
