@@ -51,7 +51,7 @@
 		
 		console.log("onLoad");
 		fetchPuzzlesFromBackend(5, true, onPuzzlesLoaded);
-		completionGraphic = new Animation(document.getElementById("completion_graphic"), 1000);
+		completionGraphic = new Animation(document.getElementById("completionGraphic"), 1000);
 	}
 	
 	/**
@@ -335,7 +335,7 @@
 </head>
 <body onload="onLoad();">
 	<!-- starts hidden, but will be shown briefly after user finishes each puzzle -->
-	<image id="completion_graphic" style="visibility: hidden;"/>
+	<image id="completionGraphic" style="visibility: hidden;"/>
 	
 	<table>
 		<tr>
