@@ -158,6 +158,39 @@ typoglyph.puzzle.Puzzle = function(sentence, options, gaps) {
 	}
 }
 
+/**
+ * @param {String} json
+ * @return {Array<Puzzle>}
+ */
+typoglyph.puzzle.Puzzle.fromJsonArray = function(json) {
+	var jsonPuzzles = JSON.parse(json);
+	var puzzles = [];
+	for (var i = 0; i < jsonPuzzles.length; i++) {
+		var jsonPuzzle = jsonPuzzles[i];
+		var jsonGaps = jsonPuzzle.gaps;
+		var jsonOptions = jsonPuzzle.options;
+		var gaps = [];
+		var options = [];
+		for (var j = 0; j < jsonGaps.length; j++) {
+			var jsonGap = jsonGaps[j];
+			var solution = (jsonGap.solution === null) ? null : new typoglyph.puzzle.Option(jsonGap.solution.value);
+			var gap = new typoglyph.puzzle.Gap(jsonGap.position, solution);
+			if (jsonGap.currentChoice !== null) {
+				gap.setCurrentChoice(new typoglyph.puzzle.Option(jsonGap.currentChoice.value));
+			}
+			gaps.push(gap);
+		}
+		for (var j = 0; j < jsonOptions.length; j++) {
+			var jsonOption = jsonOptions[j];
+			var option = new typoglyph.puzzle.Option(jsonOption.value);
+			options.push(option);
+		}
+		var puzzle = new typoglyph.puzzle.Puzzle(jsonPuzzle.sentence, options, gaps);
+		puzzles.push(puzzle);
+	}
+	return puzzles;
+}
+
 
 /**
  * @param {int} position

@@ -33,11 +33,19 @@
 	 * Called when the browser has finished (re)loading the document
 	 */
 	function onLoad() {
+		/**
+		 * @param {Array<Puzzle>} puzzles
+		 */
+		function onPuzzlesLoaded(puzzles) {
+			console.log("onLoad.onPuzzlesLoaded: " + puzzles);
+			puzzleSet = puzzles;
+			currentPuzzleIndex = 0;
+			renderCurrentPuzzle();
+			renderStatistics();
+		}
+		
 		console.log("onLoad");
-		puzzleSet = createTestPuzzles(3);
-		currentPuzzleIndex = 0;
-		renderCurrentPuzzle();
-		renderStatistics();
+		fetchPuzzlesFromBackend(3, true, onPuzzlesLoaded);
 	}
 	
 	/**
@@ -222,57 +230,28 @@
 	
 	
 	/**
-	 * This function generates puzzles straight from the browser, without needing to call the
-	 * backend. Once the backend has been updated to use the new puzzle data structure, this
-	 * function will be removed and any code calling it will need to be updated to use the updated
-	 * backend functionallity.
+	 * Fetches the specified number of puzzles from the backend, and then passes them to a
+	 * specified callback function. Puzzles can be fetched asynchronously if required.
 	 * 
-	 * @param {int} count How many test puzzles to create. Note that a maximum of 3 puzzles will be
-	 *     returned.
-	 * @return {Array<Puzzle>}
+	 * @param {int} count How many puzzles to fetch. Note that the number of fetched puzzles could
+	 *     be smaller if there aren't that many unique puzzles available.
+	 * @param {boolean} async True if you want the puzzles should be fetched asynchronously. Note:
+	 *     Specifying false means this function will not return until after the specified callback
+	 *     function has been called and has returned.
+	 * @param {function(Array<Puzzle>)} The function which will be called when the puzzles have
+	 *     finished being loaded.
 	 */
-	function createTestPuzzles(count) {
-		var sentences = [
-			"Hello world",
-			"This is a test sentence Can you work out which punctuation to use",
-			"Hello my name is Jake How are you today" ];
-		var options = [
-			new Option("."), new Option(","), new Option(";"), new Option("#"), new Option("!"), new Option("?") ];
-		
-		var gaps = [
-			[ new Gap(11, new Option("!")) ],
-			[ new Gap(23, new Option(".")), new Gap(65, new Option("?")) ],
-			[ new Gap(5, new Option(",")), new Gap(21, new Option(".")), new Gap(39, new Option("?")) ] ];
-		
-		var puzzles = [];
-		for (var i = 0; i < Math.min(sentences.length, count); i++) {
-			var puzzle = new Puzzle(sentences[i], options, gaps[i]);
-			fillMissingGaps(puzzle);
-			puzzles.push(puzzle);
-		}
-		
-		for (var i = 0; i < puzzles.length; i++) {
-			console.log("    " + puzzles[i]);
-		}
-		return puzzles;
-	}
-	
-	/**
-	 * Adds a gap with a null solution just before every space in the sentence, assuming no gap has
-	 * already been added in that position.
-	 * 
-	 * @param {Puzzle} puzzle
-	 */
-	function fillMissingGaps(puzzle) {
-		var sentence = puzzle.getSentence();
-		for (var i = 0; i <= sentence.length; i++) {
-			if (sentence.charAt(i) === ' ' || i === sentence.length) {
-				if (puzzle.getGapAtPosition(i) === null) {
-					// Puzzle doesn't yet have a gap in this position
-					puzzle.getGaps().push(new Gap(i, null));
-				}
+	function fetchPuzzlesFromBackend(count, async, callback) {
+		var req = new XMLHttpRequest();
+		req.onreadystatechange = function() {
+			if (req.readyState === 4 && req.status === 200) {
+				var resp = req.responseText;
+				var puzzles = Puzzle.fromJsonArray(resp);
+				callback(puzzles);
 			}
-		}
+		};
+		req.open("GET", "backend/getRandomPuzzles.php?count=" + count, async);
+		req.send();
 	}
 	
 	
