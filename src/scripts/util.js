@@ -107,6 +107,16 @@ typoglyph.util.setImageRotation = function(e, rotation) {
 }
 
 /**
+/**
+ * @param {HTMLElement} e The element whose children should be removed
+ */
+typoglyph.util.removeAllChildren = function(e) {
+	var node;
+	while (node = e.firstChild)
+		e.removeChild(node);
+}
+
+/**
  * Adapted from http://stackoverflow.com/questions/979975/how-to-get-the-value-from-the-url-parameter
  *
  * @param {String} parameterName
