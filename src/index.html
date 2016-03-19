@@ -53,18 +53,17 @@
 	}
 	
 	/**
-	 * @param {MouseEvent} event Information about the click event
-	 * @param {HTMLElement} element The DOM element representing the button which was clicked
+	 * @param {MouseEvent} event Information about the event which completed the puzzle
+	 * @param {Puzzle} puzzle
+	 * @param {boolean} correct
 	 */
-	function onNextPuzzleButtonClicked(event, element) {
-		console.log("onNextPuzzleButtonClicked: event=" + event + ", element=" + element);
+	function onPuzzleComplete(event, puzzle, correct) {
+		console.log("onPuzzleComplete: event=" + event + ", puzzle=" + puzzle + ", correct=" + correct);
 		
-		var puzzle = _puzzleSet[_currentPuzzleIndex];
 		var stats = _statistics;
 		var completionGraphic = _completionGraphic;
-		var isAnsweredCorrectly = isPuzzleFilledCorrectly(puzzle);
 		
-		stats.onPuzzleAnswered(puzzle, isAnsweredCorrectly);
+		stats.onPuzzleAnswered(puzzle, correct);
 		_currentPuzzleIndex++;
 		
 		// Cancel any currently visible graphic
@@ -72,7 +71,7 @@
 		completionGraphic.onPreStart = function(e) {
 			console.log("completionGraphic.onPreStart: e=" + e);
 			
-			fetchCompletionGraphics(isAnsweredCorrectly, false, function(graphics) {
+			fetchCompletionGraphics(correct, false, function(graphics) {
 				e.src = util.randomElement(graphics);
 			});
 			util.setImageRotation(e, util.randomInt(-50, 50));
@@ -107,62 +106,6 @@
 		}
 	}
 	
-	/**
-	 * @param {DragEvent} event Information about the drag event
-	 * @param {HTMLElement} element The DOM element representing the option which was dragged
-	 * @param {int} optionId The ID of the option which was dragged, in the context of the
-	 *     currently shown puzzle
-	 */
-	function onStartDraggingOption(event, element, optionId) {
-		console.log("onStartDraggingOption: event=" + event + ", element=" + element + ", optionId=" + optionId);
-		event.dataTransfer.setData("optionId", optionId);
-	}
-	
-	/**
-	 * @param {DragEvent} event Information about the drag event
-	 * @param {HTMLElement} element The DOM element representing the gap you're dragging something
-	 *     over
-	 * @param {int} gapId The ID of the gap which is being gragged over, in the context of the
-	 *     currently shown puzzle
-	 */
-	function onDragOverGap(event, element, gapId) {
-		var optionId = event.dataTransfer.getData("optionId");
-		console.log("onDragOverGap: event=" + event + ", element=" + element + ", optionId=" + optionId + ", gapId=" + gapId);
-		
-		if (optionId !== null) {
-			optionId = parseInt(optionId);
-			
-			// The element being dragged is an option
-			// Prevent the default behaviour to allow it to be dropped here
-			event.preventDefault();
-		}
-	}
-	
-	/**
-	 * @param {DragEvent} event Information about the drag event
-	 * @param {HTMLElement} element The DOM element representing the gap you dropped something onto
-	 * @param {int} gapId The ID of the gap which is being dropped onto, in the context of the
-	 *     currently shown puzzle
-	 */
-	function onDropOntoGap(event, element, gapId) {
-		var optionId = event.dataTransfer.getData("optionId");
-		console.log("onDropOntoGap: event=" + event + ", element=" + element + ", optionId=" + optionId + ", gapId=" + gapId);
-		
-		if (optionId !== null) {
-			optionId = parseInt(optionId, 10);
-			
-			// The element being dragged is an option
-			// Prevent the default behaviour to allow it to be dropped here
-			event.preventDefault();
-			
-			var puzzle = _puzzleSet[_currentPuzzleIndex];
-			var option = puzzle.getOptionById(optionId);
-			var gap = puzzle.getGapById(gapId);
-			gap.setCurrentChoice(option);
-			renderCurrentPuzzle();
-		}
-	}
-	
 	
 	// Rendering functions
 	/**
@@ -177,87 +120,13 @@
 	 * 
 	 */
 	function renderCurrentPuzzle() {
-		var puzzle = _puzzleSet[_currentPuzzleIndex];
-		var sentenceElement = document.getElementById("puzzleSentence");
-		var optionsElement = document.getElementById("puzzleOptions");
-		util.removeAllChildren(sentenceElement);
-		util.removeAllChildren(optionsElement);
-		sentenceElement.appendChild(renderPuzzle(puzzle));
-		optionsElement.appendChild(renderPuzzleOptions(puzzle));
-	}
-	
-	/**
-	 * @param {Puzzle} puzzle
-	 * @return {HTMLElement}
-	 */
-	function renderPuzzle(puzzle) {
-		var e = document.createElement("span");
-		var sentence = puzzle.getSentence();
-		var gaps = puzzle.getGaps();
-		for (var i = 0; i < sentence.length + 1; i++) {
-			// see if there is a gap which is supposed to go in this position
-			var gap = puzzle.getGapAtPosition(i);
-			if (gap !== null) {
-				e.appendChild(renderPuzzleGap(gap));
-			}
-			e.appendChild(document.createTextNode(sentence.charAt(i)));
-		}
-		return e;
-	}
-	
-	/**
-	 * @param {Gap} gap
-	 * @return {HTMLElement}
-	 */
-	function renderPuzzleGap(gap) {
-		var id = gap.getId();
-		var e = document.createElement("span");
-		e.className = "blankSpace";
-		e.addEventListener("drop", function(event) { onDropOntoGap(event, event.target, id); });
-		e.ondragover = function(event) { onDragOverGap(event, event.target, id); };
-		
-		var option = gap.getCurrentChoice();
-		if (option !== null)
-			e.appendChild(renderPuzzleOption(option));
-		
-		return e;
-	}
-	
-	/**
-	 * @param {Puzzle} puzzle
-	 * @return {HTMLElement}
-	 */
-	function renderPuzzleOptions(puzzle) {
-		var e = document.createElement("span");
-		var options = puzzle.getOptions();
-		for (var i = 0; i < options.length; i++) {
-			var option = renderPuzzleOption(options[i]);
-			e.appendChild(option);
-		}
-		return e;
-	}
-	
-	/**
-	 * @param {Option} option
-	 * @return {HTMLElement}
-	 */
-	function renderPuzzleOption(option) {
-		var id = option.getId();
-		var e = document.createElement("span");
-		e.className = "draggableOption";
-		e.draggable = true;
-		e.innerHTML = option.getValue();
-		e.addEventListener("dragstart", function(event) { console.log("dragstart"); onStartDraggingOption(event, event.target, id); });
-		return e;
-	}
-	
-	
-	/**
-	 * @param {Puzzle} puzzle
-	 * @return {boolean}
-	 */
-	function isPuzzleFilledCorrectly(puzzle) {
-		return puzzle.areAllGapsFilledCorrectly();
+		var frame = document.getElementById("main");
+		util.addOneOffEventListener(frame, "load", function(event) {
+			var currentPuzzle = _puzzleSet[_currentPuzzleIndex];
+			event.target.contentWindow.setOnPuzzleCompleteListener(onPuzzleComplete);
+			event.target.contentWindow.showPuzzle(currentPuzzle);
+		});
+		frame.src = "puzzle.html";
 	}
 	
 	
@@ -314,18 +183,9 @@
 	<image id="completionGraphic" style="visibility: hidden;"/>
 	<progress id="progressBar" value="0"></progress>
 	
+	<iframe id="main" frameborder="0" scrolling="no" seamless="seamless" style="width:100%;"></iframe>
+	
 	<table>
-		<tr>
-			<td>Options:</td>
-			<td id="puzzleOptions"></td>
-		</tr>
-		<tr>
-			<td>Sentence:</td>
-			<td id="puzzleSentence"></td>
-		</tr>
-		<tr>
-			<td><button id="nextPuzzle" class="button" onclick="onNextPuzzleButtonClicked(event, this);">Check answer | Next puzzle</button></td>
-		</tr>
 		<tr>
 			<td><a href="rawData.html">View raw data</a></td>
 			<td><a href="info.php">View PHP info</a></td>

@@ -107,6 +107,17 @@ typoglyph.util.setImageRotation = function(e, rotation) {
 }
 
 /**
+ * @param {HTMLElement} e
+ * @param {String} type
+ * @param {function(Event, HTMLElement)} listener
+ */
+typoglyph.util.addOneOffEventListener = function(e, type, listener) {
+	e.addEventListener(type, function(event) {
+		event.target.removeEventListener(event.type, arguments.callee);
+		listener(event, event.target);
+	});
+}
+
 /**
  * @param {HTMLElement} e The element whose children should be removed
  */
