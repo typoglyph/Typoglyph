@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+	<meta content="utf-8" http-equiv="encoding">
+	
+	<link rel="stylesheet" type="text/css" href="styles/common.css">
+	<link rel="stylesheet" type="text/css" href="styles/index.css">
+	
+	<script type="text/javascript" src="scripts/util.js"></script>
+	<script>
+	
+	
+	// Imports
+	var util = typoglyph.util;
+	
+	
+	// Global variables
+	var _currentPuzzle = null;
+	var _onPuzzleCompleteListener = null;
+	
+	
+	// Visible to other pages (when this page is embeded inside another)
+	/**
+	 * @param {boolean} result
+	 */
+	function showResult(result) {
+		var resultElement = renderResult(result);
+		document.getElementById("result").appendChild(resultElement);
+	}
+	
+	
+	// Event handlers
+	/**
+	 * Called when the browser has finished (re)loading the document
+	 */
+	function onLoad() {
+		console.log("onLoad");
+	}
+	
+	
+	// Rendering functions
+	/**
+	 * @param {boolean} result
+	 * @return {HTMLElement}
+	 */
+	function renderResult(result) {
+		return document.createTextNode(result ? "Correct!" : "Incorrect!");
+	}
+	</script>
+</head>
+<body onload="onLoad();">
+	<h2 id="result"></h2>
+</body>
+</html>

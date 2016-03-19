@@ -92,18 +92,23 @@
 		// Show the completion graphic
 		completionGraphic.start();
 		
-		// Move on to the next puzzle
-		if (_currentPuzzleIndex < _puzzleSet.length) {
-			// Not all puzzles have yet been completed
-			renderStatistics();
-			renderCurrentPuzzle();
-		} else {
-			// All puzzles have been completed
-			// Load the results page
-			var correct = stats.getCorrectlyAnsweredPuzzlesCount();
-			var total = stats.getAnsweredPuzzlesCount();
-			window.location.href = "results.html?correct=" + correct + "&total=" + total;
-		}
+		renderPuzzleResult(correct);
+		setTimeout(
+			function() {
+				// Move on to the next puzzle
+				if (_currentPuzzleIndex < _puzzleSet.length) {
+					// Not all puzzles have yet been completed
+					renderStatistics();
+					renderCurrentPuzzle();
+				} else {
+					// All puzzles have been completed
+					// Load the results page
+					var correct = stats.getCorrectlyAnsweredPuzzlesCount();
+					var total = stats.getAnsweredPuzzlesCount();
+					window.location.href = "results.html?correct=" + correct + "&total=" + total;
+				}
+			},
+			2000);
 	}
 	
 	
@@ -127,6 +132,17 @@
 			event.target.contentWindow.showPuzzle(currentPuzzle);
 		});
 		frame.src = "puzzle.html";
+	}
+	
+	/**
+	 * @param {boolean} result
+	 */
+	function renderPuzzleResult(result) {
+		var frame = document.getElementById("main");
+		util.addOneOffEventListener(frame, "load", function(event) {
+			event.target.contentWindow.showResult(result);
+		});
+		frame.src = "completion.html";
 	}
 	
 	
