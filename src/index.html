@@ -18,19 +18,17 @@
 	
 	
 	// Imports
-	var util	= typoglyph.util;
-	var Gap		= typoglyph.puzzle.Gap;
-	var Option	= typoglyph.puzzle.Option;
-	var Puzzle	= typoglyph.puzzle.Puzzle;
-	var Animation			= typoglyph.anim.Animation;
-	var StatisticsTracker	= typoglyph.StatisticsTracker;
+	var util = typoglyph.util;
+	var Puzzle = typoglyph.puzzle.Puzzle;
+	var Animation = typoglyph.anim.Animation;
+	var StatisticsTracker = typoglyph.StatisticsTracker;
 	
 	
 	// Global variables
-	var puzzleSet = null;
-	var currentPuzzleIndex = null;
-	var statistics = new StatisticsTracker();
-	var completionGraphic = null;
+	var _puzzleSet = null;
+	var _currentPuzzleIndex = null;
+	var _statistics = new StatisticsTracker();
+	var _completionGraphic = null;
 	
 	
 	// Event handlers
@@ -43,15 +41,15 @@
 		 */
 		function onPuzzlesLoaded(puzzles) {
 			console.log("onLoad.onPuzzlesLoaded: " + puzzles);
-			puzzleSet = puzzles;
-			currentPuzzleIndex = 0;
+			_puzzleSet = puzzles;
+			_currentPuzzleIndex = 0;
 			renderCurrentPuzzle();
 			renderStatistics();
 		}
 		
 		console.log("onLoad");
 		fetchPuzzlesFromBackend(5, true, onPuzzlesLoaded);
-		completionGraphic = new Animation(document.getElementById("completionGraphic"), 1000);
+		_completionGraphic = new Animation(document.getElementById("completionGraphic"), 1000);
 	}
 	
 	/**
@@ -61,12 +59,13 @@
 	function onNextPuzzleButtonClicked(event, element) {
 		console.log("onNextPuzzleButtonClicked: event=" + event + ", element=" + element);
 		
-		var puzzle = puzzleSet[currentPuzzleIndex];
-		var stats = statistics;
+		var puzzle = _puzzleSet[_currentPuzzleIndex];
+		var stats = _statistics;
+		var completionGraphic = _completionGraphic;
 		var isAnsweredCorrectly = isPuzzleFilledCorrectly(puzzle);
 		
 		stats.onPuzzleAnswered(puzzle, isAnsweredCorrectly);
-		currentPuzzleIndex++;
+		_currentPuzzleIndex++;
 		
 		// Cancel any currently visible graphic
 		completionGraphic.cancel();
@@ -95,7 +94,7 @@
 		completionGraphic.start();
 		
 		// Move on to the next puzzle
-		if (currentPuzzleIndex < puzzleSet.length) {
+		if (_currentPuzzleIndex < _puzzleSet.length) {
 			// Not all puzzles have yet been completed
 			renderStatistics();
 			renderCurrentPuzzle();
@@ -156,7 +155,7 @@
 			// Prevent the default behaviour to allow it to be dropped here
 			event.preventDefault();
 			
-			var puzzle = puzzleSet[currentPuzzleIndex];
+			var puzzle = _puzzleSet[_currentPuzzleIndex];
 			var option = puzzle.getOptionById(optionId);
 			var gap = puzzle.getGapById(gapId);
 			gap.setCurrentChoice(option);
@@ -170,15 +169,15 @@
 	 * 
 	 */
 	function renderStatistics() {
-		document.getElementById("progressBar").value = currentPuzzleIndex;
-		document.getElementById("progressBar").max = puzzleSet.length;
+		document.getElementById("progressBar").value = _currentPuzzleIndex;
+		document.getElementById("progressBar").max = _puzzleSet.length;
 	}
 	
 	/**
 	 * 
 	 */
 	function renderCurrentPuzzle() {
-		var puzzle = puzzleSet[currentPuzzleIndex];
+		var puzzle = _puzzleSet[_currentPuzzleIndex];
 		var sentenceElement = document.getElementById("puzzleSentence");
 		var optionsElement = document.getElementById("puzzleOptions");
 		util.removeAllChildren(sentenceElement);
@@ -307,27 +306,6 @@
 		}
 		req.open("GET", "backend/getCompletionGraphics.php?correct_answer=" + (correct ? "true" : "false"), async);
 		req.send();
-	}
-	
-	
-	// Utility functions
-	/**
-	 * @param {HTMLElement} e
-	 * @param {String} className
-	 * @return {boolean}
-	 */
-	function isElementOfClass(e, className) {
-		var regExp = new RegExp("(^| )" + className + "($| )");
-		return e.className.match(regExp);
-	}
-	
-	/**
-	 * @param {HTMLElement} e
-	 * @param {String} className
-	 */
-	function removeClassFromElement(e, className) {
-		var regExp = new RegExp("(^| )" + className + "($| )");
-		e.className = e.className.replace(regExp, "");
 	}
 	</script>
 </head>
