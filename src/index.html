@@ -92,7 +92,7 @@
 		// Show the completion graphic
 		completionGraphic.start();
 		
-		renderPuzzleResult(correct);
+		renderPuzzleResult(puzzle, correct);
 		setTimeout(
 			function() {
 				// Move on to the next puzzle
@@ -135,12 +135,13 @@
 	}
 	
 	/**
+	 * @param {Puzzle} puzzle
 	 * @param {boolean} result
 	 */
-	function renderPuzzleResult(result) {
+	function renderPuzzleResult(puzzle, result) {
 		var frame = document.getElementById("main");
 		util.addOneOffEventListener(frame, "load", function(event) {
-			event.target.contentWindow.showResult(result);
+			event.target.contentWindow.showResult(puzzle, result);
 		});
 		frame.src = "completion.html";
 	}
