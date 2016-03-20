@@ -36,20 +36,23 @@
 	 * Called when the browser has finished (re)loading the document
 	 */
 	function onLoad() {
+		console.log("onLoad");
+		_completionGraphic = new Animation(document.getElementById("completionGraphic"), 1000);
+		startNewPuzzleSet();
+	}
+	
+	function startNewPuzzleSet() {
 		/**
 		 * @param {Array<Puzzle>} puzzles
 		 */
 		function onPuzzlesLoaded(puzzles) {
-			console.log("onLoad.onPuzzlesLoaded: " + puzzles);
+			console.log("startNewPuzzleSet.onPuzzlesLoaded: " + puzzles);
 			_puzzleSet = puzzles;
 			_currentPuzzleIndex = 0;
 			renderCurrentPuzzle();
 			renderStatistics();
 		}
-		
-		console.log("onLoad");
 		fetchPuzzlesFromBackend(5, true, onPuzzlesLoaded);
-		_completionGraphic = new Animation(document.getElementById("completionGraphic"), 1000);
 	}
 	
 	/**
@@ -105,7 +108,7 @@
 					// Load the results page
 					var correct = stats.getCorrectlyAnsweredPuzzlesCount();
 					var total = stats.getAnsweredPuzzlesCount();
-					window.location.href = "results.html?correct=" + correct + "&total=" + total;
+					renderPuzzleSetResults(correct, total);
 				}
 			},
 			2000);
@@ -144,6 +147,21 @@
 			event.target.contentWindow.showResult(puzzle, result);
 		});
 		frame.src = "completion.html";
+	}
+	
+	/**
+	 * @param {int} correct
+	 * @param {int} total
+	 */
+	function renderPuzzleSetResults(correct, total) {
+		var frame = document.getElementById("main");
+		util.addOneOffEventListener(frame, "load", function(event) {
+			event.target.contentWindow.setOnNextPuzzleSetListener(function(event) {
+				startNewPuzzleSet();
+			});
+			event.target.contentWindow.showResults(correct, total);
+		});
+		frame.src = "results.html";
 	}
 	
 	
