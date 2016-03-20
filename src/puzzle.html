@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+	<meta content="utf-8" http-equiv="encoding">
+	
+	<link rel="stylesheet" type="text/css" href="styles/common.css">
+	<link rel="stylesheet" type="text/css" href="styles/index.css">
+	
+	<script type="text/javascript" src="scripts/util.js"></script>
+	<script>
+	
+	
+	// Imports
+	var util = typoglyph.util;
+	
+	
+	// Global variables
+	var _currentPuzzle = null;
+	var _onPuzzleCompleteListener = null;
+	
+	
+	// Visible to other pages (when this page is embeded inside another)
+	function showPuzzle(puzzle) {
+		_currentPuzzle = puzzle;
+		renderCurrentPuzzle();
+		
+	}
+	
+	function setOnPuzzleCompleteListener(listener) {
+		_onPuzzleCompleteListener = listener;
+	}
+	
+	
+	// Event handlers
+	/**
+	 * Called when the browser has finished (re)loading the document
+	 */
+	function onLoad() {
+		console.log("onLoad");
+	}
+	
+	/**
+	 * @param {MouseEvent} event Information about the click event
+	 * @param {HTMLElement} element The DOM element representing the button which was clicked
+	 */
+	function onNextPuzzleButtonClicked(event, element) {
+		console.log("onNextPuzzleButtonClicked: event=" + event + ", element=" + element);
+		if (_onPuzzleCompleteListener !== null)
+			_onPuzzleCompleteListener(event, _currentPuzzle, _currentPuzzle.areAllGapsFilledCorrectly());
+	}
+	
+	/**
+	 * @param {DragEvent} event Information about the drag event
+	 * @param {HTMLElement} element The DOM element representing the option which was dragged
+	 * @param {int} optionId The ID of the option which was dragged, in the context of the
+	 *     currently shown puzzle
+	 */
+	function onStartDraggingOption(event, element, optionId) {
+		console.log("onStartDraggingOption: event=" + event + ", element=" + element + ", optionId=" + optionId);
+		event.dataTransfer.setData("optionId", optionId);
+	}
+	
+	/**
+	 * @param {DragEvent} event Information about the drag event
+	 * @param {HTMLElement} element The DOM element representing the gap you're dragging something
+	 *     over
+	 * @param {int} gapId The ID of the gap which is being gragged over, in the context of the
+	 *     currently shown puzzle
+	 */
+	function onDragOverGap(event, element, gapId) {
+		var optionId = event.dataTransfer.getData("optionId");
+		console.log("onDragOverGap: event=" + event + ", element=" + element + ", optionId=" + optionId + ", gapId=" + gapId);
+		
+		if (optionId !== null) {
+			optionId = parseInt(optionId);
+			
+			// The element being dragged is an option
+			// Prevent the default behaviour to allow it to be dropped here
+			event.preventDefault();
+		}
+	}
+	
+	/**
+	 * @param {DragEvent} event Information about the drag event
+	 * @param {HTMLElement} element The DOM element representing the gap you dropped something onto
+	 * @param {int} gapId The ID of the gap which is being dropped onto, in the context of the
+	 *     currently shown puzzle
+	 */
+	function onDropOntoGap(event, element, gapId) {
+		var optionId = event.dataTransfer.getData("optionId");
+		console.log("onDropOntoGap: event=" + event + ", element=" + element + ", optionId=" + optionId + ", gapId=" + gapId);
+		
+		if (optionId !== null) {
+			optionId = parseInt(optionId, 10);
+			
+			// The element being dragged is an option
+			// Prevent the default behaviour to allow it to be dropped here
+			event.preventDefault();
+			
+			var option = _currentPuzzle.getOptionById(optionId);
+			var gap = _currentPuzzle.getGapById(gapId);
+			gap.setCurrentChoice(option);
+			renderCurrentPuzzle();
+		}
+	}
+	
+	
+	// Rendering functions
+	/**
+	 * 
+	 */
+	function renderCurrentPuzzle() {
+		var sentenceElement = document.getElementById("puzzleSentence");
+		var optionsElement = document.getElementById("puzzleOptions");
+		util.removeAllChildren(sentenceElement);
+		util.removeAllChildren(optionsElement);
+		sentenceElement.appendChild(renderPuzzle(_currentPuzzle));
+		optionsElement.appendChild(renderPuzzleOptions(_currentPuzzle));
+	}
+	
+	/**
+	 * @param {Puzzle} puzzle
+	 * @return {HTMLElement}
+	 */
+	function renderPuzzle(puzzle) {
+		var e = document.createElement("span");
+		var sentence = puzzle.getSentence();
+		var gaps = puzzle.getGaps();
+		for (var i = 0; i < sentence.length + 1; i++) {
+			// see if there is a gap which is supposed to go in this position
+			var gap = puzzle.getGapAtPosition(i);
+			if (gap !== null) {
+				e.appendChild(renderPuzzleGap(gap));
+			}
+			e.appendChild(document.createTextNode(sentence.charAt(i)));
+		}
+		return e;
+	}
+	
+	/**
+	 * @param {Gap} gap
+	 * @return {HTMLElement}
+	 */
+	function renderPuzzleGap(gap) {
+		var id = gap.getId();
+		var e = document.createElement("span");
+		e.className = "blankSpace";
+		e.addEventListener("drop", function(event) { onDropOntoGap(event, event.target, id); });
+		e.ondragover = function(event) { onDragOverGap(event, event.target, id); };
+		
+		var option = gap.getCurrentChoice();
+		if (option !== null)
+			e.appendChild(renderPuzzleOption(option));
+		
+		return e;
+	}
+	
+	/**
+	 * @param {Puzzle} puzzle
+	 * @return {HTMLElement}
+	 */
+	function renderPuzzleOptions(puzzle) {
+		var e = document.createElement("span");
+		var options = puzzle.getOptions();
+		for (var i = 0; i < options.length; i++) {
+			var option = renderPuzzleOption(options[i]);
+			e.appendChild(option);
+		}
+		return e;
+	}
+	
+	/**
+	 * @param {Option} option
+	 * @return {HTMLElement}
+	 */
+	function renderPuzzleOption(option) {
+		var id = option.getId();
+		var e = document.createElement("span");
+		e.className = "draggableOption";
+		e.draggable = true;
+		e.innerHTML = option.getValue();
+		e.addEventListener("dragstart", function(event) { onStartDraggingOption(event, event.target, id); });
+		return e;
+	}
+	</script>
+</head>
+<body onload="onLoad();">
+	<table>
+		<tr>
+			<td>Options:</td>
+			<td id="puzzleOptions"></td>
+		</tr>
+		<tr>
+			<td>Sentence:</td>
+			<td id="puzzleSentence"></td>
+		</tr>
+		<tr>
+			<td><button id="nextPuzzle" class="button" onclick="onNextPuzzleButtonClicked(event, this);">Check answer | Next puzzle</button></td>
+		</tr>
+	</table>
+</body>
+</html>

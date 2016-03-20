@@ -33,3 +33,8 @@
 	padding:		5px;
 	pointer-events:	none; /* Allow clicking through the image */
 }
+
+#progressBar {
+	width:			100%;
+	height:			20px;
+}

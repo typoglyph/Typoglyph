@@ -4,9 +4,6 @@
 	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 	<meta content="utf-8" http-equiv="encoding">
 	
-	<title>Typoglyph</title>
-	<link rel="icon" type="image/ico" href="images/favicon.ico">
-	
 	<link rel="stylesheet" type="text/css" href="styles/common.css">
 	<link rel="stylesheet" type="text/css" href="styles/results.css">
 	
@@ -14,8 +11,26 @@
 	<script>
 	
 	
-	// Imports
-	var getQueryParameter	= typoglyph.util.getQueryParameter;
+	// Global variables
+	var _onNextPuzzleSetListener = null;
+	
+	
+	// Visible to other pages (when this page is embeded inside another)
+	/**
+	 * @param {int} correct
+	 * @param {int} total
+	 */
+	function showResults(correct, total) {
+		document.getElementById("correct").innerHTML = correct;
+		document.getElementById("total").innerHTML = total;
+	}
+	
+	/**
+	 * @param {function(TouchEvent)} listener
+	 */
+	function setOnNextPuzzleSetListener(listener) {
+		_onNextPuzzleSetListener = listener;
+	}
 	
 	
 	// Event handlers
@@ -24,12 +39,6 @@
 	 */
 	function onLoad() {
 		console.log("onLoad");
-		
-		var correct = getQueryParameter("correct");
-		var total = getQueryParameter("total");
-		
-		document.getElementById("correct").innerHTML = correct;
-		document.getElementById("total").innerHTML = total;
 	}
 	
 	/**
@@ -38,7 +47,8 @@
 	 */
 	function onNextPuzzleSetButtonClicked(event, element) {
 		console.log("onNextPuzzleSetButtonClicked: event=" + event + ", element=" + element);
-		window.location.href = "index.html";
+		if (_onNextPuzzleSetListener !== null)
+			_onNextPuzzleSetListener(event);
 	}
 	</script>
 </head>

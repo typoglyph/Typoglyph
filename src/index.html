@@ -18,19 +18,17 @@
 	
 	
 	// Imports
-	var util	= typoglyph.util;
-	var Gap		= typoglyph.puzzle.Gap;
-	var Option	= typoglyph.puzzle.Option;
-	var Puzzle	= typoglyph.puzzle.Puzzle;
-	var Animation			= typoglyph.anim.Animation;
-	var StatisticsTracker	= typoglyph.StatisticsTracker;
+	var util = typoglyph.util;
+	var Puzzle = typoglyph.puzzle.Puzzle;
+	var Animation = typoglyph.anim.Animation;
+	var StatisticsTracker = typoglyph.StatisticsTracker;
 	
 	
 	// Global variables
-	var puzzleSet = null;
-	var currentPuzzleIndex = null;
-	var statistics = new StatisticsTracker();
-	var completionGraphic = null;
+	var _puzzleSet = null;
+	var _currentPuzzleIndex = null;
+	var _statistics = new StatisticsTracker();
+	var _completionGraphic = null;
 	
 	
 	// Event handlers
@@ -38,42 +36,45 @@
 	 * Called when the browser has finished (re)loading the document
 	 */
 	function onLoad() {
+		console.log("onLoad");
+		_completionGraphic = new Animation(document.getElementById("completionGraphic"), 1000);
+		startNewPuzzleSet();
+	}
+	
+	function startNewPuzzleSet() {
 		/**
 		 * @param {Array<Puzzle>} puzzles
 		 */
 		function onPuzzlesLoaded(puzzles) {
-			console.log("onLoad.onPuzzlesLoaded: " + puzzles);
-			puzzleSet = puzzles;
-			currentPuzzleIndex = 0;
+			console.log("startNewPuzzleSet.onPuzzlesLoaded: " + puzzles);
+			_puzzleSet = puzzles;
+			_currentPuzzleIndex = 0;
 			renderCurrentPuzzle();
 			renderStatistics();
 		}
-		
-		console.log("onLoad");
 		fetchPuzzlesFromBackend(5, true, onPuzzlesLoaded);
-		completionGraphic = new Animation(document.getElementById("completionGraphic"), 1000);
 	}
 	
 	/**
-	 * @param {MouseEvent} event Information about the click event
-	 * @param {HTMLElement} element The DOM element representing the button which was clicked
+	 * @param {MouseEvent} event Information about the event which completed the puzzle
+	 * @param {Puzzle} puzzle
+	 * @param {boolean} correct
 	 */
-	function onNextPuzzleButtonClicked(event, element) {
-		console.log("onNextPuzzleButtonClicked: event=" + event + ", element=" + element);
+	function onPuzzleComplete(event, puzzle, correct) {
+		console.log("onPuzzleComplete: event=" + event + ", puzzle=" + puzzle + ", correct=" + correct);
 		
-		var puzzle = puzzleSet[currentPuzzleIndex];
-		var stats = statistics;
-		var isAnsweredCorrectly = isPuzzleFilledCorrectly(puzzle);
+		var stats = _statistics;
+		var completionGraphic = _completionGraphic;
 		
-		stats.onPuzzleAnswered(puzzle, isAnsweredCorrectly);
-		currentPuzzleIndex++;
+		stats.onPuzzleAnswered(puzzle, correct);
+		_currentPuzzleIndex++;
 		
 		// Cancel any currently visible graphic
 		completionGraphic.cancel();
 		completionGraphic.onPreStart = function(e) {
 			console.log("completionGraphic.onPreStart: e=" + e);
 			
-			fetchCompletionGraphics(isAnsweredCorrectly, false, function(graphics) {
+			fetchCompletionGraphics(correct, false, function(graphics) {
 				e.src = util.randomElement(graphics);
 			});
 			util.setImageRotation(e, util.randomInt(-50, 50));
@@ -94,74 +95,23 @@
 		// Show the completion graphic
 		completionGraphic.start();
 		
-		// Move on to the next puzzle
-		if (currentPuzzleIndex < puzzleSet.length) {
-			// Not all puzzles have yet been completed
-			renderStatistics();
-			renderCurrentPuzzle();
-		} else {
-			// All puzzles have been completed
-			// Load the results page
-			var correct = stats.getCorrectlyAnsweredPuzzlesCount();
-			var total = stats.getAnsweredPuzzlesCount();
-			window.location.href = "results.html?correct=" + correct + "&total=" + total;
-		}
-	}
-	
-	/**
-	 * @param {DragEvent} event Information about the drag event
-	 * @param {HTMLElement} element The DOM element representing the option which was dragged
-	 * @param {int} optionId The ID of the option which was dragged, in the context of the
-	 *     currently shown puzzle
-	 */
-	function onStartDraggingOption(event, element, optionId) {
-		console.log("onStartDraggingOption: event=" + event + ", element=" + element + ", optionId=" + optionId);
-		event.dataTransfer.setData("optionId", optionId);
-	}
-	
-	/**
-	 * @param {DragEvent} event Information about the drag event
-	 * @param {HTMLElement} element The DOM element representing the gap you're dragging something
-	 *     over
-	 * @param {int} gapId The ID of the gap which is being gragged over, in the context of the
-	 *     currently shown puzzle
-	 */
-	function onDragOverGap(event, element, gapId) {
-		var optionId = event.dataTransfer.getData("optionId");
-		console.log("onDragOverGap: event=" + event + ", element=" + element + ", optionId=" + optionId + ", gapId=" + gapId);
-		
-		if (optionId !== null) {
-			optionId = parseInt(optionId);
-			
-			// The element being dragged is an option
-			// Prevent the default behaviour to allow it to be dropped here
-			event.preventDefault();
-		}
-	}
-	
-	/**
-	 * @param {DragEvent} event Information about the drag event
-	 * @param {HTMLElement} element The DOM element representing the gap you dropped something onto
-	 * @param {int} gapId The ID of the gap which is being dropped onto, in the context of the
-	 *     currently shown puzzle
-	 */
-	function onDropOntoGap(event, element, gapId) {
-		var optionId = event.dataTransfer.getData("optionId");
-		console.log("onDropOntoGap: event=" + event + ", element=" + element + ", optionId=" + optionId + ", gapId=" + gapId);
-		
-		if (optionId !== null) {
-			optionId = parseInt(optionId, 10);
-			
-			// The element being dragged is an option
-			// Prevent the default behaviour to allow it to be dropped here
-			event.preventDefault();
-			
-			var puzzle = puzzleSet[currentPuzzleIndex];
-			var option = puzzle.getOptionById(optionId);
-			var gap = puzzle.getGapById(gapId);
-			gap.setCurrentChoice(option);
-			renderCurrentPuzzle();
-		}
+		renderPuzzleResult(puzzle, correct);
+		setTimeout(
+			function() {
+				// Move on to the next puzzle
+				if (_currentPuzzleIndex < _puzzleSet.length) {
+					// Not all puzzles have yet been completed
+					renderStatistics();
+					renderCurrentPuzzle();
+				} else {
+					// All puzzles have been completed
+					// Load the results page
+					var correct = stats.getCorrectlyAnsweredPuzzlesCount();
+					var total = stats.getAnsweredPuzzlesCount();
+					renderPuzzleSetResults(correct, total);
+				}
+			},
+			2000);
 	}
 	
 	
@@ -170,97 +120,48 @@
 	 * 
 	 */
 	function renderStatistics() {
-		var stats = statistics;
-		var latestAnswer = stats.wasLatestAnswerCorrect();
-		document.getElementById("answer").innerHTML = (latestAnswer == null) ? "N/A" : (latestAnswer ? "Correct" : "Incorrect");
-		document.getElementById("correctAnswers").innerHTML = stats.getCorrectlyAnsweredPuzzlesCount();
-		document.getElementById("totalAnswers").innerHTML = stats.getAnsweredPuzzlesCount();
-		
-		document.getElementById("puzzleNumber").innerHTML = (currentPuzzleIndex + 1);
-		document.getElementById("totalPuzzles").innerHTML = puzzleSet.length;
+		document.getElementById("progressBar").value = _currentPuzzleIndex;
+		document.getElementById("progressBar").max = _puzzleSet.length;
 	}
 	
 	/**
 	 * 
 	 */
 	function renderCurrentPuzzle() {
-		var puzzle = puzzleSet[currentPuzzleIndex];
-		document.getElementById("sentence").innerHTML = renderPuzzleHtml(puzzle);
-		document.getElementById("options").innerHTML = renderPuzzleOptionsHtml(puzzle);
+		var frame = document.getElementById("main");
+		util.addOneOffEventListener(frame, "load", function(event) {
+			var currentPuzzle = _puzzleSet[_currentPuzzleIndex];
+			event.target.contentWindow.setOnPuzzleCompleteListener(onPuzzleComplete);
+			event.target.contentWindow.showPuzzle(currentPuzzle);
+		});
+		frame.src = "puzzle.html";
 	}
 	
 	/**
 	 * @param {Puzzle} puzzle
-	 * @return {String}
+	 * @param {boolean} result
 	 */
-	function renderPuzzleHtml(puzzle) {
-		var html = "";
-		var sentence = puzzle.getSentence();
-		var gaps = puzzle.getGaps();
-		for (var i = 0; i < sentence.length + 1; i++) {
-			// see if there is a gap which is supposed to go in this position
-			var gap = puzzle.getGapAtPosition(i);
-			if (gap !== null) {
-				html += renderPuzzleGapHtml(gap);
-			}
-			
-			html += sentence.charAt(i);
-		}
-		return html;
+	function renderPuzzleResult(puzzle, result) {
+		var frame = document.getElementById("main");
+		util.addOneOffEventListener(frame, "load", function(event) {
+			event.target.contentWindow.showResult(puzzle, result);
+		});
+		frame.src = "completion.html";
 	}
 	
 	/**
-	 * @param {Gap} gap
-	 * @return {String}
+	 * @param {int} correct
+	 * @param {int} total
 	 */
-	function renderPuzzleGapHtml(gap) {
-		var html = "";
-		var ondrop = "onDropOntoGap(event, this, " + gap.getId() + ");";
-		var ondragover = "onDragOverGap(event, this, " + gap.getId() + ");";
-		html += "<span class='blankSpace' ondrop='" + ondrop + "' ondragover='" + ondragover + "'>";
-		
-		var option = gap.getCurrentChoice();
-		if (option !== null)
-			html += renderPuzzleOptionHtml(option);
-		
-		html += "</span>";
-		return html;
-	}
-	
-	/**
-	 * @param {Puzzle} puzzle
-	 * @return {String}
-	 */
-	function renderPuzzleOptionsHtml(puzzle) {
-		var html = "";
-		var options = puzzle.getOptions();
-		for (var i = 0; i < options.length; i++) {
-			var option = options[i];
-			html += renderPuzzleOptionHtml(option);
-		}
-		return html;
-	}
-	
-	/**
-	 * @param {Option} option
-	 * @return {String}
-	 */
-	function renderPuzzleOptionHtml(option) {
-		var html = "";
-		var ondragstart = "onStartDraggingOption(event, this, " + option.getId() + ");";
-		html += "<span class='draggableOption' draggable='true' ondragstart='" + ondragstart + "'>";
-		html += option.getValue();
-		html += "</span>";
-		return html;
-	}
-	
-	
-	/**
-	 * @param {Puzzle} puzzle
-	 * @return {boolean}
-	 */
-	function isPuzzleFilledCorrectly(puzzle) {
-		return puzzle.areAllGapsFilledCorrectly();
+	function renderPuzzleSetResults(correct, total) {
+		var frame = document.getElementById("main");
+		util.addOneOffEventListener(frame, "load", function(event) {
+			event.target.contentWindow.setOnNextPuzzleSetListener(function(event) {
+				startNewPuzzleSet();
+			});
+			event.target.contentWindow.showResults(correct, total);
+		});
+		frame.src = "results.html";
 	}
 	
 	
@@ -310,57 +211,16 @@
 		req.open("GET", "backend/getCompletionGraphics.php?correct_answer=" + (correct ? "true" : "false"), async);
 		req.send();
 	}
-	
-	
-	// Utility functions
-	/**
-	 * @param {HTMLElement} e
-	 * @param {String} className
-	 * @return {boolean}
-	 */
-	function isElementOfClass(e, className) {
-		var regExp = new RegExp("(^| )" + className + "($| )");
-		return e.className.match(regExp);
-	}
-	
-	/**
-	 * @param {HTMLElement} e
-	 * @param {String} className
-	 */
-	function removeClassFromElement(e, className) {
-		var regExp = new RegExp("(^| )" + className + "($| )");
-		e.className = e.className.replace(regExp, "");
-	}
 	</script>
 </head>
 <body onload="onLoad();">
 	<!-- starts hidden, but will be shown briefly after user finishes each puzzle -->
 	<image id="completionGraphic" style="visibility: hidden;"/>
+	<progress id="progressBar" value="0"></progress>
+	
+	<iframe id="main" frameborder="0" scrolling="no" seamless="seamless" style="width:100%;"></iframe>
 	
 	<table>
-		<tr>
-			<td>Previous puzzle:</td>
-			<td><span id="answer"/></td>
-		</td>
-		<tr>
-			<td>Score:</td>
-			<td><span id="correctAnswers"></span> / <span id="totalAnswers"></span></td>
-		</tr>
-		<tr>
-			<td>Puzzle:</td>
-			<td><span id="puzzleNumber"></span> / <span id="totalPuzzles"></span></td>
-		</tr>
-		<tr>
-			<td>Options:</td>
-			<td><span id="options"/></td>
-		</tr>
-		<tr>
-			<td>Sentence:</td>
-			<td><span id="sentence"/></td>
-		</tr>
-		<tr>
-			<td><button id="nextPuzzle" class="button" onclick="onNextPuzzleButtonClicked(event, this);">Check answer | Next puzzle</button></td>
-		</tr>
 		<tr>
 			<td><a href="rawData.html">View raw data</a></td>
 			<td><a href="info.php">View PHP info</a></td>
