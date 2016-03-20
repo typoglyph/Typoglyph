@@ -77,8 +77,6 @@
 		if (!gap.isFilledCorrectly()) {
 			e.className += (showAnswer) ? " correct" : "incorrect";
 		}
-		e.addEventListener("drop", function(event) { onDropOntoGap(event, event.target, id); });
-		e.ondragover = function(event) { onDragOverGap(event, event.target, id); };
 		
 		var option = (showAnswer) ? gap.getSolution() : gap.getCurrentChoice();
 		if (option !== null)
@@ -111,7 +109,6 @@
 		e.className = "draggableOption";
 		e.draggable = true;
 		e.innerHTML = option.getValue();
-		e.addEventListener("dragstart", function(event) { onStartDraggingOption(event, event.target, id); });
 		return e;
 	}
 	</script>
