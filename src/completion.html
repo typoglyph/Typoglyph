@@ -53,8 +53,7 @@
 	 */
 	function renderPuzzle(puzzle, showAnswer) {
 		var e = document.createElement("span");
-		var sentence = puzzle.getSentence();
-		var gaps = puzzle.getGaps();
+		var sentence = puzzle.sentence;
 		for (var i = 0; i < sentence.length + 1; i++) {
 			// see if there is a gap which is supposed to go in this position
 			var gap = puzzle.getGapAtPosition(i);
@@ -72,14 +71,13 @@
 	 * @return {HTMLElement}
 	 */
 	function renderPuzzleGap(gap, showAnswer) {
-		var id = gap.getId();
 		var e = document.createElement("span");
 		e.className = "blankSpace";
 		if (!gap.isFilledCorrectly()) {
 			e.className += (showAnswer) ? " correct" : "incorrect";
 		}
 		
-		var option = (showAnswer) ? gap.getSolution() : gap.getCurrentChoice();
+		var option = (showAnswer) ? gap.solution : gap.currentChoice;
 		if (option !== null)
 			e.appendChild(renderPuzzleOption(option));
 		
@@ -92,7 +90,7 @@
 	 */
 	function renderPuzzleOptions(puzzle) {
 		var e = document.createElement("span");
-		var options = puzzle.getOptions();
+		var options = puzzle.options;
 		for (var i = 0; i < options.length; i++) {
 			var option = renderPuzzleOption(options[i]);
 			e.appendChild(option);
@@ -105,11 +103,10 @@
 	 * @return {HTMLElement}
 	 */
 	function renderPuzzleOption(option) {
-		var id = option.getId();
 		var e = document.createElement("span");
 		e.className = "draggableOption";
 		e.draggable = true;
-		e.innerHTML = option.getValue();
+		e.innerHTML = option.value;
 		return e;
 	}
 	</script>

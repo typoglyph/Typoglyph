@@ -4,161 +4,118 @@ if (typeof typoglyph.puzzle == 'undefined') typoglyph.puzzle = {};
 
 
 /**
- * @param {String} sentence
- * @param {Array<Option>} options
- * @param {Array<Gap>} gaps
- * @constructor
+ * The process of solving a puzzle consists of populating its gaps with options. A puzzle is solved
+ * correctly when all of its gaps contain the correct option.
+ * 
  * @author jakemarsden
  */
-typoglyph.puzzle.Puzzle = function(sentence, options, gaps) {
-	/** @private */ var _sentence = sentence;
-	/** @private */ var _options = options;
-	/** @private */ var _gaps = gaps
+typoglyph.puzzle.Puzzle = {
+	/**
+	 * @param {String} sentence The main part of a puzzle
+	 * @param {Array<Option>} options The values which can be used to populate the puzzle's gaps
+	 *     (each option can be used zero or more times)
+	 * @param {Array<Gap>} gaps Represents the places in the sentence where an option can be
+	 *     inserted
+	 * @constructor
+	 */
+	create: function(sentence, options, gaps) {
+		var self = this.extend({
+			sentence: sentence,
+			options: options,
+			gaps: gaps
+		});
+		return self;
+	},
 	
 	/**
-	 * @return {String}
+	 * @param {int} id
+	 * @return {Option} The option of this puzzle which has the specified ID, or null if the puzzle
+	 *     doesn't have any options with that ID
 	 */
-	this.getSentence = function() {
-		return _sentence;
-	}
-	
-	/**
-	 * @return {Array<Option>}
-	 */
-	this.getOptions = function() {
-		return _options;
-	}
-	
-	/**
-	 * @param {int} optionId
-	 * @return {Option}
-	 */
-	this.getOptionById = function(optionId) {
-		var options = _options;
-		for (var i = 0; i < options.length; i++) {
-			var option = options[i];
-			if (option.getId() === optionId)
-				return option;
+	getOptionById: function(id) {
+		for (var i = 0; i < this.options.length; i++) {
+			if (this.options[i].id === id) {
+				return this.options[i];
+			}
 		}
 		return null;
-	}
-	
+	},
 	/**
-	 * @return {Array<Gap>}
+	 * @param {int} id
+	 * @return {Gap} The gap of this puzzle which has the specified ID, or null if the puzzle
+	 *     doesn't have any gaps with that ID
 	 */
-	this.getGaps = function() {
-		return _gaps;
-	}
-	
-	/**
-	 * @param {int} gapId
-	 * @return {Gap}
-	 */
-	this.getGapById = function(gapId) {
-		var gaps = _gaps;
-		for (var i = 0; i < gaps.length; i++) {
-			var gap = gaps[i];
-			if (gap.getId() === gapId)
-				return gap;
+	getGapById: function(id) {
+		for (var i = 0; i < this.gaps.length; i++) {
+			if (this.gaps[i].id === id) {
+				return this.gaps[i];
+			}
 		}
 		return null;
-	}
-	
+	},
 	/**
 	 * @param {int} position
-	 * @reutrn {Gap}
+	 * @return {Gap} The gap of this puzzle which has the specified position, or null if the puzzle
+	 *     doesn't have any gaps at that position
 	 */
-	this.getGapAtPosition = function(position) {
-		var gaps = _gaps;
-		for (var i = 0; i < gaps.length; i++) {
-			var gap = gaps[i];
-			if (gap.getPosition() === position)
-				return gap;
+	getGapAtPosition: function(position) {
+		for (var i = 0; i < this.gaps.length; i++) {
+			if (this.gaps[i].position === position) {
+				return this.gaps[i];
+			}
 		}
 		return null;
-	}
+	},
 	
 	/**
 	 * @return {boolean}
 	 */
-	this.areAllGapsFilled = function() {
-		var gaps = _gaps;
-		for (var i = 0; i < gaps.length; i++) {
-			if (!gaps[i].isFilled()) {
+	areAllGapsFilled: function() {
+		for (var i = 0; i < this.gaps.length; i++) {
+			if (!this.gaps[i].isFilled()) {
 				return false;
 			}
 		}
 		return true;
-	}
-	
+	},
 	/**
 	 * @return {boolean}
 	 */
-	this.areAllGapsFilledCorrectly = function() {
-		var gaps = _gaps;
-		for (var i = 0; i < gaps.length; i++) {
-			if (!gaps[i].isFilledCorrectly()) {
+	areAllGapsFilledCorrectly: function() {
+		for (var i = 0; i < this.gaps.length; i++) {
+			if (!this.gaps[i].isFilledCorrectly()) {
 				return false;
 			}
 		}
 		return true;
-	}
+	},
 	
 	/**
 	 * @return {String}
 	 */
-	this.toString = function() {
+	toString: function() {
 		var str = "";
-		var sentence = _sentence;
-		var gaps = _gaps;
-		for (var i = 0; i <= sentence.length; i++) {
-			for (var j = 0; j < gaps.length; j++) {
-				// Is the gap at the current position?
-				if (gaps[j].getPosition() === i) {
-					str += gaps[j];
-					break;
-				}
+		for (var i = 0; i <= this.sentence.length; i++) {
+			var gap = this.getGapAtPosition(i);
+			if (gap !== null) {
+				str += gap;
 			}
-			str += sentence.charAt(i);
+			str += this.sentence.charAt(i);
 		}
 		return str;
-	}
-	
+	},
 	/**
-	 * @param {Puzzle} other
 	 * @return {boolean}
 	 */
-	this.equals = function(other) {
-		/**
-		 * @param {Array<?>} a
-		 * @param {Array<?>} b
-		 * @return {boolean}
-		 */
-		function arrayEquals(a, b) {
-			if (a === null || b === null)
-				return (a === b);
-			if (a.length !== b.length)
-				return false;
-			for (var i = 0; i < a.length; i++) {
-				if (a[i] === null) {
-					if (b[i] !== null) {
-						return false;
-					}
-				} else if (!a[i].equals(b[i])) {
-					return false;
-				}
-			}
-			return true;
-		}
-		
+	equals: function(other) {
 		return other !== null
-			&& _sentence === other.getSentence()
-			&& arrayEquals(_options, other.getOptions())
-			&& arrayEquals(_gaps, other.getGaps());
+			&& Objects.equals(this.sentence, other.sentence)
+			&& Objects.equals(this.options, other.options)
+			&& Objects.equals(this.gaps, other.gaps);
 	}
-}
+};
 
-/**
+/** 
  * @param {String} json
  * @return {Array<Puzzle>}
  */
@@ -173,19 +130,19 @@ typoglyph.puzzle.Puzzle.fromJsonArray = function(json) {
 		var options = [];
 		for (var j = 0; j < jsonGaps.length; j++) {
 			var jsonGap = jsonGaps[j];
-			var solution = (jsonGap.solution === null) ? null : new typoglyph.puzzle.Option(jsonGap.solution.value);
-			var gap = new typoglyph.puzzle.Gap(jsonGap.position, solution);
+			var solution = (jsonGap.solution === null) ? null : typoglyph.puzzle.Option.create(jsonGap.solution.value);
+			var gap = typoglyph.puzzle.Gap.create(jsonGap.position, solution);
 			if (jsonGap.currentChoice !== null) {
-				gap.setCurrentChoice(new typoglyph.puzzle.Option(jsonGap.currentChoice.value));
+				gap.currentChoice = typoglyph.puzzle.Option.create(jsonGap.currentChoice.value);
 			}
 			gaps.push(gap);
 		}
 		for (var j = 0; j < jsonOptions.length; j++) {
 			var jsonOption = jsonOptions[j];
-			var option = new typoglyph.puzzle.Option(jsonOption.value);
+			var option = typoglyph.puzzle.Option.create(jsonOption.value);
 			options.push(option);
 		}
-		var puzzle = new typoglyph.puzzle.Puzzle(jsonPuzzle.sentence, options, gaps);
+		var puzzle = typoglyph.puzzle.Puzzle.create(jsonPuzzle.sentence, options, gaps);
 		puzzles.push(puzzle);
 	}
 	return puzzles;
@@ -193,131 +150,95 @@ typoglyph.puzzle.Puzzle.fromJsonArray = function(json) {
 
 
 /**
- * @param {int} position
- * @param {Option} solution The option needed to make this gap considered "filled correctly", or
- *     null if the gap should be considered "filled correctly" when unfilled.
- * @constructor
+ * A gap represents a space within a puzzle's sentence which can be filled in with an option. An
+ * option is filled correctly when its solution matches the current choice.
+ * 
  * @author jakemarsden
  */
-typoglyph.puzzle.Gap = function(position, solution) {
-	/** @private */ var _id = typoglyph.puzzle.Gap._nextId++;
-	/** @private */ var _position = position;
-	/** @private */ var _solution = solution;
-	/** @private */ var _currentChoice = null;
-	
+typoglyph.puzzle.Gap = {
 	/**
-	 * @return {int}
+	 * @param {int} position Where in a puzzle this gap should lie:
+	 *     0: just before the first character of a puzzle's sentence
+	 *     1: just after the first character of a puzzle's sentence
+	 *     sentence.length: just after the last character of a puzzle's sentence
+	 * @param {Option} solution The value this gap must be filled with if it is to be considered
+	 *     "correct". If null, the gap will be correct if it hasn't been filled.
+	 * @constructor
 	 */
-	this.getId = function() {
-		return _id;
-	}
-	
-	/**
-	 * Returns where abouts this gap lies in a puzzle's sentence:
-	 *     0               = Just before the first character of the sentence
-	 *     1               = Just after the first character of the sentence
-	 *     sentence.length = Just after the last character of the sentence
-	 *
-	 * @return {int}
-	 */
-	this.getPosition = function() {
-		return _position;
-	}
-	
-	/**
-	 * @return {Option}
-	 */
-	this.getSolution = function() {
-		return _solution;
-	}
-	
-	/**
-	 * @return {Option}
-	 */
-	this.getCurrentChoice = function() {
-		return _currentChoice;
-	}
-	
-	/**
-	 * @param {Option} newChoice
-	 */
-	this.setCurrentChoice = function(newChoice) {
-		_currentChoice = newChoice;
-	}
+	create: function(position, solution) {
+		var self = this.extend({
+			id: typoglyph.puzzle.Gap.nextId++,
+			position: position,
+			solution: solution,
+			currentChoice: null
+		});
+		return self;
+	},
 	
 	/**
 	 * @return {boolean}
 	 */
-	this.isFilled = function() {
-		return (_currentChoice !== null);
-	}
-	
+	isFilled: function() {
+		return this.currentChoice !== null;
+	},
 	/**
 	 * @return {boolean}
 	 */
-	this.isFilledCorrectly = function() {
-		return (_currentChoice === null) ? (_solution === null)
-			: _currentChoice.equals(solution);
-	}
+	isFilledCorrectly: function() {
+		return Objects.equals(this.currentChoice, this.solution);
+	},
 	
 	/**
 	 * @return {String}
 	 */
-	this.toString = function() {
-		return "{" + _solution + "}";
-	}
-	
+	toString: function() {
+		return "{" + (this.solution === null ? "" : this.solution) + "}";
+	},
 	/**
 	 * @param {Gap} other
 	 * @return {boolean}
 	 */
-	this.equals = function(other) {
+	equals: function(other) {
 		return other !== null
-			&& _position === other.getPosition()
-			&& (_solution === null) ? (other.getSolution() === null) : _solution.equals(other.getSolution())
-			&& (_currentChoice === null) ? (other.getCurrentChoice() === null) : _currentChoice.equals(other.getCurrentChoice());
+			&& Objects.equals(this.position, other.position)
+			&& Objects.equals(this.solution, other.solution)
+			&& Objects.equals(this.currentChoice, other.currentChoice);
 	}
-}
-/** @private */ typoglyph.puzzle.Gap._nextId = 0;
+};
+typoglyph.puzzle.Gap.nextId = 0;
 
 
 /**
- * @param {String} value
- * @constructor
+ * A value which can be used to populate one of the gaps of a puzzle 
+ * 
  * @author jakemarsden
  */
-typoglyph.puzzle.Option = function(value) {
-	/** @private */ var _id = typoglyph.puzzle.Option._nextId++;
-	/** @private */ var _value = value;
+typoglyph.puzzle.Option = {
+	/**
+	 * @param {String} value
+	 * @constructor
+	 */
+	create: function(value) {
+		var self = this.extend({
+			id: typoglyph.puzzle.Option.nextId++,
+			value: value
+		});
+		return self;
+	},
 	
 	/**
-	 * @return {int}
+	 * @return {String} toString
 	 */
-	this.getId = function() {
-		return _id;
-	}
-	
-	/**
-	 * @return {String}
-	 */
-	this.getValue = function() {
-		return _value;
-	}
-	
-	/**
-	 * @return {String}
-	 */
-	this.toString = function() {
-		return _value;
-	}
-	
+	toString: function() {
+		return this.value;
+	},
 	/**
 	 * @param {Option} other
 	 * @return {boolean}
 	 */
-	this.equals = function(other) {
+	equals: function(other) {
 		return other !== null
-			&& _value === other.getValue();
+			&& Objects.equals(this.value, other.value);
 	}
-}
-/** @private */ typoglyph.puzzle.Option._nextId = 0;
+};
+typoglyph.puzzle.Option.nextId = 0;
