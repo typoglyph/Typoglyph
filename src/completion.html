@@ -23,16 +23,15 @@
 	
 	// Visible to other pages (when this page is embeded inside another)
 	/**
-	 * @param {Puzzle} puzzle
-	 * @param {boolean} result
+	 * @param {StatisticsTracker} stats
 	 */
-	function showResult(puzzle, result) {
-		var resultElement = document.createTextNode(result ? "Correct!" : "Incorrect!");
+	function showResults(stats) {
+		var resultElement = document.createTextNode(stats.latestResult ? "Correct!" : "Incorrect!");
 		document.getElementById("result").appendChild(resultElement);
 		
 		var answerElement = document.getElementById("puzzleAnswer");
 		util.removeAllChildren(answerElement);
-		answerElement.appendChild(renderPuzzle(puzzle, true));
+		answerElement.appendChild(renderPuzzle(stats.getLatestAnsweredPuzzle(), true));
 	}
 	
 	
