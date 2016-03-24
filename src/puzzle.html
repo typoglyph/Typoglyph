@@ -9,25 +9,46 @@
 	
 	<script type="text/javascript" src="scripts/common.js"></script>
 	<script type="text/javascript" src="scripts/util.js"></script>
+	<script type="text/javascript" src="scripts/ui.js"></script>
 	<script>
 	
 	
 	// Imports
 	var util = typoglyph.util;
+	var PuzzleDrawer = typoglyph.ui.PuzzleDrawer;
+	var PuzzleGapDrawer = typoglyph.ui.PuzzleGapDrawer;
+	var PuzzleOptionDrawer = typoglyph.ui.PuzzleOptionDrawer;
+	var PuzzleOptionBarDrawer = typoglyph.ui.PuzzleOptionBarDrawer;
 	
 	
 	// Global variables
 	var _currentPuzzle = null;
 	var _onPuzzleCompleteListener = null;
 	
+	var _puzzleDrawer = null;
+	var _optionBarDrawer = null;
+	
 	
 	// Visible to other pages (when this page is embeded inside another)
+	/**
+	 * Displays the given puzzle for the user to start solving
+	 * 
+	 * @param {Puzzle} puzzle
+	 */
 	function showPuzzle(puzzle) {
 		_currentPuzzle = puzzle;
 		renderCurrentPuzzle();
-		
 	}
 	
+	/**
+	 * Sets up a listener which will be called when the user has completed the shown puzzle. The
+	 * listener will be given two arguments: the puzzle which was completed, and a boolean
+	 * indicating if it was solved correctly.
+	 * 
+	 * Pass null to remove the current listener.
+	 * 
+	 * @param {function(Puzzle, boolean)} listener
+	 */
 	function setOnPuzzleCompleteListener(listener) {
 		_onPuzzleCompleteListener = listener;
 	}
@@ -39,6 +60,12 @@
 	 */
 	function onLoad() {
 		console.log("onLoad");
+		
+		// DI would be nice here... oh well
+		var optionDrawer = PuzzleOptionDrawer.create();
+		var gapDrawer = PuzzleGapDrawer.create(optionDrawer, false);
+		_puzzleDrawer = PuzzleDrawer.create(gapDrawer);
+		_optionBarDrawer = PuzzleOptionBarDrawer.create(optionDrawer);
 	}
 	
 	/**
@@ -51,135 +78,21 @@
 			_onPuzzleCompleteListener(event, _currentPuzzle, _currentPuzzle.areAllGapsFilledCorrectly());
 	}
 	
-	/**
-	 * @param {DragEvent} event Information about the drag event
-	 * @param {HTMLElement} element The DOM element representing the option which was dragged
-	 * @param {int} optionId The ID of the option which was dragged, in the context of the
-	 *     currently shown puzzle
-	 */
-	function onStartDraggingOption(event, element, optionId) {
-		console.log("onStartDraggingOption: event=" + event + ", element=" + element + ", optionId=" + optionId);
-		event.dataTransfer.setData("optionId", optionId);
-	}
-	
-	/**
-	 * @param {DragEvent} event Information about the drag event
-	 * @param {HTMLElement} element The DOM element representing the gap you're dragging something
-	 *     over
-	 * @param {int} gapId The ID of the gap which is being gragged over, in the context of the
-	 *     currently shown puzzle
-	 */
-	function onDragOverGap(event, element, gapId) {
-		var optionId = event.dataTransfer.getData("optionId");
-		console.log("onDragOverGap: event=" + event + ", element=" + element + ", optionId=" + optionId + ", gapId=" + gapId);
-		
-		if (optionId !== null) {
-			optionId = parseInt(optionId);
-			
-			// The element being dragged is an option
-			// Prevent the default behaviour to allow it to be dropped here
-			event.preventDefault();
-		}
-	}
-	
-	/**
-	 * @param {DragEvent} event Information about the drag event
-	 * @param {HTMLElement} element The DOM element representing the gap you dropped something onto
-	 * @param {int} gapId The ID of the gap which is being dropped onto, in the context of the
-	 *     currently shown puzzle
-	 */
-	function onDropOntoGap(event, element, gapId) {
-		var optionId = event.dataTransfer.getData("optionId");
-		console.log("onDropOntoGap: event=" + event + ", element=" + element + ", optionId=" + optionId + ", gapId=" + gapId);
-		
-		if (optionId !== null) {
-			optionId = parseInt(optionId);
-			
-			// The element being dragged is an option
-			// Prevent the default behaviour to allow it to be dropped here
-			event.preventDefault();
-			
-			var option = _currentPuzzle.getOptionById(optionId);
-			var gap = _currentPuzzle.getGapById(gapId);
-			gap.currentChoice = option;
-			renderCurrentPuzzle();
-		}
-	}
-	
 	
 	// Rendering functions
 	/**
-	 * 
+	 * (Re)Draw the current puzzle on the screen
 	 */
 	function renderCurrentPuzzle() {
-		var sentenceElement = document.getElementById("puzzleSentence");
-		var optionsElement = document.getElementById("puzzleOptions");
-		util.removeAllChildren(sentenceElement);
-		util.removeAllChildren(optionsElement);
-		sentenceElement.appendChild(renderPuzzle(_currentPuzzle));
-		optionsElement.appendChild(renderPuzzleOptions(_currentPuzzle));
-	}
-	
-	/**
-	 * @param {Puzzle} puzzle
-	 * @return {HTMLElement}
-	 */
-	function renderPuzzle(puzzle) {
-		var e = document.createElement("span");
-		var sentence = puzzle.sentence;
-		for (var i = 0; i < sentence.length + 1; i++) {
-			// see if there is a gap which is supposed to go in this position
-			var gap = puzzle.getGapAtPosition(i);
-			if (gap !== null) {
-				e.appendChild(renderPuzzleGap(gap));
-			}
-			e.appendChild(document.createTextNode(sentence.charAt(i)));
-		}
-		return e;
-	}
-	
-	/**
-	 * @param {Gap} gap
-	 * @return {HTMLElement}
-	 */
-	function renderPuzzleGap(gap) {
-		var e = document.createElement("span");
-		e.className = "blankSpace";
-		e.addEventListener("drop", function(event) { onDropOntoGap(event, event.target, gap.id); });
-		e.addEventListener("dragover", function(event) { onDragOverGap(event, event.target, gap.id); });
+		var puzzleElement = document.getElementById("puzzleSentence");
+		var optionBarElement = document.getElementById("puzzleOptions");
 		
-		var option = gap.currentChoice;
-		if (option !== null)
-			e.appendChild(renderPuzzleOption(option));
-		
-		return e;
-	}
-	
-	/**
-	 * @param {Puzzle} puzzle
-	 * @return {HTMLElement}
-	 */
-	function renderPuzzleOptions(puzzle) {
-		var e = document.createElement("span");
-		var options = puzzle.options;
-		for (var i = 0; i < options.length; i++) {
-			var option = renderPuzzleOption(options[i]);
-			e.appendChild(option);
-		}
-		return e;
-	}
-	
-	/**
-	 * @param {Option} option
-	 * @return {HTMLElement}
-	 */
-	function renderPuzzleOption(option) {
-		var e = document.createElement("span");
-		e.className = "draggableOption";
-		e.draggable = true;
-		e.innerHTML = option.value;
-		e.addEventListener("dragstart", function(event) { onStartDraggingOption(event, event.target, option.id); });
-		return e;
+		var drawnPuzzle = _puzzleDrawer.draw(_currentPuzzle);
+		var drawnOptions = _optionBarDrawer.draw(_currentPuzzle.options);
+		util.removeAllChildren(puzzleElement);
+		util.removeAllChildren(optionBarElement);
+		puzzleElement.appendChild(drawnPuzzle);
+		optionBarElement.appendChild(drawnOptions);
 	}
 	</script>
 </head>

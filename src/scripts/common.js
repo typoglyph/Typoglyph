@@ -8,13 +8,11 @@
  * @see http://aaditmshah.github.io/why-prototypal-inheritance-matters/#toc_11
  */
 Object.prototype.extend = function() {
-	var hasOwnProperty = Object.hasOwnProperty;
 	var object = Object.create(this);
-	
 	for (var i = (arguments.length - 1); i >= 0; i--) {
 		var extension = arguments[i];
 		for (var property in extension) {
-			if (hasOwnProperty.call(extension, property) || typeof object[property] === "undefined") {
+			if (Object.hasOwnProperty.call(extension, property) || typeof object[property] === "undefined") {
 				object[property] = extension[property];
 			}
 		}
