@@ -191,3 +191,37 @@ typoglyph.ui.PuzzleOptionDrawer = typoglyph.ui.Drawer.extend({
 		return e;
 	}
 });
+
+
+/**
+ * @author jakemarsden
+ */
+typoglyph.ui.CompletionGraphicDrawer = typoglyph.ui.Drawer.extend({
+	/**
+	 * @param {Array<String>} correctGraphics
+	 * @param {Array<String>} incorrectGraphics
+	 * @constructor
+	 */
+	create: function(correctGraphics, incorrectGraphics) {
+		var self = typoglyph.ui.Drawer.create.call(this);
+		self.correctGraphics = correctGraphics;
+		self.incorrectGraphics = incorrectGraphics;
+		return self;
+	},
+	
+	/**
+	 * @param {boolean} correct
+	 * @return {HTMLElement}
+	 * @override
+	 */
+	draw: function(correct) {
+		var util = typoglyph.util;
+		
+		var graphic = util.randomElement(correct ? this.correctGraphics : this.incorrectGraphics);
+		var e = this.newElement("img", "completionGraphic");
+		e.src = graphic;
+		util.setImageRotation(e, util.randomInt(-50, 50));
+		
+		return e;
+	}
+});
