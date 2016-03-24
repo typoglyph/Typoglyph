@@ -3,66 +3,6 @@ if (typeof typoglyph == "undefined") typoglyph = {};
 if (typeof typoglyph.ui == "undefined") typoglyph.ui = {};
 
 
-
-	
-	/**
-	 * @param {DragEvent} event Information about the drag event
-	 * @param {HTMLElement} element The DOM element representing the option which was dragged
-	 * @param {int} optionId The ID of the option which was dragged, in the context of the
-	 *     currently shown puzzle
-	 */
-	function onStartDraggingOption(event, element, optionId) {
-		console.log("onStartDraggingOption: event=" + event + ", element=" + element + ", optionId=" + optionId);
-		event.dataTransfer.setData("optionId", optionId);
-	}
-	
-	/**
-	 * @param {DragEvent} event Information about the drag event
-	 * @param {HTMLElement} element The DOM element representing the gap you're dragging something
-	 *     over
-	 * @param {int} gapId The ID of the gap which is being gragged over, in the context of the
-	 *     currently shown puzzle
-	 */
-	function onDragOverGap(event, element, gapId) {
-		var optionId = event.dataTransfer.getData("optionId");
-		console.log("onDragOverGap: event=" + event + ", element=" + element + ", optionId=" + optionId + ", gapId=" + gapId);
-		
-		if (optionId !== null) {
-			optionId = parseInt(optionId);
-			
-			// The element being dragged is an option
-			// Prevent the default behaviour to allow it to be dropped here
-			event.preventDefault();
-		}
-	}
-	
-	/**
-	 * @param {DragEvent} event Information about the drag event
-	 * @param {HTMLElement} element The DOM element representing the gap you dropped something onto
-	 * @param {int} gapId The ID of the gap which is being dropped onto, in the context of the
-	 *     currently shown puzzle
-	 */
-	function onDropOntoGap(event, element, gapId) {
-		var optionId = event.dataTransfer.getData("optionId");
-		console.log("onDropOntoGap: event=" + event + ", element=" + element + ", optionId=" + optionId + ", gapId=" + gapId);
-		
-		if (optionId !== null) {
-			optionId = parseInt(optionId);
-			
-			// The element being dragged is an option
-			// Prevent the default behaviour to allow it to be dropped here
-			event.preventDefault();
-			
-			var option = _currentPuzzle.getOptionById(optionId);
-			var gap = _currentPuzzle.getGapById(gapId);
-			gap.currentChoice = option;
-			renderCurrentPuzzle();
-		}
-	}
-
-
-
-
 /**
  * @author jakemarsden
  */
