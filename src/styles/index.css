@@ -29,6 +29,8 @@
 
 #completionGraphic {
 	position:		absolute;
+	left:			100px;
+	top:			100px;
 	height:			70px;
 	padding:		5px;
 	pointer-events:	none; /* Allow clicking through the image */
