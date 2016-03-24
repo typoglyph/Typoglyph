@@ -3,47 +3,68 @@ if (typeof typoglyph == 'undefined') typoglyph = {};
 
 
 /**
- * Used to track the puzzles which the user has answered since the latest page (re)load
- *
- * @constructor
+ * Used to track statistics about the puzzles the user has answered
+ * 
  * @author jakemarsden
  */
-typoglyph.StatisticsTracker = function() {
-	/** @private */ var _correctPuzzles = 0;
-	/** @private */ var _answeredPuzzles = 0;
-	/** @private */ var _latestResult = null;
-	
+typoglyph.StatisticsTracker = {
 	/**
-	 * @return {int} How many puzzles the user has answered correctly
+	 * @constructor
 	 */
-	this.getCorrectlyAnsweredPuzzlesCount = function() {
-		return _correctPuzzles;
-	}
+	create: function() {
+		var self = this.extend({
+			correctPuzzles: [],
+			incorrectPuzzles: [],
+			latestResult: null
+		});
+		return self;
+	},
 	
 	/**
-	 * @return {int} How many puzzles the user has answered
+	 * @return {int} Get the total number of answered puzzles, regardless of if they were correct
 	 */
-	this.getAnsweredPuzzlesCount = function() {
-		return _answeredPuzzles;
-	}
-	
+	getAnsweredPuzzlesCount: function() {
+		return this.getCorrectlyAnsweredPuzzlesCount() + this.getIncorrectlyAnsweredPuzzlesCount();
+	},
 	/**
-	 * @return {boolean} True if the most recently answered puzzle was answered correctly, null if
-	 *     no puzzles have yet been answered, false otherwise
+	 * @return {int}
 	 */
-	this.wasLatestAnswerCorrect = function() {
-		return _latestResult;
-	}
+	getCorrectlyAnsweredPuzzlesCount: function() {
+		return this.correctPuzzles.length;
+	},
+	/**
+	 * @return {int}
+	 */
+	getIncorrectlyAnsweredPuzzlesCount: function() {
+		return this.incorrectPuzzles.length;
+	},
+	/**
+	 * @return {typoglyph.puzzle.Puzzle} The puzzle which was answered the most recently
+	 */
+	getLatestAnsweredPuzzle: function() {
+		if (this.latestResult === null)
+			return null;
+		return (this.result) ? this.correctPuzzles[this.correctPuzzles.length -1]
+			: this.incorrectPuzzles[this.incorrectPuzzles.length - 1];
+	},
 	
 	/**
+	 * Used to clear all stored statistics
+	 */
+	reset: function() {
+		this.correctPuzzles = [];
+		this.incorrectPuzzles = [];
+		this.latestResult = null;
+	},
+	
+	/**
+	 * Used to update statistics after a puzzle has been answered
+	 * 
 	 * @param {typoglyph.puzzle.Puzzle} puzzle
 	 * @param {boolean} correct
 	 */
-	this.onPuzzleAnswered = function(puzzle, correct) {
-		if (correct) {
-			_correctPuzzles++;
-		}
-		_answeredPuzzles++;
-		_latestResult = correct;
+	onPuzzleAnswered: function(puzzle, correct) {
+		(correct ? this.correctPuzzles : this.incorrectPuzzles).push(puzzle);
+		this.latestResult = correct;
 	}
-}
+};

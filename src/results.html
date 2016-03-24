@@ -7,6 +7,7 @@
 	<link rel="stylesheet" type="text/css" href="styles/common.css">
 	<link rel="stylesheet" type="text/css" href="styles/results.css">
 	
+	<script type="text/javascript" src="scripts/common.js"></script>
 	<script type="text/javascript" src="scripts/util.js"></script>
 	<script>
 	
@@ -17,12 +18,11 @@
 	
 	// Visible to other pages (when this page is embeded inside another)
 	/**
-	 * @param {int} correct
-	 * @param {int} total
+	 * @param {StatisticsTracker} stats
 	 */
-	function showResults(correct, total) {
-		document.getElementById("correct").innerHTML = correct;
-		document.getElementById("total").innerHTML = total;
+	function showResults(stats) {
+		document.getElementById("correct").innerHTML = stats.getCorrectlyAnsweredPuzzlesCount();
+		document.getElementById("total").innerHTML = stats.getAnsweredPuzzlesCount();
 	}
 	
 	/**

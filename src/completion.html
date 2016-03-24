@@ -7,31 +7,42 @@
 	<link rel="stylesheet" type="text/css" href="styles/common.css">
 	<link rel="stylesheet" type="text/css" href="styles/index.css">
 	
+	<script type="text/javascript" src="scripts/common.js"></script>
 	<script type="text/javascript" src="scripts/util.js"></script>
+	<script type="text/javascript" src="scripts/ui.js"></script>
 	<script>
 	
 	
 	// Imports
 	var util = typoglyph.util;
+	var PuzzleDrawer = typoglyph.ui.PuzzleDrawer;
+	var PuzzleGapDrawer = typoglyph.ui.PuzzleGapDrawer;
+	var PuzzleOptionDrawer = typoglyph.ui.PuzzleOptionDrawer;
 	
 	
 	// Global variables
 	var _currentPuzzle = null;
 	var _onPuzzleCompleteListener = null;
 	
+	var _puzzleDrawer = null;
+	
 	
 	// Visible to other pages (when this page is embeded inside another)
 	/**
-	 * @param {Puzzle} puzzle
-	 * @param {boolean} result
+	 * Displays the given statistics for the user
+	 * 
+	 * @param {StatisticsTracker} stats
 	 */
-	function showResult(puzzle, result) {
-		var resultElement = document.createTextNode(result ? "Correct!" : "Incorrect!");
-		document.getElementById("result").appendChild(resultElement);
+	function showResults(stats) {
+		var resultElement = document.getElementById("result"); 
+		var puzzleElement = document.getElementById("puzzleAnswer");
 		
-		var answerElement = document.getElementById("puzzleAnswer");
-		util.removeAllChildren(answerElement);
-		answerElement.appendChild(renderPuzzle(puzzle, true));
+		var result = document.createTextNode(stats.latestResult ? "Correct!" : "Incorrect!");
+		var drawnPuzzle = _puzzleDrawer.draw(stats.getLatestAnsweredPuzzle());
+		util.removeAllChildren(resultElement);
+		util.removeAllChildren(puzzleElement);
+		resultElement.appendChild(result);
+		puzzleElement.appendChild(drawnPuzzle);
 	}
 	
 	
@@ -41,75 +52,10 @@
 	 */
 	function onLoad() {
 		console.log("onLoad");
-	}
-	
-	
-	// Rendering functions
-	/**
-	 * @param {Puzzle} puzzle
-	 * @param {boolean} showAnswer
-	 * @return {HTMLElement}
-	 */
-	function renderPuzzle(puzzle, showAnswer) {
-		var e = document.createElement("span");
-		var sentence = puzzle.getSentence();
-		var gaps = puzzle.getGaps();
-		for (var i = 0; i < sentence.length + 1; i++) {
-			// see if there is a gap which is supposed to go in this position
-			var gap = puzzle.getGapAtPosition(i);
-			if (gap !== null) {
-				e.appendChild(renderPuzzleGap(gap, showAnswer));
-			}
-			e.appendChild(document.createTextNode(sentence.charAt(i)));
-		}
-		return e;
-	}
-	
-	/**
-	 * @param {Gap} gap
-	 * @param {boolean} showAnswer
-	 * @return {HTMLElement}
-	 */
-	function renderPuzzleGap(gap, showAnswer) {
-		var id = gap.getId();
-		var e = document.createElement("span");
-		e.className = "blankSpace";
-		if (!gap.isFilledCorrectly()) {
-			e.className += (showAnswer) ? " correct" : "incorrect";
-		}
 		
-		var option = (showAnswer) ? gap.getSolution() : gap.getCurrentChoice();
-		if (option !== null)
-			e.appendChild(renderPuzzleOption(option));
-		
-		return e;
-	}
-	
-	/**
-	 * @param {Puzzle} puzzle
-	 * @return {HTMLElement}
-	 */
-	function renderPuzzleOptions(puzzle) {
-		var e = document.createElement("span");
-		var options = puzzle.getOptions();
-		for (var i = 0; i < options.length; i++) {
-			var option = renderPuzzleOption(options[i]);
-			e.appendChild(option);
-		}
-		return e;
-	}
-	
-	/**
-	 * @param {Option} option
-	 * @return {HTMLElement}
-	 */
-	function renderPuzzleOption(option) {
-		var id = option.getId();
-		var e = document.createElement("span");
-		e.className = "draggableOption";
-		e.draggable = true;
-		e.innerHTML = option.getValue();
-		return e;
+		var optionDrawer = PuzzleOptionDrawer.create();
+		var gapDrawer = PuzzleGapDrawer.create(optionDrawer, true);
+		_puzzleDrawer = PuzzleDrawer.create(gapDrawer);
 	}
 	</script>
 </head>

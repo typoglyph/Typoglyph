@@ -2,7 +2,7 @@
 	width:			100%;
 }
 
-.blankSpace {
+.puzzleGap {
 	display:		inline-block;
 	width:			24px;
 	height:			24px;
@@ -12,7 +12,7 @@
 	vertical-align:	middle;
 }
 
-.draggableOption {
+.puzzleOption {
 	display:		inline-block;
 	width:			20px;
 	height:			20px;
@@ -23,7 +23,7 @@
 	text-align:		center;
 	vertical-align:	middle;
 }
-.blankSpace .draggableOption {
+.puzzleGap .puzzleOption {
 	margin:			0px;
 }
 

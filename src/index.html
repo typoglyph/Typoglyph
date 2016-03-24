@@ -10,6 +10,7 @@
 	<link rel="stylesheet" type="text/css" href="styles/common.css">
 	<link rel="stylesheet" type="text/css" href="styles/index.css">
 	
+	<script type="text/javascript" src="scripts/common.js"></script>
 	<script type="text/javascript" src="scripts/util.js"></script>
 	<script type="text/javascript" src="scripts/puzzle.js"></script>
 	<script type="text/javascript" src="scripts/anim.js"></script>
@@ -27,7 +28,7 @@
 	// Global variables
 	var _puzzleSet = null;
 	var _currentPuzzleIndex = null;
-	var _statistics = new StatisticsTracker();
+	var _statistics = StatisticsTracker.create();
 	var _completionGraphic = null;
 	
 	
@@ -49,6 +50,7 @@
 			console.log("startNewPuzzleSet.onPuzzlesLoaded: " + puzzles);
 			_puzzleSet = puzzles;
 			_currentPuzzleIndex = 0;
+			_statistics.reset();
 			renderCurrentPuzzle();
 			renderStatistics();
 		}
@@ -63,10 +65,9 @@
 	function onPuzzleComplete(event, puzzle, correct) {
 		console.log("onPuzzleComplete: event=" + event + ", puzzle=" + puzzle + ", correct=" + correct);
 		
-		var stats = _statistics;
 		var completionGraphic = _completionGraphic;
 		
-		stats.onPuzzleAnswered(puzzle, correct);
+		_statistics.onPuzzleAnswered(puzzle, correct);
 		_currentPuzzleIndex++;
 		
 		// Cancel any currently visible graphic
@@ -95,7 +96,7 @@
 		// Show the completion graphic
 		completionGraphic.start();
 		
-		renderPuzzleResult(puzzle, correct);
+		renderPuzzleResult();
 		setTimeout(
 			function() {
 				// Move on to the next puzzle
@@ -106,9 +107,7 @@
 				} else {
 					// All puzzles have been completed
 					// Load the results page
-					var correct = stats.getCorrectlyAnsweredPuzzlesCount();
-					var total = stats.getAnsweredPuzzlesCount();
-					renderPuzzleSetResults(correct, total);
+					renderPuzzleSetResults();
 				}
 			},
 			2000);
@@ -138,28 +137,26 @@
 	}
 	
 	/**
-	 * @param {Puzzle} puzzle
-	 * @param {boolean} result
+	 * 
 	 */
-	function renderPuzzleResult(puzzle, result) {
+	function renderPuzzleResult() {
 		var frame = document.getElementById("main");
 		util.addOneOffEventListener(frame, "load", function(event) {
-			event.target.contentWindow.showResult(puzzle, result);
+			event.target.contentWindow.showResults(_statistics);
 		});
 		frame.src = "completion.html";
 	}
 	
 	/**
-	 * @param {int} correct
-	 * @param {int} total
+	 * 
 	 */
-	function renderPuzzleSetResults(correct, total) {
+	function renderPuzzleSetResults() {
 		var frame = document.getElementById("main");
 		util.addOneOffEventListener(frame, "load", function(event) {
 			event.target.contentWindow.setOnNextPuzzleSetListener(function(event) {
 				startNewPuzzleSet();
 			});
-			event.target.contentWindow.showResults(correct, total);
+			event.target.contentWindow.showResults(_statistics);
 		});
 		frame.src = "results.html";
 	}
@@ -217,14 +214,6 @@
 	<!-- starts hidden, but will be shown briefly after user finishes each puzzle -->
 	<image id="completionGraphic" style="visibility: hidden;"/>
 	<progress id="progressBar" value="0"></progress>
-	
 	<iframe id="main" frameborder="0" scrolling="no" seamless="seamless" style="width:100%;"></iframe>
-	
-	<table>
-		<tr>
-			<td><a href="rawData.html">View raw data</a></td>
-			<td><a href="info.php">View PHP info</a></td>
-		</tr>
-	</table>
 </body>
 </html>
