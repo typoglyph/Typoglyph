@@ -7,6 +7,7 @@
 	<link rel="stylesheet" type="text/css" href="styles/common.css">
 	<link rel="stylesheet" type="text/css" href="styles/index.css">
 	
+	<script type="text/javascript" src="http://code.interactjs.io/v1.2.6/interact.js"></script>
 	<script type="text/javascript" src="scripts/common.js"></script>
 	<script type="text/javascript" src="scripts/util.js"></script>
 	<script type="text/javascript" src="scripts/ui.js"></script>
@@ -66,6 +67,8 @@
 		var gapDrawer = PuzzleGapDrawer.create(optionDrawer, false);
 		_puzzleDrawer = PuzzleDrawer.create(gapDrawer);
 		_optionBarDrawer = PuzzleOptionBarDrawer.create(optionDrawer);
+		
+		initTouchControls();
 	}
 	
 	/**
@@ -93,6 +96,72 @@
 		util.removeAllChildren(optionBarElement);
 		puzzleElement.appendChild(drawnPuzzle);
 		optionBarElement.appendChild(drawnOptions);
+	}
+	
+	
+	function initTouchControls() {
+		interact(".puzzleOption").draggable({
+			inertia: false,
+			autoScroll: false,
+			restrict: {
+				restriction: document.body.getBoundingClientRect(),
+				elementRect: {
+					left: 0,
+					right: 1,
+					top: 0,
+					bottom: 1
+				}
+			},
+			max: 1,
+			maxPerElement: 1,
+			onmove: function(event) {
+				var target = event.target;
+				//console.log("[" + target.className + "].onmove: dx=" + event.dx + ", dy=" + event.dy);
+				var x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
+				var y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
+				
+				
+				// translate the element
+				target.style.transform = target.style.webkitTransform = "translate(" + x + "px, " + y + "px)";
+				
+				// update the position attributes
+				target.setAttribute("data-x", x);
+				target.setAttribute("data-y", y);
+			},
+			/*onend: function(event) {
+				var target = event.target;
+				console.log("[" + target.className + "].ondrop");
+				target.setAttribute("data-x", null);
+				target.setAttribute("data-y", null);
+				target.style.transform = target.style.webkitTransform = "";
+			}*/
+		});
+		
+		interact(".puzzleGap").dropzone({
+			accept: ".puzzleOption",
+			overlap: 0.1,
+			ondrop: function(event) {
+				// event.relatedTarget was just dropped in the dropzone
+				console.log("onDrop: target=" + event.target.className + ", related=" + event.relatedTarget.className);
+				
+				var optionId = parseInt(event.relatedTarget.getAttribute("data-id"));
+				var gapId = parseInt(event.target.getAttribute("data-id"));
+				var option = _currentPuzzle.getOptionById(optionId);
+				var gap = _currentPuzzle.getGapById(gapId);
+				
+				gap.currentChoice = option;
+			},
+			ondropactivate: function(event) {
+				// event.relatedTarget was just picked up
+				console.log("onDropActivate: target=" + event.target.className + ", related=" + event.relatedTarget.className);
+			},
+			ondropdeactivate: function(event) {
+				// event.relatedTarget was just dropped (possibly in the dropzone, but maybe not)
+				// called just after ondrop
+				console.log("onDropDeactivate: target=" + event.target.className + ", related=" + event.relatedTarget.className);
+				renderCurrentPuzzle();
+			}
+		});
 	}
 	</script>
 </head>

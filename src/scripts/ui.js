@@ -155,6 +155,7 @@ typoglyph.ui.PuzzleGapDrawer = typoglyph.ui.Drawer.extend({
 	draw: function(gap) {
 		var id = "puzzleGap-" + gap.id;
 		var e = this.newElement("span", id, "puzzleGap");
+		e.setAttribute("data-id", gap.id);
 		
 		var option = (this.showSolution) ? gap.solution : gap.currentChoice;
 		if (option !== null) {
@@ -187,6 +188,7 @@ typoglyph.ui.PuzzleOptionDrawer = typoglyph.ui.Drawer.extend({
 	draw: function(option) {
 		var id = "puzzleOption-" + option.id;
 		var e = this.newElement("span", id, "puzzleOption");
+		e.setAttribute("data-id", option.id);
 		e.appendChild(this.newTextNode(option.value));
 		return e;
 	}
