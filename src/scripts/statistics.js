@@ -44,7 +44,7 @@ typoglyph.StatisticsTracker = {
 	getLatestAnsweredPuzzle: function() {
 		if (this.latestResult === null)
 			return null;
-		return (this.result) ? this.correctPuzzles[this.correctPuzzles.length -1]
+		return (this.latestResult) ? this.correctPuzzles[this.correctPuzzles.length - 1]
 			: this.incorrectPuzzles[this.incorrectPuzzles.length - 1];
 	},
 	
