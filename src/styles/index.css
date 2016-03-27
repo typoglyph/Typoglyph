@@ -1,4 +1,4 @@
-#buttonHolder {
+.buttonHolder {
 	width: 180px;
 	margin-left: auto;
 	margin-right: auto;
@@ -6,17 +6,17 @@
 	margin-bottom: 10px;
 }
 
-#buttonHolder * {
-	width: 70px;
-	height: 70px;
-}
-
-#buttonHolder *:first-child {
+.buttonHolder *:first-child {
 	float: left;
 }
 
-#buttonHolder *:last-child {
+.buttonHolder *:last-child {
 	float: right;
+}
+
+.button {
+	width: 70px;
+	height: 70px;
 }
 
 

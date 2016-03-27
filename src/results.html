@@ -5,7 +5,7 @@
 	<meta content="utf-8" http-equiv="encoding">
 	
 	<link rel="stylesheet" type="text/css" href="styles/common.css">
-	<link rel="stylesheet" type="text/css" href="styles/results.css">
+	<link rel="stylesheet" type="text/css" href="styles/index.css">
 	
 	<!-- see https://github.com/davidjbradshaw/iframe-resizer -->
 	<script type="text/javascript" src="scripts/lib/iframe-resizer-v3.5.0/iframeResizer.contentWindow.min.js"></script>
@@ -55,8 +55,16 @@
 	</script>
 </head>
 <body onload="onLoad();">
-	<h1>Results</h1>
-	<p><span id="correct"></span> / <span id="total"></span></p>
-	<p><button id="nextPuzzle" class="button" onclick="onNextPuzzleSetButtonClicked(event, this);">Next set</button></p>
+	<table>
+		<tr>
+			<td>
+				<h1>Results</h1>
+				<p><span id="correct"></span> / <span id="total"></span></p>
+			</td>
+			<td class="buttonHolder">
+				<img id="nextPuzzleSet" class="button" src="images/button_next_set.svg" onclick="onNextPuzzleSetButtonClicked(event, this);" />
+			</td>
+		</tr>
+	</table>
 </body>
 </html>
