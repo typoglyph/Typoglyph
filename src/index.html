@@ -10,6 +10,8 @@
 	<link rel="stylesheet" type="text/css" href="styles/common.css">
 	<link rel="stylesheet" type="text/css" href="styles/index.css">
 	
+	<!-- see https://github.com/davidjbradshaw/iframe-resizer -->
+	<script type="text/javascript" src="scripts/lib/iframe-resizer-v3.5.0/iframeResizer.min.js"></script>
 	<script type="text/javascript" src="scripts/common.js"></script>
 	<script type="text/javascript" src="scripts/util.js"></script>
 	<script type="text/javascript" src="scripts/puzzle.js"></script>
@@ -53,6 +55,25 @@
 	 */
 	function onLoad() {
 		console.info("onLoad");
+		
+		// see https://github.com/davidjbradshaw/iframe-resizer
+		iFrameResize({
+			log: false,
+			checkOrigin: [ "http://localhost:8080", "https://localhost:8080" ],
+			
+			closedCallback: function(iframeId) {
+				console.debug("iFrameResize.closedCallback: iframeId=" + iframeId);
+			},
+			initCallback: function(iframe) {
+				console.debug("iFrameResize.initCallback: iframe=" + iframe);
+			},
+			messageCallback: function(iframe, message) {
+				console.debug("iFrameResize.messageCallback: iframe=" + iframe + ", msg=" + message);
+			},
+			resizedCallback: function(iframe, height, width, type) {
+				console.debug("iFrameResize.resizedCallback: iframe=" + iframe + ", w=" + width + ", h=" + height + ", type=" + type);
+			}
+		});
 		
 		var correctCompletionGraphics = null;
 		var incorrectCompletionGraphics = null;
