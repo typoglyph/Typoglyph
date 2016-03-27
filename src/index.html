@@ -25,6 +25,21 @@
 	var CompletionGraphicDrawer = typoglyph.ui.CompletionGraphicDrawer;
 	
 	
+	// Constant variables
+	/**
+	 * How many puzzles should be in each set
+	 */
+	var PUZZLE_SET_SIZE = 5;
+	/**
+	 * How long to display the answer page between each puzzle for, in milliseconds
+	 */
+	var PUZZLE_RESULT_DISPLAY_TIME = 2000;
+	/**
+	 * How long to display the completion graphic for, in milliseconds
+	 */
+	var COMPLETION_GRAPHIC_DISPLAY_TIME = 300;
+	
+	
 	// Global variables
 	var _puzzleSet = null;
 	var _currentPuzzleIndex = null;
@@ -37,31 +52,32 @@
 	 * Called when the browser has finished (re)loading the document
 	 */
 	function onLoad() {
-		console.log("onLoad");
+		console.info("onLoad");
 		
 		var correctCompletionGraphics = null;
 		var incorrectCompletionGraphics = null;
 		// execute synchronously to avoid race condition
 		fetchCompletionGraphics(true, false, function(graphics) { correctCompletionGraphics = graphics; });
 		fetchCompletionGraphics(false, false, function(graphics) { incorrectCompletionGraphics = graphics; });
-
-		_completionGraphicDrawer = CompletionGraphicDrawer.create(correctCompletionGraphics, incorrectCompletionGraphics, 1000);
+		
+		_completionGraphicDrawer = CompletionGraphicDrawer.create(correctCompletionGraphics, incorrectCompletionGraphics);
 		startNewPuzzleSet();
 	}
 	
+	/**
+	 * Loads and starts a new set of puzzles for the user to solve
+	 */
 	function startNewPuzzleSet() {
-		/**
-		 * @param {Array<Puzzle>} puzzles
-		 */
-		function onPuzzlesLoaded(puzzles) {
-			console.log("startNewPuzzleSet.onPuzzlesLoaded: " + puzzles);
+		console.info("startNewPuzzleSet");
+		fetchPuzzlesFromBackend(PUZZLE_SET_SIZE, true, function(puzzles) {
+			console.debug("startNewPuzzleSet.onPuzzlesLoaded: " + puzzles);
 			_puzzleSet = puzzles;
 			_currentPuzzleIndex = 0;
 			_statistics.reset();
-			renderCurrentPuzzle();
+			
+			renderCurrentPuzzle(onPuzzleComplete);
 			renderStatistics();
-		}
-		fetchPuzzlesFromBackend(5, true, onPuzzlesLoaded);
+		});
 	}
 	
 	/**
@@ -70,78 +86,101 @@
 	 * @param {boolean} correct
 	 */
 	function onPuzzleComplete(event, puzzle, correct) {
-		console.log("onPuzzleComplete: event=" + event + ", puzzle=" + puzzle + ", correct=" + correct);
+		console.info("onPuzzleComplete: event=" + event + ", puzzle=" + puzzle + ", correct=" + correct);
 		
 		_statistics.onPuzzleAnswered(puzzle, correct);
 		_currentPuzzleIndex++;
 		
-		renderPuzzleResult();
-		setTimeout(
+		renderStatistics();
+		renderPuzzleResult(
 			function() {
 				// Move on to the next puzzle
 				if (_currentPuzzleIndex < _puzzleSet.length) {
 					// Not all puzzles have yet been completed
-					renderStatistics();
-					renderCurrentPuzzle();
+					renderCurrentPuzzle(onPuzzleComplete);
 				} else {
 					// All puzzles have been completed
 					// Load the results page
-					renderPuzzleSetResults();
+					renderPuzzleSetResults(function() { startNewPuzzleSet(); });
 				}
-			},
-			2000);
+			});
 	}
 	
 	
 	// Rendering functions
 	/**
-	 * 
+	 * Updates sections of the UI which show how far the user is through the puzzle set, etc.
 	 */
 	function renderStatistics() {
+		console.debug("renderStatistics");
 		document.getElementById("progressBar").value = _currentPuzzleIndex;
 		document.getElementById("progressBar").max = _puzzleSet.length;
 	}
 	
 	/**
+	 * Update the UI to (re)draw the puzzle currently being solved
 	 * 
+	 * @param {function(Puzzle, boolean)} onPuzzleCompleteListener The listener to call once the
+	 *     user has completed the given puzzle
 	 */
-	function renderCurrentPuzzle() {
+	function renderCurrentPuzzle(onPuzzleCompleteListener) {
+		console.debug("renderCurrentPuzzle");
+		
 		var frame = document.getElementById("main");
-		util.addOneOffEventListener(frame, "load", function(event) {
-			var currentPuzzle = _puzzleSet[_currentPuzzleIndex];
-			event.target.contentWindow.setOnPuzzleCompleteListener(onPuzzleComplete);
-			event.target.contentWindow.showPuzzle(currentPuzzle);
-		});
+		util.addOneOffEventListener(frame, "load",
+			function(event) {
+				var currentPuzzle = _puzzleSet[_currentPuzzleIndex];
+				event.target.contentWindow.setOnPuzzleCompleteListener(onPuzzleCompleteListener);
+				event.target.contentWindow.showPuzzle(currentPuzzle);
+			});
 		frame.src = "puzzle.html";
 	}
 	
 	/**
+	 * Show the completion graphic and the puzzle result page for a specified amount of time
 	 * 
+	 * @param {function()} onFinishListener The listener to call once the results page has finished
+	 *     been shown
 	 */
-	function renderPuzzleResult() {
+	function renderPuzzleResult(onFinishListener) {
+		console.debug("renderPuzzleResult");
+		
+		// Get ready to show the completion graphic
 		var completionGraphicHolder = document.getElementById("completionGraphicHolder");
 		var completionGraphic = _completionGraphicDrawer.draw(_statistics.latestResult);
-		completionGraphicHolder.appendChild(completionGraphic);
-		setTimeout(function() { util.removeAllChildren(completionGraphicHolder); }, 1000);
-		
+
+		// Show the results page
 		var frame = document.getElementById("main");
-		util.addOneOffEventListener(frame, "load", function(event) {
-			event.target.contentWindow.showResults(_statistics);
-		});
+		util.addOneOffEventListener(frame, "load",
+			function(event) {
+				event.target.contentWindow.showResults(_statistics);
+				setTimeout(onFinishListener, PUZZLE_RESULT_DISPLAY_TIME);
+				
+				// Show the completion graphic for a time
+				completionGraphicHolder.appendChild(completionGraphic);
+				setTimeout(
+					function() { util.removeAllChildren(completionGraphicHolder); },
+					COMPLETION_GRAPHIC_DISPLAY_TIME);
+			});
 		frame.src = "completion.html";
 	}
 	
 	/**
+	 * At the end of each full set of puzzles, show the set result page and then move on to the
+	 * next set
 	 * 
+	 * @param {function()} onFinishListener The function to execute when the results page has
+	 *     finsished being shown
 	 */
-	function renderPuzzleSetResults() {
+	function renderPuzzleSetResults(onFinishListener) {
+		console.debug("renderPuzzleSetResults");
+		
 		var frame = document.getElementById("main");
-		util.addOneOffEventListener(frame, "load", function(event) {
-			event.target.contentWindow.setOnNextPuzzleSetListener(function(event) {
-				startNewPuzzleSet();
+		util.addOneOffEventListener(frame, "load",
+			function(event) {
+				event.target.contentWindow.setOnNextPuzzleSetListener(onFinishListener);
+				event.target.contentWindow.showResults(_statistics);
 			});
-			event.target.contentWindow.showResults(_statistics);
-		});
 		frame.src = "results.html";
 	}
 	
