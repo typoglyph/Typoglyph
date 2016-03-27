@@ -1,5 +1,22 @@
-#nextPuzzle.button {
-	width: 100%;
+#buttonHolder {
+	width: 180px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+#buttonHolder * {
+	width: 70px;
+	height: 70px;
+}
+
+#buttonHolder *:first-child {
+	float: left;
+}
+
+#buttonHolder *:last-child {
+	float: right;
 }
 
 

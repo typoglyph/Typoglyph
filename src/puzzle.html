@@ -72,12 +72,26 @@
 	
 	/**
 	 * @param {MouseEvent} event Information about the click event
-	 * @param {HTMLElement} element The DOM element representing the button which was clicked
+	 * @param {HTMLElement} element The DOM element which was clicked
 	 */
 	function onNextPuzzleButtonClicked(event, element) {
 		console.log("onNextPuzzleButtonClicked: event=" + event + ", element=" + element);
 		if (_onPuzzleCompleteListener !== null)
 			_onPuzzleCompleteListener(event, _currentPuzzle, _currentPuzzle.areAllGapsFilledCorrectly());
+	}
+	
+	/**
+	 * @param {MouseEvent} event Information about the click event
+	 * @param {HTMLElement} element The DOM element which was clicked
+	 */
+	function onResetPuzzleButtonClicked(event, element) {
+		console.log("onResetPuzzleButtonClicked: event=" + event + ", element=" + element);
+		
+		for (var i = 0; i < _currentPuzzle.gaps.length; i++) {
+			var gap = _currentPuzzle.gaps[i];
+			gap.currentChoice = null;
+		}
+		renderCurrentPuzzle();
 	}
 	
 	
@@ -108,9 +122,11 @@
 			<td>Sentence:</td>
 			<td id="puzzleSentence"></td>
 		</tr>
-		<tr>
-			<td><button id="nextPuzzle" class="button" onclick="onNextPuzzleButtonClicked(event, this);">Check answer | Next puzzle</button></td>
-		</tr>
 	</table>
+	
+	<div id="buttonHolder">
+		<img id="resetPuzzle" class="button" src="images/button_reset.svg" onclick="onResetPuzzleButtonClicked(event, this);" />
+		<img id="nextPuzzle" class="button" src="images/button_next.svg" onclick="onNextPuzzleButtonClicked(event, this);" />
+	</div>
 </body>
 </html>
