@@ -86,6 +86,53 @@ typoglyph.util.getElementHeight = function(e) {
 }
 
 /**
+ * @param {HTMLElement} e The DOM element to get the classes of
+ * @return {Array<String>} The classes of the specified element
+ * @static
+ */
+typoglyph.util.getClasses = function(e) {
+	var clazzes = e.className.split(/\s+/);
+	return clazzes.filter(function(item) { return item.length !== 0; });
+}
+
+/**
+ * @param {HTMLElement} e The DOM element to set the classes of
+ * @param {Array<String>} The classes to give to the specified element
+ * @static
+ */
+typoglyph.util.setClasses = function(e, clazzes) {
+	var str = "";
+	for (var i = 0; i < clazzes.length; i++) {
+		if (i !== 0)
+			str += " ";
+		str += clazzes[i];
+	}
+	e.className = str;
+}
+
+/**
+ * @param {HTMLElement} e The DOM element to add the specified class to
+ * @param {String} clazz The class to add to the specified element
+ * @static
+ */
+typoglyph.util.addClass = function(e, clazz) {
+	var clazzes = typoglyph.util.getClasses(e);
+	clazzes.pushUnique(clazz);
+	typoglyph.util.setClasses(e, clazzes);
+}
+
+/**
+ * @param {HTMLElement} e The DOM element to remove the specified class from
+ * @param {String} clazz The class to remove from the specified element
+ * @static
+ */
+typoglyph.util.removeClass = function(e, clazz) {
+	var clazzes = typoglyph.util.getClasses(e);
+	clazzes.removeAll(clazz);
+	typoglyph.util.setClasses(e, clazzes);
+}
+
+/**
  * @param {HTMLElement} e The DOM element to rotate
  * @param {float} rotation How much to rotate the image, in degrees
  * @static

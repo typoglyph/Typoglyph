@@ -22,6 +22,41 @@ Object.prototype.extend = function() {
 
 
 /**
+ * @param {Object} element
+ * @return {boolean} True if this array contains the specified element
+ */
+Array.prototype.contains = function(element) {
+	return this.indexOf(element) !== -1;
+}
+
+/**
+ * @param {Object} element The element to remove from this array
+ */
+Array.prototype.remove = function(element) {
+	var index = this.findIndex(function(item) { return item === element; });
+	if (index !== -1) {
+		this.splice(index, 1);
+	}
+}
+
+/**
+ * @param {Object} element The element to remove all references of from this array
+ */
+Array.prototype.removeAll = function(element) {
+	while (this.contains(element))
+		this.remove(element);
+}
+
+/**
+ * @param {Object} element The element to add to this array if it isn't already present
+ */
+Array.prototype.pushUnique = function(element) {
+	if (!this.contains(element))
+		this.push(element);
+}
+
+
+/**
  * A translation of https://docs.oracle.com/javase/7/docs/api/java/util/Objects.html for
  * JavaScript:
  *
