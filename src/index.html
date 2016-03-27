@@ -37,7 +37,7 @@
 	 * Called when the browser has finished (re)loading the document
 	 */
 	function onLoad() {
-		console.log("onLoad");
+		console.info("onLoad");
 		
 		var correctCompletionGraphics = null;
 		var incorrectCompletionGraphics = null;
@@ -50,11 +50,12 @@
 	}
 	
 	function startNewPuzzleSet() {
+		console.info("startNewPuzzleSet");
 		/**
 		 * @param {Array<Puzzle>} puzzles
 		 */
 		function onPuzzlesLoaded(puzzles) {
-			console.log("startNewPuzzleSet.onPuzzlesLoaded: " + puzzles);
+			console.debug("startNewPuzzleSet.onPuzzlesLoaded: " + puzzles);
 			_puzzleSet = puzzles;
 			_currentPuzzleIndex = 0;
 			_statistics.reset();
@@ -70,7 +71,7 @@
 	 * @param {boolean} correct
 	 */
 	function onPuzzleComplete(event, puzzle, correct) {
-		console.log("onPuzzleComplete: event=" + event + ", puzzle=" + puzzle + ", correct=" + correct);
+		console.info("onPuzzleComplete: event=" + event + ", puzzle=" + puzzle + ", correct=" + correct);
 		
 		_statistics.onPuzzleAnswered(puzzle, correct);
 		_currentPuzzleIndex++;
@@ -98,6 +99,7 @@
 	 * 
 	 */
 	function renderStatistics() {
+		console.debug("renderStatistics");
 		document.getElementById("progressBar").value = _currentPuzzleIndex;
 		document.getElementById("progressBar").max = _puzzleSet.length;
 	}
@@ -106,6 +108,7 @@
 	 * 
 	 */
 	function renderCurrentPuzzle() {
+		console.debug("renderCurrentPuzzle");
 		var frame = document.getElementById("main");
 		util.addOneOffEventListener(frame, "load", function(event) {
 			var currentPuzzle = _puzzleSet[_currentPuzzleIndex];
@@ -119,6 +122,7 @@
 	 * 
 	 */
 	function renderPuzzleResult() {
+		console.debug("renderPuzzleResult");
 		var completionGraphicHolder = document.getElementById("completionGraphicHolder");
 		var completionGraphic = _completionGraphicDrawer.draw(_statistics.latestResult);
 		completionGraphicHolder.appendChild(completionGraphic);
@@ -135,6 +139,7 @@
 	 * 
 	 */
 	function renderPuzzleSetResults() {
+		console.debug("renderPuzzleSetResults");
 		var frame = document.getElementById("main");
 		util.addOneOffEventListener(frame, "load", function(event) {
 			event.target.contentWindow.setOnNextPuzzleSetListener(function(event) {
