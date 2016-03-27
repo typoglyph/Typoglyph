@@ -104,7 +104,7 @@
 			inertia: false,
 			autoScroll: false,
 			restrict: {
-				restriction: document.body.getBoundingClientRect(),
+				restriction: function() { return document.body.getBoundingClientRect(); },
 				elementRect: {
 					left: 0,
 					right: 1,
