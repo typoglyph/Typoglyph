@@ -36,7 +36,7 @@
 	/**
 	 * How long to display the answer page between each puzzle for, in milliseconds
 	 */
-	var PUZZLE_RESULT_DISPLAY_TIME = 2000;
+	var PUZZLE_RESULT_DISPLAY_TIME = 5000;
 	/**
 	 * How long to display the completion graphic for, in milliseconds
 	 */
@@ -179,9 +179,13 @@
 		// Show the results page
 		var frame = document.getElementById("main");
 		util.addOneOffEventListener(frame, "load",
-			function(event) {
+			function(event) {				
+				var finishTimeout = setTimeout(onFinishListener, PUZZLE_RESULT_DISPLAY_TIME);
+				event.target.contentWindow.setOnSkipListener(function() {
+					clearTimeout(finishTimeout);
+					onFinishListener();
+				});
 				event.target.contentWindow.showResults(_statistics);
-				setTimeout(onFinishListener, PUZZLE_RESULT_DISPLAY_TIME);
 				
 				// Show the completion graphic for a time
 				completionGraphicHolder.appendChild(completionGraphic);

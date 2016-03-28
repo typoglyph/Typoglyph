@@ -23,10 +23,9 @@
 	
 	
 	// Global variables
-	var _currentPuzzle = null;
-	var _onPuzzleCompleteListener = null;
-	
+	var _currentPuzzle = null;	
 	var _puzzleDrawer = null;
+	var _onSkipListener = null;
 	
 	
 	// Visible to other pages (when this page is embeded inside another)
@@ -48,6 +47,15 @@
 		puzzleElement.appendChild(drawnPuzzle);
 	}
 	
+	/**
+	 * Sets up a listener to be called when the user decides to skip past the completion page. Pass
+	 * null to remove any current listener.
+	 * 
+	 * @param {function()} listener
+	 */
+	function setOnSkipListener(listener) {
+		_onSkipListener = listener;
+	}
 	
 	// Event handlers
 	/**
@@ -60,9 +68,19 @@
 		var gapDrawer = PuzzleGapDrawer.create(optionDrawer, true);
 		_puzzleDrawer = PuzzleDrawer.create(gapDrawer);
 	}
+	
+	/**
+	 * @param {MouseEvent} event Information about the click event
+	 * @param {HTMLElement} element The DOM element which was clicked
+	 */
+	function onClickAnywhere(event, element) {
+		console.debug("onClickAnywhere: event=" + event + ", element=" + element);
+		if (_onSkipListener !== null)
+			_onSkipListener();
+	}
 	</script>
 </head>
-<body onload="onLoad();">
+<body onload="onLoad();" onclick="onClickAnywhere(event, this);">
 	<h2 id="result"></h2>
 	<table>
 		<tr>
