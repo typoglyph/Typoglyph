@@ -24,13 +24,18 @@
 	var util = typoglyph.util;
 	var Puzzle = typoglyph.puzzle.Puzzle;
 	var StatisticsTracker = typoglyph.StatisticsTracker;
+	var ProgressBarDrawer = typoglyph.ui.ProgressBarDrawer;
 	var CompletionGraphicDrawer = typoglyph.ui.CompletionGraphicDrawer;
+	
+	// Constants
+	var PUZZLE_SET_SIZE = 5;
 	
 	
 	// Global variables
 	var _puzzleSet = null;
 	var _currentPuzzleIndex = null;
 	var _statistics = StatisticsTracker.create();
+	var _progressBarDrawer = null;
 	var _completionGraphicDrawer = null;
 	
 	
@@ -65,7 +70,8 @@
 		// execute synchronously to avoid race condition
 		fetchCompletionGraphics(true, false, function(graphics) { correctCompletionGraphics = graphics; });
 		fetchCompletionGraphics(false, false, function(graphics) { incorrectCompletionGraphics = graphics; });
-
+		
+		_progressBarDrawer = ProgressBarDrawer.create(PUZZLE_SET_SIZE);
 		_completionGraphicDrawer = CompletionGraphicDrawer.create(correctCompletionGraphics, incorrectCompletionGraphics, 1000);
 		startNewPuzzleSet();
 	}
@@ -82,7 +88,7 @@
 			renderCurrentPuzzle();
 			renderStatistics();
 		}
-		fetchPuzzlesFromBackend(5, true, onPuzzlesLoaded);
+		fetchPuzzlesFromBackend(PUZZLE_SET_SIZE, true, onPuzzlesLoaded);
 	}
 	
 	/**
@@ -119,8 +125,10 @@
 	 * 
 	 */
 	function renderStatistics() {
-		document.getElementById("progressBar").value = _currentPuzzleIndex;
-		document.getElementById("progressBar").max = _puzzleSet.length;
+		var progressBarHolder = document.getElementById("progressBarHolder");
+		var drawnProgressBar = _progressBarDrawer.draw(_statistics);
+		util.removeAllChildren(progressBarHolder);
+		progressBarHolder.appendChild(drawnProgressBar);
 	}
 	
 	/**
@@ -141,7 +149,7 @@
 	 */
 	function renderPuzzleResult() {
 		var completionGraphicHolder = document.getElementById("completionGraphicHolder");
-		var completionGraphic = _completionGraphicDrawer.draw(_statistics.latestResult);
+		var completionGraphic = _completionGraphicDrawer.draw(_statistics.getLatestStatistic().result);
 		completionGraphicHolder.appendChild(completionGraphic);
 		setTimeout(function() { util.removeAllChildren(completionGraphicHolder); }, 1000);
 		
@@ -217,7 +225,7 @@
 </head>
 <body onload="onLoad();">
 	<span id="completionGraphicHolder"></span>
-	<progress id="progressBar" value="0"></progress>
+	<span id="progressBarHolder"></span>
 	<iframe id="main" frameborder="0" scrolling="no" seamless="seamless" style="width:100%;"></iframe>
 </body>
 </html>

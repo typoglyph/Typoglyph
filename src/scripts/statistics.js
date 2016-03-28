@@ -13,48 +13,53 @@ typoglyph.StatisticsTracker = {
 	 */
 	create: function() {
 		var self = this.extend({
-			correctPuzzles: [],
-			incorrectPuzzles: [],
-			latestResult: null
+			stats: []
 		});
 		return self;
 	},
 	
 	/**
-	 * @return {int} Get the total number of answered puzzles, regardless of if they were correct
+	 * @return {Array<typoglyph.Statistic>} All recorded statistics
 	 */
-	getAnsweredPuzzlesCount: function() {
-		return this.getCorrectlyAnsweredPuzzlesCount() + this.getIncorrectlyAnsweredPuzzlesCount();
+	getStatistics: function() {
+		return this.stats;
 	},
 	/**
-	 * @return {int}
+	 * @return {Array<typoglyph.Statistic>} All recorded statistics whcih represent a correctly
+	 *     answered puzzle
 	 */
-	getCorrectlyAnsweredPuzzlesCount: function() {
-		return this.correctPuzzles.length;
+	getCorrectlyAnsweredStatistics: function() {
+		return this.stats.filter(
+			function(item) {
+				return item.result;
+			});
 	},
 	/**
-	 * @return {int}
+	 * @return {Array<typoglyph.Statistic>} All recorded statistics which represent an incorrectly
+	 *     answered puzzle
 	 */
-	getIncorrectlyAnsweredPuzzlesCount: function() {
-		return this.incorrectPuzzles.length;
+	getIncorrectlyAnsweredStatistics: function() {
+		return this.stats.filter(
+			function(item) {
+				return !item.result;
+			});
 	},
 	/**
-	 * @return {typoglyph.puzzle.Puzzle} The puzzle which was answered the most recently
+	 * @return {typoglyph.Statistic} The most recently recorded statistic, or null if no statistics
+	 *     have yet been recorded
 	 */
-	getLatestAnsweredPuzzle: function() {
-		if (this.latestResult === null)
+	getLatestStatistic: function() {
+		if (this.stats.length === 0)
 			return null;
-		return (this.latestResult) ? this.correctPuzzles[this.correctPuzzles.length - 1]
-			: this.incorrectPuzzles[this.incorrectPuzzles.length - 1];
+		var stat = this.stats[this.stats.length - 1];
+		return stat;
 	},
 	
 	/**
 	 * Used to clear all stored statistics
 	 */
 	reset: function() {
-		this.correctPuzzles = [];
-		this.incorrectPuzzles = [];
-		this.latestResult = null;
+		this.stats = [];
 	},
 	
 	/**
@@ -64,7 +69,28 @@ typoglyph.StatisticsTracker = {
 	 * @param {boolean} correct
 	 */
 	onPuzzleAnswered: function(puzzle, correct) {
-		(correct ? this.correctPuzzles : this.incorrectPuzzles).push(puzzle);
-		this.latestResult = correct;
+		var stat = typoglyph.Statistic.create(puzzle, correct);
+		this.stats.push(stat);
 	}
 };
+
+
+/**
+ * Used to store information about a single answered puzzle
+ * 
+ * @author jakemarsden
+ */
+typoglyph.Statistic = {
+	/**
+	 * @param {typoglyph.puzzle.Puzzle} puzzle
+	 * @param {boolean} result True if the puzzle was answered correctly
+	 * @constructor
+	 */
+	create: function(puzzle, result) {
+		var self = this.extend({
+			puzzle: puzzle,
+			result: result
+		});
+		return self;
+	}
+}
