@@ -104,6 +104,9 @@
 
 .progressBar * {
 	display: inline-block;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
 	height: 100%;
 	border-right: 1px solid #999;
 }
