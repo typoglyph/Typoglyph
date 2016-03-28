@@ -6,6 +6,4 @@
   * Error in console: *TypeError: prefixedPropREs[vendor].test is not a function*
   * Switch to minified version of interact library
 * Graphical overhaul
-  * Update progress bar - it's different on every different browswer I've tried
-  * Allow skipping the between-puzzle answer page (by clicking somewhere)
 * Show which puzzles you got wrong on the results page
