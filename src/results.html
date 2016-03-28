@@ -20,11 +20,13 @@
 	
 	// Visible to other pages (when this page is embeded inside another)
 	/**
-	 * @param {StatisticsTracker} stats
+	 * @param {StatisticsTracker} statsTracker
 	 */
-	function showResults(stats) {
-		document.getElementById("correct").innerHTML = stats.getCorrectlyAnsweredPuzzlesCount();
-		document.getElementById("total").innerHTML = stats.getAnsweredPuzzlesCount();
+	function showResults(statsTracker) {
+		var allStats = statsTracker.getStatistics();
+		var correctStats = statsTracker.getCorrectlyAnsweredStatistics();
+		document.getElementById("correct").innerHTML = correctStats.length;
+		document.getElementById("total").innerHTML = allStats.length;
 	}
 	
 	/**

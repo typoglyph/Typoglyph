@@ -92,7 +92,48 @@
 
 
 
-#progressBar {
+.progressBar {
 	width: 100%;
 	height: 20px;
+	padding: 2px;
+	border: 1px solid #ccc;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+}
+
+.progressBar * {
+	display: inline-block;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	height: 100%;
+	border-right: 1px solid #999;
+}
+
+.progressBar *:first-child {
+	-moz-border-radius-topleft: 5px;
+	-moz-border-radius-bottomleft: 50px;
+	-webkit-border-top-left-radius: 5px;
+	-webkit-border-bottom-left-radius: 5px;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+}
+
+.progressBar *:last-child {
+	border-right: none;
+	-moz-border-radius-topright: 5px;
+	-moz-border-radius-bottomright: 50px;
+	-webkit-border-top-right-radius: 5px;
+	-webkit-border-bottom-right-radius: 5px;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
+.progressBar .correct {
+	background: green;
+}
+
+.progressBar .incorrect {
+	background: red;
 }

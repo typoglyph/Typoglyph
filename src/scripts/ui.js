@@ -196,6 +196,38 @@ typoglyph.ui.PuzzleOptionDrawer = typoglyph.ui.Drawer.extend({
 /**
  * @author jakemarsden
  */
+typoglyph.ui.ProgressBarDrawer = typoglyph.ui.Drawer.extend({
+	/**
+	 * @param {int} setSize How many puzzles to expect in each set of puzzles
+	 * @constructor
+	 */
+	create: function(setSize) {
+		var self = typoglyph.ui.Drawer.create.call(this);
+		self.setSize = setSize;
+		return self;
+	},
+	
+	/**
+	 * @param {StatisticsTracker} statsTracker Information about puzzles which have been answered so far
+	 * @return {HTMLElement}
+	 * @override
+	 */
+	draw: function(statsTracker) {
+		var e = this.newElement("div", "", "progressBar");
+		var stats = statsTracker.getStatistics();
+		for (var i = 0; i < stats.length; i++) {
+			var progress = this.newElement("span", "", (stats[i].result ? "correct" : "incorrect"));
+			progress.style.width = (100 / this.setSize) + "%";
+			e.appendChild(progress);
+		}
+		return e;
+	}
+});
+
+
+/**
+ * @author jakemarsden
+ */
 typoglyph.ui.CompletionGraphicDrawer = typoglyph.ui.Drawer.extend({
 	/**
 	 * @param {Array<String>} correctGraphics

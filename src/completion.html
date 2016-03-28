@@ -33,14 +33,15 @@
 	/**
 	 * Displays the given statistics for the user
 	 * 
-	 * @param {StatisticsTracker} stats
+	 * @param {StatisticsTracker} statsTracker
 	 */
-	function showResults(stats) {
+	function showResults(statsTracker) {
 		var resultElement = document.getElementById("result"); 
 		var puzzleElement = document.getElementById("puzzleAnswer");
 		
-		var result = document.createTextNode(stats.latestResult ? "Correct!" : "Incorrect!");
-		var drawnPuzzle = _puzzleDrawer.draw(stats.getLatestAnsweredPuzzle());
+		var latestStat = statsTracker.getLatestStatistic();
+		var result = document.createTextNode(latestStat.result ? "Correct!" : "Incorrect!");
+		var drawnPuzzle = _puzzleDrawer.draw(latestStat.puzzle);
 		util.removeAllChildren(resultElement);
 		util.removeAllChildren(puzzleElement);
 		resultElement.appendChild(result);
