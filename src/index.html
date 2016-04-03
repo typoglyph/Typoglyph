@@ -61,7 +61,7 @@
 		// see https://github.com/davidjbradshaw/iframe-resizer
 		iFrameResize({
 			log: false,
-			checkOrigin: [ "http://localhost:8080", "https://localhost:8080" ],
+			checkOrigin: false,
 			
 			closedCallback: function(iframeId) {
 				console.debug("iFrameResize.closedCallback: iframeId=" + iframeId);
