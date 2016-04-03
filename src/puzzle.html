@@ -9,6 +9,7 @@
 	
 	<!-- see https://github.com/davidjbradshaw/iframe-resizer -->
 	<script type="text/javascript" src="scripts/lib/iframe-resizer-v3.5.0/iframeResizer.contentWindow.min.js"></script>
+	<script type="text/javascript" src="http://code.interactjs.io/v1.2.6/interact.js"></script>
 	<script type="text/javascript" src="scripts/common.js"></script>
 	<script type="text/javascript" src="scripts/util.js"></script>
 	<script type="text/javascript" src="scripts/ui.js"></script>
@@ -68,6 +69,8 @@
 		var gapDrawer = PuzzleGapDrawer.create(optionDrawer, false);
 		_puzzleDrawer = PuzzleDrawer.create(gapDrawer);
 		_optionBarDrawer = PuzzleOptionBarDrawer.create(optionDrawer);
+		
+		initTouchControls();
 	}
 	
 	/**
@@ -109,6 +112,112 @@
 		util.removeAllChildren(optionBarElement);
 		puzzleElement.appendChild(drawnPuzzle);
 		optionBarElement.appendChild(drawnOptions);
+	}
+	
+	
+	function initTouchControls() {
+		interact(".puzzleOption").draggable({
+			inertia: false,
+			autoScroll: false,
+			restrict: {
+				restriction: function() { return document.body.getBoundingClientRect(); },
+				elementRect: {
+					left: 0,
+					right: 1,
+					top: 0,
+					bottom: 1
+				}
+			},
+			max: 1,
+			maxPerElement: 1,
+			
+			/**
+			 * Called periodically as event.target is being dragged around so the element's
+			 * position can be updated. event.dx and event.dy describe how far the element has
+			 * been dragged since the previous call to this function. Note that the given event.dx
+			 * and event.dy will never take event.target outside the defined restriction area.
+			 * 
+			 * @param {Event} event
+			 */
+			onmove: function(event) {
+				console.debug(`onmove: target=${event.target.id}`);
+				
+				var dragDistanceX = parseFloat(event.target.getAttribute("data-dragDistanceX")) || 0;
+				var dragDistanceY = parseFloat(event.target.getAttribute("data-dragDistanceY")) || 0;
+				dragDistanceX += event.dx;
+				dragDistanceY += event.dy;
+				event.target.setAttribute("data-dragDistanceX", dragDistanceX);
+				event.target.setAttribute("data-dragDistanceY", dragDistanceY);
+				
+				var translation = `translate(${dragDistanceX}px, ${dragDistanceY}px)`;
+				event.target.style.transform = event.target.style.webkitTransform = translation;
+			},
+			/**
+			 * Called when event.target has just started being dragged, just before the first call
+			 * to onmove().
+			 * 
+			 * Note: This function is called before ondropactivate() if a drop zone has been set to
+			 * accept event.target.
+			 * 
+			 * @param {Event} event
+			 */
+			onstart: function(event) {
+				console.debug(`onstart: target=${event.target.id}`);
+				util.addClass(event.target, "highlight");
+			},
+			/**
+			 * Called when event.target has just stopped being dragged, just after the last call to
+			 * onmove().
+			 * 
+			 * Note: This function is called after ondropdeactivate() if a drop zone has been set
+			 * to accept event.target.
+			 * 
+			 * @param {Event} event
+			 */
+			onend: function(event) {
+				console.debug(`onend: target=${event.target.id}`);
+				util.removeClass(event.target, "highlight");
+			}
+		});
+		
+		interact(".puzzleGap").dropzone({
+			accept: ".puzzleOption",
+			overlap: 0.1,
+			
+			/**
+			 * Called just after event.relatedTarget has been dropped anywhere inside event.target
+			 * (the dropzone)
+			 * 
+			 * @param {Event} event
+			 */
+			ondrop: function(event) {
+				console.debug(`ondrop: target=${event.target.id}, related=${event.relatedTarget.id}`);
+				
+				var optionId = parseInt(event.relatedTarget.getAttribute("data-id"));
+				var gapId = parseInt(event.target.getAttribute("data-id"));
+				_currentPuzzle.getGapById(gapId).currentChoice = _currentPuzzle.getOptionById(optionId);
+			},
+			/**
+			 * Called when event.relatedTarget has been picked up and has just started being
+			 * dragged
+			 *
+			 * @param {Event} event
+			 */
+			ondropactivate: function(event) {
+				console.debug(`ondropactivate: target=${event.target.id}, related=${event.relatedTarget.id}`);
+			},
+			/**
+			 * Called when event.relatedTarget has been dropped. If event.relatedTarget is inside
+			 * the dropzone, this function will be called just *after* ondrop() (but will still be
+			 * called even if it's outside the drop zone).
+			 * 
+			 * @param {Event} event
+			 */
+			ondropdeactivate: function(event) {
+				console.debug(`ondropdeactivate: target=${event.target.id}, related=${event.relatedTarget.id}`);
+				renderCurrentPuzzle();
+			}
+		});
 	}
 	</script>
 </head>

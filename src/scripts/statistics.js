@@ -12,7 +12,7 @@ typoglyph.StatisticsTracker = {
 	 * @constructor
 	 */
 	create: function() {
-		var self = this.extend({
+		var self = Objects.subclass(this, {
 			stats: []
 		});
 		return self;
@@ -87,7 +87,7 @@ typoglyph.Statistic = {
 	 * @constructor
 	 */
 	create: function(puzzle, result) {
-		var self = this.extend({
+		var self = Objects.subclass({
 			puzzle: puzzle,
 			result: result
 		});

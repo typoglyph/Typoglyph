@@ -3,22 +3,38 @@
 
 
 /**
- * Utility for using prototypal inheritance
- * 
- * @see http://aaditmshah.github.io/why-prototypal-inheritance-matters/#toc_11
+ * @param {Object} element
+ * @return {boolean} True if this array contains the specified element
  */
-Object.prototype.extend = function() {
-	var object = Object.create(this);
-	for (var i = (arguments.length - 1); i >= 0; i--) {
-		var extension = arguments[i];
-		for (var property in extension) {
-			if (Object.hasOwnProperty.call(extension, property) || typeof object[property] === "undefined") {
-				object[property] = extension[property];
-			}
-		}
+Array.prototype.contains = function(element) {
+	return this.indexOf(element) !== -1;
+}
+
+/**
+ * @param {Object} element The element to remove from this array
+ */
+Array.prototype.remove = function(element) {
+	var index = this.findIndex(function(item) { return item === element; });
+	if (index !== -1) {
+		this.splice(index, 1);
 	}
-	return object;
-};
+}
+
+/**
+ * @param {Object} element The element to remove all references of from this array
+ */
+Array.prototype.removeAll = function(element) {
+	while (this.contains(element))
+		this.remove(element);
+}
+
+/**
+ * @param {Object} element The element to add to this array if it isn't already present
+ */
+Array.prototype.pushUnique = function(element) {
+	if (!this.contains(element))
+		this.push(element);
+}
 
 
 /**
@@ -29,10 +45,34 @@ Object.prototype.extend = function() {
  * null-safe or null-tolerant methods for computing the hash code of an object, returning a string
  * for an object, and comparing two objects.
  * 
+ * Also includes utilities to help with object inheritance in JavaScript.
+ * 
  * @see https://docs.oracle.com/javase/7/docs/api/java/util/Objects.html
  * @author jakemarsden
  */
 var Objects = Object.create(null);
+
+/**
+ * Utility for using prototypal inheritance
+ * 
+ * @param {Object} superclass The base class to extend from (will not be modified by this function)
+ * @param {Array<Object>} [vararg] The extensions to apply to the superclass to create a subclass
+ * @return {Object} A new object consisting of the given superclass combined with the given
+ *     extensions
+ * @see http://aaditmshah.github.io/why-prototypal-inheritance-matters/#toc_11
+ */
+Objects.subclass = function(superclass) {
+	var object = Object.create(superclass);
+	for (var i = (arguments.length - 1); i >= 1; i--) {
+		var extension = arguments[i];
+		for (var property in extension) {
+			if (Object.hasOwnProperty.call(extension, property) || typeof object[property] === "undefined") {
+				object[property] = extension[property];
+			}
+		}
+	}
+	return object;
+}
 
 /**
  * @param {?} a
