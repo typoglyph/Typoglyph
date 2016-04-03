@@ -1,3 +1,18 @@
+#puzzleSentence,
+#puzzleOptions {
+	/* Make text unselectable */
+	/* See: http://stackoverflow.com/questions/826782/css-rule-to-disable-text-selection-highlighting#4407335 */
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	cursor: default;
+}
+
+
+
 .buttonHolder {
 	width: 180px;
 	margin-left: auto;
@@ -17,6 +32,7 @@
 .button {
 	width: 70px;
 	height: 70px;
+	cursor: pointer;
 }
 
 
@@ -63,6 +79,10 @@
 	background: #eee;
 	background-image: url("../images/border-solid.svg");
 	background-size: 100% 100%;
+	
+	cursor: -moz-grab;
+	cursor: -webkit-grab;
+	cursor: grab;
 }
 
 .puzzleGap .puzzleOption {
@@ -77,6 +97,9 @@
 
 .puzzleOption.highlight {
 	/* Options which are being dragged around */
+	cursor: -moz-grabbing;
+	cursor: -webkit-grabbing;
+	cursor: grabbing;
 }
 
 
