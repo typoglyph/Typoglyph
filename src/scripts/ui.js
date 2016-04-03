@@ -11,7 +11,7 @@ typoglyph.ui.Drawer = {
 	 * @constructor
 	 */
 	create: function() {
-		var self = this.extend({});
+		var self = Objects.subclass(this);
 		return self;
 	},
 	
@@ -55,7 +55,7 @@ typoglyph.ui.Drawer = {
 /**
  * Used to generate a visual representation of a list of puzzle options
  */
-typoglyph.ui.PuzzleOptionBarDrawer = typoglyph.ui.Drawer.extend({
+typoglyph.ui.PuzzleOptionBarDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 	/**
 	 * @param {PuzzleOptionDrawer} optionDrawer
 	 * @constructor
@@ -90,7 +90,7 @@ typoglyph.ui.PuzzleOptionBarDrawer = typoglyph.ui.Drawer.extend({
  * 
  * @author jakemarsden
  */
-typoglyph.ui.PuzzleDrawer = typoglyph.ui.Drawer.extend({
+typoglyph.ui.PuzzleDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 	/**
 	 * @param {PuzzleGapDrawer} gapDrawer
 	 * @constructor
@@ -133,7 +133,7 @@ typoglyph.ui.PuzzleDrawer = typoglyph.ui.Drawer.extend({
  * 
  * @author jakemarsden
  */
-typoglyph.ui.PuzzleGapDrawer = typoglyph.ui.Drawer.extend({
+typoglyph.ui.PuzzleGapDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 	/**
 	 * @param {PuzzleOptionDrawer} optionDrawer
 	 * @param {boolean} showSolution True if you want the solution to be shown, false if you want
@@ -172,7 +172,7 @@ typoglyph.ui.PuzzleGapDrawer = typoglyph.ui.Drawer.extend({
  * 
  * @author jakemarsden
  */
-typoglyph.ui.PuzzleOptionDrawer = typoglyph.ui.Drawer.extend({
+typoglyph.ui.PuzzleOptionDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 	/**
 	 * @constructor
 	 */
@@ -198,7 +198,7 @@ typoglyph.ui.PuzzleOptionDrawer = typoglyph.ui.Drawer.extend({
 /**
  * @author jakemarsden
  */
-typoglyph.ui.CompletionGraphicDrawer = typoglyph.ui.Drawer.extend({
+typoglyph.ui.CompletionGraphicDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 	/**
 	 * @param {Array<String>} correctGraphics
 	 * @param {Array<String>} incorrectGraphics

@@ -19,7 +19,7 @@ typoglyph.puzzle.Puzzle = {
 	 * @constructor
 	 */
 	create: function(sentence, options, gaps) {
-		var self = this.extend({
+		var self = Objects.subclass(this, {
 			sentence: sentence,
 			options: options,
 			gaps: gaps
@@ -166,7 +166,7 @@ typoglyph.puzzle.Gap = {
 	 * @constructor
 	 */
 	create: function(position, solution) {
-		var self = this.extend({
+		var self = Objects.subclass(this, {
 			id: typoglyph.puzzle.Gap.nextId++,
 			position: position,
 			solution: solution,
@@ -219,7 +219,7 @@ typoglyph.puzzle.Option = {
 	 * @constructor
 	 */
 	create: function(value) {
-		var self = this.extend({
+		var self = Objects.subclass(this, {
 			id: typoglyph.puzzle.Option.nextId++,
 			value: value
 		});

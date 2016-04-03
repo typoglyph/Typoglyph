@@ -12,7 +12,7 @@ typoglyph.StatisticsTracker = {
 	 * @constructor
 	 */
 	create: function() {
-		var self = this.extend({
+		var self = Objects.subclass(this, {
 			correctPuzzles: [],
 			incorrectPuzzles: [],
 			latestResult: null
