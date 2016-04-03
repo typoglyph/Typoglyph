@@ -26,63 +26,38 @@ typoglyph.util.randomElement = function(array) {
 }
 
 /**
- * @return {int}
+ * @return {Rect}
  * @static
  * @author jakemarsden
  * @see https://andylangton.co.uk/blog/development/get-viewportwindow-size-width-and-height-javascript
  */
-typoglyph.util.getViewportWidth = function() {
-	// the more standards compliant browsers (mozilla/netscape/opera/IE7) use window.innerWidth and window.innerHeight
-	if (typeof window.innerWidth != 'undefined')
-		return window.innerWidth;
-		
-	// IE6 in standards compliant mode (i.e. with a valid doctype as the first line in the document)
-	if (typeof document.documentElement != 'undefined'
+typoglyph.util.getViewportSize = function() {
+	var w;
+	var h;
+	if (typeof window.innerWidth != 'undefined') {
+		// the more standards compliant browsers (mozilla/netscape/opera/IE7) use window.innerWidth and window.innerHeight
+		w = window.innerWidth;
+		h = window.innerHeight;
+	} else if (typeof document.documentElement != 'undefined'
 			&& typeof document.documentElement.clientWidth != 'undefined'
-			&& document.documentElement.clientWidth != 0)
-		return document.documentElement.clientWidth;
+			&& document.documentElement.clientWidth != 0) {
+		// IE6 in standards compliant mode (i.e. with a valid doctype as the first line in the document)
+		w = document.documentElement.clientWidth;
+		h = document.documentElement.clientHeight;
+	} else {
+		// older versions of IE
+		w = document.getElementsByTagName('body')[0].clientWidth;
+		h = document.getElementsByTagName('body')[0].clientHeight;
+	}
 	
-	// older versions of IE
-	return document.getElementsByTagName('body')[0].clientWidth;
-}
-
-/**
- * @return {int}
- * @static
- * @author jakemarsden
- * @see https://andylangton.co.uk/blog/development/get-viewportwindow-size-width-and-height-javascript
- */
-typoglyph.util.getViewportHeight = function() {
-	// the more standards compliant browsers (mozilla/netscape/opera/IE7) use window.innerWidth and window.innerHeight
-	if (typeof window.innerHeight != 'undefined')
-		return window.innerHeight;
-		
-	// IE6 in standards compliant mode (i.e. with a valid doctype as the first line in the document)
-	if (typeof document.documentElement != 'undefined'
-			&& typeof document.documentElement.clientHeight != 'undefined'
-			&& document.documentElement.clientHeight != 0)
-		return document.documentElement.clientHeight;
-	
-	// older versions of IE
-	return document.getElementsByTagName('body')[0].clientHeight;
-}
-
-/**
- * @param {HTMLElement} e The DOM element to get the size of
- * @return {float} The width of the specified element, in pixels
- * @static
- */
-typoglyph.util.getElementWidth = function(e) {
-	return e.getBoundingClientRect().width;
-}
-
-/**
- * @param {HTMLElement} e The DOM element to get the size of
- * @return {float} The height of the specified element, in pixels
- * @static
- */
-typoglyph.util.getElementHeight = function(e) {
-	return e.getBoundingClientRect().height;
+	var rect = {
+		left: 0,
+		top: 0,
+		right: w,
+		bottom: h,
+		width: w,
+		height: h };
+	return rect;
 }
 
 /**
@@ -172,34 +147,4 @@ typoglyph.util.removeAllChildren = function(e) {
 	var node;
 	while (node = e.firstChild)
 		e.removeChild(node);
-}
-
-/**
- * Adapted from http://stackoverflow.com/questions/979975/how-to-get-the-value-from-the-url-parameter
- *
- * @param {String} parameterName
- * @return {String}
- * @static
- * @author jakemarsden
- * @see http://stackoverflow.com/questions/979975/how-to-get-the-value-from-the-url-parameter
- */
-typoglyph.util.getQueryParameter = function(parameterName) {
-	var query_string = {};
-	var query = window.location.search.substring(1);
-	var vars = query.split("&");
-	for (var i = 0; i < vars.length; i++) {
-		var pair = vars[i].split("=");
-			// If first entry with this name
-		if (typeof query_string[pair[0]] === "undefined") {
-			query_string[pair[0]] = decodeURIComponent(pair[1]);
-			// If second entry with this name
-		} else if (typeof query_string[pair[0]] === "string") {
-			var arr = [ query_string[pair[0]], decodeURIComponent(pair[1]) ];
-			query_string[pair[0]] = arr;
-			// If third or later entry with this name
-		} else {
-			query_string[pair[0]].push(decodeURIComponent(pair[1]));
-		}
-	} 
-	return query_string[parameterName];
 }
