@@ -9,7 +9,7 @@
 	
 	<!-- see https://github.com/davidjbradshaw/iframe-resizer -->
 	<script type="text/javascript" src="scripts/lib/iframe-resizer-v3.5.0/iframeResizer.contentWindow.min.js"></script>
-	<script type="text/javascript" src="http://code.interactjs.io/v1.2.6/interact.js"></script>
+	<script type="text/javascript" src="scripts/lib/interact.js-v1.2.6/interact.min.js"></script>
 	<script type="text/javascript" src="scripts/common.js"></script>
 	<script type="text/javascript" src="scripts/util.js"></script>
 	<script type="text/javascript" src="scripts/ui.js"></script>
@@ -180,7 +180,7 @@
 			}
 		});
 		
-		interact(".puzzleGap").dropzone({
+		interact("*").dropzone({
 			accept: ".puzzleOption",
 			overlap: 0.1,
 			
@@ -191,11 +191,25 @@
 			 * @param {Event} event
 			 */
 			ondrop: function(event) {
-				console.debug(`ondrop: target=${event.target.id}, related=${event.relatedTarget.id}`);
+				console.debug(`ondrop: target=${event.relatedTarget.id}, origin=${event.relatedTarget.parentNode.id}, dest=${event.target.id}`);
 				
-				var optionId = parseInt(event.relatedTarget.getAttribute("data-id"));
-				var gapId = parseInt(event.target.getAttribute("data-id"));
-				_currentPuzzle.getGapById(gapId).currentChoice = _currentPuzzle.getOptionById(optionId);
+				if (util.getClasses(event.relatedTarget).contains("puzzleOption")) {
+					// A puzzle option is being dropped somewhere
+					var optionId = parseInt(event.relatedTarget.getAttribute("data-id"));
+					var option = _currentPuzzle.getOptionById(optionId);
+					
+					if (util.getClasses(event.relatedTarget.parentNode).contains("puzzleGap")) {
+						// A puzzle option is being dragged from a puzzle gap
+						var originGapId = parseInt(event.relatedTarget.parentNode.getAttribute("data-id"));
+						_currentPuzzle.getGapById(originGapId).currentChoice = null;
+					}
+					
+					if (util.getClasses(event.target).contains("puzzleGap")) {
+						// A puzzle option is being dropped into a puzzle gap
+						var destinationGapId = parseInt(event.target.getAttribute("data-id"));
+						_currentPuzzle.getGapById(destinationGapId).currentChoice = option;
+					}
+				}
 			},
 			/**
 			 * Called when event.relatedTarget has been picked up and has just started being
@@ -204,7 +218,7 @@
 			 * @param {Event} event
 			 */
 			ondropactivate: function(event) {
-				console.debug(`ondropactivate: target=${event.target.id}, related=${event.relatedTarget.id}`);
+				console.debug(`ondropactivate: target=${event.relatedTarget.id}, origin=${event.relatedTarget.parentNode.id}, dest=${event.target.id}`);
 			},
 			/**
 			 * Called when event.relatedTarget has been dropped. If event.relatedTarget is inside
@@ -214,7 +228,7 @@
 			 * @param {Event} event
 			 */
 			ondropdeactivate: function(event) {
-				console.debug(`ondropdeactivate: target=${event.target.id}, related=${event.relatedTarget.id}`);
+				console.debug(`ondropdeactivate: target=${event.relatedTarget.id}, origin=${event.relatedTarget.parentNode.id}, dest=${event.target.id}`);
 				renderCurrentPuzzle();
 			}
 		});
