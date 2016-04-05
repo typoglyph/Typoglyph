@@ -208,6 +208,12 @@
 						// A puzzle option is being dropped into a puzzle gap
 						var destinationGapId = parseInt(event.target.getAttribute("data-id"));
 						_currentPuzzle.getGapById(destinationGapId).currentChoice = option;
+						
+					} else if (util.getClasses(event.target).contains("puzzleOption")
+							&& util.getClasses(event.target.parentNode).contains("puzzleGap")) {
+						// A puzzle option is being dropped into an already-populated gap
+						var destinationGapId = parseInt(event.target.parentNode.getAttribute("data-id"));
+						_currentPuzzle.getGapById(destinationGapId).currentChoice = option;
 					}
 				}
 			},
