@@ -5,6 +5,12 @@
 ; the values of all options should be replaced with the default value, or should be left blank if
 ; there is no default.
 
+
+[Logger]
+FilePath=
+Level=["Trace"|"Debug"|"Info"|"Warn"|"Error"]
+
+
 [DatabaseConnection]
 ConnectionString=
 Username=

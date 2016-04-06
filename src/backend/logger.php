@@ -1,4 +1,7 @@
 <?php
+require_once("configuration.php");
+
+
 /*
 Example usage:
 
@@ -32,7 +35,6 @@ SomeObject::initStatic();
  * completely up to this class.
  */
 final class LoggerFactory {
-	private static $LOG_FILE = "../../php_output.log";
 	private static $loggers = array();
 	
 	/**
@@ -50,8 +52,9 @@ final class LoggerFactory {
 	}
 	
 	private static function createLogger($name) {
-		$logger = new FileLogger($name, static::$LOG_FILE);
-		$logger = new FIlteredLogger($logger, LogLevel::$Trace);
+		$logConfig = (new ApplicationConfig())->getLoggerConfig();
+		$logger = new FileLogger($name, $logConfig->getFilePath());
+		$logger = new FilteredLogger($logger, LogLevel::fromName($logConfig->getLevel()));
 		return $logger;
 	}
 }
