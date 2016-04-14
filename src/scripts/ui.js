@@ -71,16 +71,14 @@ typoglyph.ui.PuzzleOptionBarDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 	 * @return {HTMLElement}
 	 */
 	draw: function(options) {
-		var table = this.newElement("table");
-		var row = this.newElement("tr");
+		var list = this.newElement("ul");
 		for (var i = 0; i < options.length; i++) {
 			var drawnOption = this.optionDrawer.draw(options[i]);
-			var td = this.newElement("td");
-			td.appendChild(drawnOption);
-			row.appendChild(td);
-		}		
-		table.appendChild(row);
-		return table;
+			var listItem = this.newElement("li");
+			listItem.appendChild(drawnOption);
+			list.appendChild(listItem);
+		}
+		return list;
 	}
 });
 
@@ -102,7 +100,7 @@ typoglyph.ui.PuzzleDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 	},
 	
 	draw: function(puzzle) {
-		var e = this.newElement("span", "", "puzzle");
+		var e = this.newElement("p", "", "puzzle");
 		var sentenceFragment = null;
 		
 		// Iterate length+1 in case there's a gap after the last character
@@ -252,7 +250,7 @@ typoglyph.ui.CompletionGraphicDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 		var util = typoglyph.util;
 		
 		var graphic = util.randomElement(correct ? this.correctGraphics : this.incorrectGraphics);
-		var e = this.newElement("img", "completionGraphic");
+		var e = this.newElement("img", "", "completionGraphic");
 		e.src = graphic;
 		util.setImageRotation(e, util.randomInt(-50, 50));
 		

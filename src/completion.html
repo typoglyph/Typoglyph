@@ -8,8 +8,8 @@
 	<!-- @see scripts/dynamicStylesheets.js -->
 	<link rel="stylesheet" type="text/css" href="styles/main.css">
 	<link rel="stylesheet" type="text/css" href="styles/main-tiny.css"		class="dynamic-stylesheet max-width:768">
-	<link rel="stylesheet" type="text/css" href="styles/main-small.css"		class="dynamic-stylesheet min-width:769		max-width:1280">
-	<link rel="stylesheet" type="text/css" href="styles/main-medium.css"	class="dynamic-stylesheet min-width:1281	max-width:2048">
+	<link rel="stylesheet" type="text/css" href="styles/main-small.css"		class="dynamic-stylesheet min-width:769		max-width:1000">
+	<link rel="stylesheet" type="text/css" href="styles/main-medium.css"	class="dynamic-stylesheet min-width:1001	max-width:2048">
 	<link rel="stylesheet" type="text/css" href="styles/main-large.css"		class="dynamic-stylesheet min-width:2049">
 	
 	<!-- see https://github.com/davidjbradshaw/iframe-resizer -->
@@ -113,11 +113,6 @@
 </head>
 <body onload="onLoad();" onresize="onResize(event);" onorientationchange="onOrientationChange(event);" onclick="onClickAnywhere(event, this);">
 	<h2 id="result"></h2>
-	<table>
-		<tr>
-			<td>Answer:</td>
-			<td id="puzzleAnswer"></td>
-		</tr>
-	</table>
+	<div id="puzzleAnswer" class="centerHorizontal"></div>
 </body>
 </html>
