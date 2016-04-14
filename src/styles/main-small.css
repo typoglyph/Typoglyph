@@ -1,2 +1,70 @@
 /* This stylesheet is only enabled when the viewport size is within a certain range */
 /* @see scripts/dynamicStylesheets.js */
+
+
+
+html {
+	/* Default */ font-size: 300%;
+}
+
+
+
+
+/* *********
+ * Buttons *
+ ***********/
+
+.buttonHolder {
+	margin-left: 25vw;
+	margin-right: 25vw;
+}
+
+.button {
+	width: 20vw;
+	height: 20vw;
+}
+
+
+
+/****************
+ * Progress bar *
+ ****************/
+
+.progressBar {
+	height: 5vh;
+}
+
+
+
+
+/**********************
+ * Completion graphic *
+ **********************/
+ 
+.completionGraphic {
+	width: 30vw;
+}
+
+
+
+
+/***********
+ * Puzzles *
+ ***********/
+
+.puzzleGap {
+	width: 7vw;
+	height: 7vw;
+	margin-left: 1.5vw;
+	margin-right: 1.5vw;
+	margin-top: 1vw;
+	margin-bottom: 1vw;
+}
+
+/* Options which are NOT inside a gap */
+:not(.puzzleGap) > .puzzleOption {
+	width: 10vw;
+	height: 10vw;
+	margin-left: 4vw;
+	margin-right: 4vw;
+}
