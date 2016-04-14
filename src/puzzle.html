@@ -171,7 +171,7 @@
 			 * @param {Event} event
 			 */
 			onmove: function(event) {
-				console.debug(`onmove: target=${event.target.id}`);
+				console.debug("onmove: target=" + event.target.id);
 				
 				var dragDistanceX = parseFloat(event.target.getAttribute("data-dragDistanceX")) || 0;
 				var dragDistanceY = parseFloat(event.target.getAttribute("data-dragDistanceY")) || 0;
@@ -180,7 +180,7 @@
 				event.target.setAttribute("data-dragDistanceX", dragDistanceX);
 				event.target.setAttribute("data-dragDistanceY", dragDistanceY);
 				
-				var translation = `translate(${dragDistanceX}px, ${dragDistanceY}px)`;
+				var translation = "translate(" + dragDistanceX + "px, " + dragDistanceY + "px)";
 				event.target.style.transform = event.target.style.webkitTransform = translation;
 			},
 			/**
@@ -193,7 +193,7 @@
 			 * @param {Event} event
 			 */
 			onstart: function(event) {
-				console.debug(`onstart: target=${event.target.id}`);
+				console.debug("onstart: target=" + event.target.id);
 				util.addClass(event.target, "highlight");
 			},
 			/**
@@ -206,7 +206,7 @@
 			 * @param {Event} event
 			 */
 			onend: function(event) {
-				console.debug(`onend: target=${event.target.id}`);
+				console.debug("onend: target=" + event.target.id);
 				util.removeClass(event.target, "highlight");
 			}
 		});
@@ -222,7 +222,7 @@
 			 * @param {Event} event
 			 */
 			ondrop: function(event) {
-				console.debug(`ondrop: target=${event.relatedTarget.id}, origin=${event.relatedTarget.parentNode.id}, dest=${event.target.id}`);
+				console.debug("ondrop: target=" + event.relatedTarget.id + ", origin=" + event.relatedTarget.parentNode.id + ", dest=" + event.target.id);
 				
 				if (util.getClasses(event.relatedTarget).contains("puzzleOption")) {
 					// A puzzle option is being dropped somewhere
@@ -255,7 +255,7 @@
 			 * @param {Event} event
 			 */
 			ondropactivate: function(event) {
-				console.debug(`ondropactivate: target=${event.relatedTarget.id}, origin=${event.relatedTarget.parentNode.id}, dest=${event.target.id}`);
+				console.debug("ondropactivate: target=" + event.relatedTarget.id + ", origin=" + event.relatedTarget.parentNode.id + ", dest=" + event.target.id);
 			},
 			/**
 			 * Called when event.relatedTarget has been dropped. If event.relatedTarget is inside
@@ -265,7 +265,7 @@
 			 * @param {Event} event
 			 */
 			ondropdeactivate: function(event) {
-				console.debug(`ondropdeactivate: target=${event.relatedTarget.id}, origin=${event.relatedTarget.parentNode.id}, dest=${event.target.id}`);
+				console.debug("ondropdeactivate: target=" + event.relatedTarget.id + ", origin=" + event.relatedTarget.parentNode.id + ", dest=" + event.target.id);
 				renderCurrentPuzzle();
 			}
 		});

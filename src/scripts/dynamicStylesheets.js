@@ -131,11 +131,11 @@ typoglyph.DynamicStylesheet = {
 	create: function(e, minWidth, maxWidth, minHeight, maxHeight) {
 		var tagName = e.tagName.toLowerCase();
 		if (!(tagName === "style" || (tagName === "link" && e.rel.toLowerCase() === "stylesheet")))
-			throw `Not a stylesheet: '${e.outerHTML}'`;
+			throw "Not a stylesheet: " + e.outerHTML;
 		if (minWidth !== null && maxWidth !== null && minWidth > maxWidth)
-			throw `minWidth cannot be greater than maxWidth: ${minWidth} > ${maxWidth}`;
+			throw "minWidth cannot be greater than maxWidth: " + minWidth + " > " + maxWidth;
 		if (minHeight !== null && maxHeight !== null && minHeight > maxHeigth)
-			throw `minHeight cannot be greater than maxHeight: ${minHeight} > ${maxHeight}`;
+			throw "minHeight cannot be greater than maxHeight: " + minHeight + " > " + maxHeight;
 		
 		var self = Objects.subclass(this, {
 			element: e,
@@ -161,5 +161,8 @@ typoglyph.DynamicStylesheet = {
 		if (this.maxHeight !== null && bounds.height > this.maxHeight)
 			enabled = false;
 		this.element.disabled = !enabled;
+		
+		if (enabled)
+			console.debug("Stylesheet enabled: " + this.element.href);
 	}
 };

@@ -2,6 +2,41 @@
    the first script defined for each HTML page. */
 
 
+if (!Array.prototype.findIndex) {
+	
+	/**
+	 * Polyfill for Array.findIndex:
+	 * 
+	 * The findIndex() method returns an index in the array, if an element in the array satisfies
+	 * the provided testing function. Otherwise -1 is returned.
+	 * 
+	 * @param {function(Object, int, Array)} predicate
+	 * @return int
+	 * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex
+	 */
+	Array.prototype.findIndex = function(predicate) {
+		if (this === null) {
+			throw new TypeError('Array.prototype.findIndex called on null or undefined');
+		}
+		if (typeof predicate !== 'function') {
+			throw new TypeError('predicate must be a function');
+		}
+		var list = Object(this);
+		var length = list.length >>> 0;
+		var thisArg = arguments[1];
+		var value;
+
+		for (var i = 0; i < length; i++) {
+			value = list[i];
+			if (predicate.call(thisArg, value, i, list)) {
+				return i;
+			}
+		}
+		return -1;
+	};
+}
+
+
 /**
  * @param {Object} element
  * @return {boolean} True if this array contains the specified element
@@ -14,7 +49,8 @@ Array.prototype.contains = function(element) {
  * @param {Object} element The element to remove from this array
  */
 Array.prototype.remove = function(element) {
-	var index = this.findIndex(function(item) { return item === element; });
+	var comparator = function(arrayElement, arrayIndex, array) { return arrayElement === element; };
+	var index = this.findIndex(comparator);
 	if (index !== -1) {
 		this.splice(index, 1);
 	}
