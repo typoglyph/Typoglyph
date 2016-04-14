@@ -40,7 +40,7 @@ typoglyph.DynamicStylesheets = {
 	 * @param {Array<HTMLElement>} elements
 	 * @constructor
 	 */
-	fromElements(elements) {
+	fromElements: function(elements) {
 		var dynamicStylesheets = [];
 		for (var i = 0; i < elements.length; i++) {
 			var dynamicStylesheet = typoglyph.DynamicStylesheet.fromElement(elements[i]);
@@ -90,7 +90,7 @@ typoglyph.DynamicStylesheet = {
 	 * @param {HTMLElement} e The DOM element representing the stylesheet
 	 * @constructor
 	 */
-	fromElement(e) {
+	fromElement: function(e) {
 		var minWidth = null;
 		var maxWidth = null;
 		var minHeight = null;
