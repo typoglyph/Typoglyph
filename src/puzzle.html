@@ -4,20 +4,27 @@
 	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 	<meta content="utf-8" http-equiv="encoding">
 	
-	<link rel="stylesheet" type="text/css" href="styles/common.css">
-	<link rel="stylesheet" type="text/css" href="styles/index.css">
+	<!-- Only one of the dynamic styles will be enabled at once, based on the current size of the browser window -->
+	<!-- @see scripts/dynamicStylesheets.js -->
+	<link rel="stylesheet" type="text/css" href="styles/main.css">
+	<link rel="stylesheet" type="text/css" href="styles/main-tiny.css"		class="dynamic-stylesheet max-width:768">
+	<link rel="stylesheet" type="text/css" href="styles/main-small.css"		class="dynamic-stylesheet min-width:769		max-width:1000">
+	<link rel="stylesheet" type="text/css" href="styles/main-medium.css"	class="dynamic-stylesheet min-width:1001	max-width:2048">
+	<link rel="stylesheet" type="text/css" href="styles/main-large.css"		class="dynamic-stylesheet min-width:2049">
 	
 	<!-- see https://github.com/davidjbradshaw/iframe-resizer -->
 	<script type="text/javascript" src="scripts/lib/iframe-resizer-v3.5.0/iframeResizer.contentWindow.min.js"></script>
 	<script type="text/javascript" src="scripts/lib/interact.js-v1.2.6/interact.min.js"></script>
 	<script type="text/javascript" src="scripts/common.js"></script>
 	<script type="text/javascript" src="scripts/util.js"></script>
+	<script type="text/javascript" src="scripts/dynamicStylesheets.js"></script>
 	<script type="text/javascript" src="scripts/ui.js"></script>
 	<script>
 	
 	
 	// Imports
 	var util = typoglyph.util;
+	var DynamicStylesheets = typoglyph.DynamicStylesheets;
 	var PuzzleDrawer = typoglyph.ui.PuzzleDrawer;
 	var PuzzleGapDrawer = typoglyph.ui.PuzzleGapDrawer;
 	var PuzzleOptionDrawer = typoglyph.ui.PuzzleOptionDrawer;
@@ -25,6 +32,7 @@
 	
 	
 	// Global variables
+	var _dynStylesheets = null;
 	var _currentPuzzle = null;
 	var _onPuzzleCompleteListener = null;
 	
@@ -64,6 +72,9 @@
 	function onLoad() {
 		console.debug("onLoad");
 		
+		_dynStylesheets = DynamicStylesheets.fromDocument(document);
+		_dynStylesheets.update();
+		
 		// DI would be nice here... oh well
 		var optionDrawer = PuzzleOptionDrawer.create();
 		var gapDrawer = PuzzleGapDrawer.create(optionDrawer, false);
@@ -71,6 +82,26 @@
 		_optionBarDrawer = PuzzleOptionBarDrawer.create(optionDrawer);
 		
 		initTouchControls();
+	}
+	
+	/**
+	 * Called whenever the size of the viewport changes
+	 * 
+	 * @param {Event} event
+	 */
+	function onResize(event) {
+		console.debug("onResize: event=" + event);
+		_dynStylesheets.update();
+	}
+	
+	/**
+	 * Called whenever the orientation of the device changes. Note browser support is spotty - some
+	 * may call onResize(), some may call onOrientationChange(), some may all both, some may not
+	 * call either
+	 */
+	function onOrientationChange(event) {
+		console.debug("onOrientationChange: event=" + event);
+		_dynStylesheets.update();
 	}
 	
 	/**
@@ -140,17 +171,14 @@
 			 * @param {Event} event
 			 */
 			onmove: function(event) {
-				console.debug(`onmove: target=${event.target.id}`);
+				console.debug("onmove: target=" + event.target.id);
 				
 				var dragDistanceX = parseFloat(event.target.getAttribute("data-dragDistanceX")) || 0;
 				var dragDistanceY = parseFloat(event.target.getAttribute("data-dragDistanceY")) || 0;
-				dragDistanceX += event.dx;
-				dragDistanceY += event.dy;
-				event.target.setAttribute("data-dragDistanceX", dragDistanceX);
-				event.target.setAttribute("data-dragDistanceY", dragDistanceY);
+				event.target.setAttribute("data-dragDistanceX", dragDistanceX += event.dx);
+				event.target.setAttribute("data-dragDistanceY", dragDistanceY += event.dy);
 				
-				var translation = `translate(${dragDistanceX}px, ${dragDistanceY}px)`;
-				event.target.style.transform = event.target.style.webkitTransform = translation;
+				util.setElementTranslation(event.target, dragDistanceX, dragDistanceY);
 			},
 			/**
 			 * Called when event.target has just started being dragged, just before the first call
@@ -162,7 +190,7 @@
 			 * @param {Event} event
 			 */
 			onstart: function(event) {
-				console.debug(`onstart: target=${event.target.id}`);
+				console.debug("onstart: target=" + event.target.id);
 				util.addClass(event.target, "highlight");
 			},
 			/**
@@ -175,7 +203,7 @@
 			 * @param {Event} event
 			 */
 			onend: function(event) {
-				console.debug(`onend: target=${event.target.id}`);
+				console.debug("onend: target=" + event.target.id);
 				util.removeClass(event.target, "highlight");
 			}
 		});
@@ -191,7 +219,7 @@
 			 * @param {Event} event
 			 */
 			ondrop: function(event) {
-				console.debug(`ondrop: target=${event.relatedTarget.id}, origin=${event.relatedTarget.parentNode.id}, dest=${event.target.id}`);
+				console.debug("ondrop: target=" + event.relatedTarget.id + ", origin=" + event.relatedTarget.parentNode.id + ", dest=" + event.target.id);
 				
 				if (util.getClasses(event.relatedTarget).contains("puzzleOption")) {
 					// A puzzle option is being dropped somewhere
@@ -224,7 +252,7 @@
 			 * @param {Event} event
 			 */
 			ondropactivate: function(event) {
-				console.debug(`ondropactivate: target=${event.relatedTarget.id}, origin=${event.relatedTarget.parentNode.id}, dest=${event.target.id}`);
+				console.debug("ondropactivate: target=" + event.relatedTarget.id + ", origin=" + event.relatedTarget.parentNode.id + ", dest=" + event.target.id);
 			},
 			/**
 			 * Called when event.relatedTarget has been dropped. If event.relatedTarget is inside
@@ -234,26 +262,17 @@
 			 * @param {Event} event
 			 */
 			ondropdeactivate: function(event) {
-				console.debug(`ondropdeactivate: target=${event.relatedTarget.id}, origin=${event.relatedTarget.parentNode.id}, dest=${event.target.id}`);
+				console.debug("ondropdeactivate: target=" + event.relatedTarget.id + ", origin=" + event.relatedTarget.parentNode.id + ", dest=" + event.target.id);
 				renderCurrentPuzzle();
 			}
 		});
 	}
 	</script>
 </head>
-<body onload="onLoad();">
-	<table>
-		<tr>
-			<td>Options:</td>
-			<td id="puzzleOptions"></td>
-		</tr>
-		<tr>
-			<td>Sentence:</td>
-			<td id="puzzleSentence"></td>
-		</tr>
-	</table>
-	
-	<div class="buttonHolder">
+<body onload="onLoad();" onresize="onResize(event);" onorientationchange="onOrientationChange(event);">
+	<div id="puzzleOptions" class="centerHorizontal"></div>
+	<div id="puzzleSentence" class="centerHorizontal"></div>
+	<div class="buttonHolder equidistantHorizontal">
 		<img id="resetPuzzle" class="button" src="images/button_reset.svg" onclick="onResetPuzzleButtonClicked(event, this);" />
 		<img id="nextPuzzle" class="button" src="images/button_next.svg" onclick="onNextPuzzleButtonClicked(event, this);" />
 	</div>

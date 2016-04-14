@@ -1,0 +1,9 @@
+/* This stylesheet is only enabled when the viewport size is within a certain range */
+/* @see scripts/dynamicStylesheets.js */
+
+
+/* This stylesheet is considered the default, and as such, property values are given as defaults in
+ * "main.css" instead of overridden here as per the other more specific stylesheets. The default
+ * property values in "main.css" will be used when either:
+ *     1) The screen is considered a "medium" size
+ *     2) The screen size cannot be determined */
