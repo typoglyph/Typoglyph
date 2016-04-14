@@ -108,6 +108,20 @@ typoglyph.util.removeClass = function(e, clazz) {
 }
 
 /**
+ * @param {HTMLElement} e The DOM element to translate
+ * @param {float} deltaX How much to translate the element along the X axis
+ * @param {float} deltaY Hot much to translate the element along the Y axis
+ * @static
+ */
+typoglyph.util.setElementTranslation = function(e, deltaX, deltaY) {
+	var transform = "translate(" + deltaX + "px, " + deltaY + "px)";
+	var style = e.style;
+	style["-ms-transform"] = transform;
+	style["-webkit-transform"] = transform;
+	style["transform"] = transform;
+}
+
+/**
  * @param {HTMLElement} e The DOM element to rotate
  * @param {float} rotation How much to rotate the image, in degrees
  * @static
@@ -119,13 +133,13 @@ typoglyph.util.setImageRotation = function(e, rotation) {
 	while (rotation >= 360)
 		rotation -= 360;
 	
-	var s = e.style;
-	var r = "rotate(" + rotation + "deg)";
-	s["-webkit-transform"] = r;
-	s["-moz-transform"] = r;
-	s["-o-transform"] = r;
-	s["-ms-transform"] = r;
-	s["transform"] = r;
+	var style = e.style;
+	var transform = "rotate(" + rotation + "deg)";
+	style["-ms-transform"] = transform;
+	style["-webkit-transform"] = transform;
+	style["-moz-transform"] = transform;
+	style["-o-transform"] = transform;
+	style["transform"] = transform;
 }
 
 /**

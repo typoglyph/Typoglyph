@@ -60,11 +60,15 @@ html {
 	padding: 2px;
 	
 	border: 1px solid #ccc;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
 	border-radius: 5px;
 }
 
 .progressBar * {
 	display: inline-block;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	
 	height: 100%;
@@ -74,6 +78,10 @@ html {
 }
 .progressBar *:first-child {
 	/* Left corners are rounded to match .progressBar */
+	-webkit-border-top-left-radius: 5px;
+	-webkit-border-bottom-left-radius: 5px;
+	-moz-border-radius-topleft: 5px;
+	-moz-border-radius-bottomleft: 5px;
 	border-top-left-radius: 5px;
 	border-bottom-left-radius: 5px;
 }
@@ -82,6 +90,10 @@ html {
 	border-right: none;
 	
 	/* Right corners are rounded to match .progressBar*/
+	-webkit-border-top-right-radius: 5px;
+	-webkit-border-bottom-right-radius: 5px;
+	-moz-border-radius-topright: 5px;
+	-moz-border-radius-bottomright: 5px;
 	border-top-right-radius: 5px;
 	border-bottom-right-radius: 5px;
 }
@@ -103,6 +115,7 @@ html {
 	padding: 5px;
 	
 	/* Allow click/touch events to pass through the element unaffected */
+	/* Note: This is unsupported pre-IE11 */
 	pointer-events: none;
 }
 
@@ -118,8 +131,7 @@ html {
 #puzzleOptions {
 	/* Make all text unselectable. "Note that it's a non-standard feature (i.e. not a part of any
 	 * specification). It is not guaranteed to work everywhere [...]"
-	 *     - http://stackoverflow.com/questions/826782/css-rule-to-disable-text-selection-highlighting#4407335
-	 */
+	 *     - http://stackoverflow.com/questions/826782/css-rule-to-disable-text-selection-highlighting#4407335 */
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
@@ -147,6 +159,8 @@ html {
 	/* Using a custom SVG for the border as "border: 1px dashed;" is broken in FFox (See: Bugzilla#382721) */
 	background-image: url("../images/border-dashed.svg");
 	background-size: 100% 100%;
+	-webkit-border-radius: 999px;
+	-moz-border-radius: 999px;
 	border-radius: 999px;
 }
 
@@ -159,6 +173,8 @@ html {
 
 .puzzleOption {
 	display: inline-block;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	
 	font-weight: bold;
@@ -169,10 +185,12 @@ html {
 	/* Using a custom SVG for the border, mainly to stay consistent with .puzzleGap */
 	background-image: url("../images/border-solid.svg");
 	background-size: 100% 100%;
+	-webkit-border-radius: 999px;
+	-moz-border-radius: 999px;
 	border-radius: 999px;
 	
-	cursor: -moz-grab;
 	cursor: -webkit-grab;
+	cursor: -moz-grab;
 	cursor: grab;
 }
 
@@ -192,7 +210,7 @@ html {
 
 /* Options which are being dragged around */
 .puzzleOption.highlight {
-	cursor: -moz-grabbing;
 	cursor: -webkit-grabbing;
+	cursor: -moz-grabbing;
 	cursor: grabbing;
 }

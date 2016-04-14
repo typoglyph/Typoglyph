@@ -175,13 +175,10 @@
 				
 				var dragDistanceX = parseFloat(event.target.getAttribute("data-dragDistanceX")) || 0;
 				var dragDistanceY = parseFloat(event.target.getAttribute("data-dragDistanceY")) || 0;
-				dragDistanceX += event.dx;
-				dragDistanceY += event.dy;
-				event.target.setAttribute("data-dragDistanceX", dragDistanceX);
-				event.target.setAttribute("data-dragDistanceY", dragDistanceY);
+				event.target.setAttribute("data-dragDistanceX", dragDistanceX += event.dx);
+				event.target.setAttribute("data-dragDistanceY", dragDistanceY += event.dy);
 				
-				var translation = "translate(" + dragDistanceX + "px, " + dragDistanceY + "px)";
-				event.target.style.transform = event.target.style.webkitTransform = translation;
+				util.setElementTranslation(event.target, dragDistanceX, dragDistanceY);
 			},
 			/**
 			 * Called when event.target has just started being dragged, just before the first call
