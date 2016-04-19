@@ -110,16 +110,29 @@ html {
  * Completion graphic *
  **********************/
  
-.completionGraphic {
-	position: absolute;
-	left: 40vw;
-	top: 40vh;
-	/* Default */ width: 30vw;
-	padding: 5px;
+#completionGraphicHolder {
+	position: fixed;
+	left: 50vw;
+	top: 50vh;
+	
+	-webkit-transform: translate(-50%, -50%);
+	-moz-transform: translate(-50%, -50%);
+	-ms-transform: translate(-50%, -50%);
+	-o-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
 	
 	/* Allow click/touch events to pass through the element unaffected */
 	/* Note: This is unsupported pre-IE11 */
 	pointer-events: none;
+}
+ 
+.completionGraphic {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	
+	/* Default */ width: 30vw;
+	padding: 5px;
 }
 
 
