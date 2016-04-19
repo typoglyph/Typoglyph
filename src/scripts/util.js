@@ -114,11 +114,7 @@ typoglyph.util.removeClass = function(e, clazz) {
  * @static
  */
 typoglyph.util.setElementTranslation = function(e, deltaX, deltaY) {
-	var transform = "translate(" + deltaX + "px, " + deltaY + "px)";
-	var style = e.style;
-	style["-ms-transform"] = transform;
-	style["-webkit-transform"] = transform;
-	style["transform"] = transform;
+	typoglyph.util.setElementTransform(e, "translate", deltaX + "px", deltaY + "px");
 }
 
 /**
@@ -132,14 +128,43 @@ typoglyph.util.setImageRotation = function(e, rotation) {
 		rotation += 360;
 	while (rotation >= 360)
 		rotation -= 360;
+	typoglyph.util.setElementTransform(e, "rotate", rotation + "deg");
+}
+
+/**
+ * Gives the specified element the specified transform. If a transform with the same name already
+ * exists, it will be overwitten without touching other types of transforms.
+ * 
+ * @param {HTMLElement} The DOM element to transform
+ * @param {String} The name of the transform to apply (rotate, translate, scale etc.)
+ * @param [vararg] The arguments to pass to use for the transform
+ */
+typoglyph.util.setElementTransform = function(e, transformName) {
+	var transform = transformName + "(";
+	for (var i = 2; i < arguments.length; i++) {
+		if (i !== 2) {
+			transform += ",";
+		}
+		transform += arguments[i];
+	}
+	transform += ")";
 	
-	var style = e.style;
-	var transform = "rotate(" + rotation + "deg)";
-	style["-ms-transform"] = transform;
-	style["-webkit-transform"] = transform;
-	style["-moz-transform"] = transform;
-	style["-o-transform"] = transform;
-	style["transform"] = transform;
+	var existingTransform = e.style.transform;
+	var regExp = "(^|\\s)" + transformName + "(\\(.*?\\))?($|\\s)";
+	var newTransform = existingTransform.replace(new RegExp(regExp), "$1" + transform + "$3");
+	
+	if (newTransform === existingTransform) {
+		// The replacement didn't do anything - there must not yet be a transform with this name
+		if (newTransform.length !== 0) {
+			newTransform += " ";
+		}
+		newTransform += transform;
+	}
+	
+	var vendors = ["-webkit-transform", "-moz-transform", "-ms-transform", "-o-transform", "transform"];
+	for (var i = 0; i < vendors.length; i++) {
+		e.style[vendors[i]] = newTransform;
+	}
 }
 
 /**
