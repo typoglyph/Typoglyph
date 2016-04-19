@@ -97,8 +97,8 @@ html {
 	border-top-right-radius: 5px;
 	border-bottom-right-radius: 5px;
 }
-.progressBar *.correct { background: green; }
-.progressBar *.incorrect { background: red; }
+.progressBar *.correct { background: #4fa637; }
+.progressBar *.incorrect { background: #db3026; }
 
 
 
