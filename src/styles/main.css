@@ -57,12 +57,12 @@ html {
 .progressBar {
 	width: 100%;
 	/* Default */ height: 5vh;
-	padding: 2px;
+	padding: 0.4vh;
 	
 	border: 1px solid #ccc;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
-	border-radius: 5px;
+	-webkit-border-radius: 1.2vh;
+	-moz-border-radius: 1.2vh;
+	border-radius: 1.2vh;
 }
 
 .progressBar * {
@@ -73,29 +73,32 @@ html {
 	
 	height: 100%;
 	
+	/* Prevents progress bar segments getting offset from the bar when the viewport is resized */
+	vertical-align: top;
+	
 	/* Dividing line between this bar and the next */
 	border-right: 1px solid #999;
 }
 .progressBar *:first-child {
 	/* Left corners are rounded to match .progressBar */
-	-webkit-border-top-left-radius: 5px;
-	-webkit-border-bottom-left-radius: 5px;
-	-moz-border-radius-topleft: 5px;
-	-moz-border-radius-bottomleft: 5px;
-	border-top-left-radius: 5px;
-	border-bottom-left-radius: 5px;
+	-webkit-border-top-left-radius: 1vh;
+	-webkit-border-bottom-left-radius: 1vh;
+	-moz-border-radius-topleft: 1vh;
+	-moz-border-radius-bottomleft: 1vh;
+	border-top-left-radius: 1vh;
+	border-bottom-left-radius: 1vh;
 }
 .progressBar *:last-child {
 	/* No dividing line between this bar and the next (as there isn't a next) */
 	border-right: none;
 	
 	/* Right corners are rounded to match .progressBar*/
-	-webkit-border-top-right-radius: 5px;
-	-webkit-border-bottom-right-radius: 5px;
-	-moz-border-radius-topright: 5px;
-	-moz-border-radius-bottomright: 5px;
-	border-top-right-radius: 5px;
-	border-bottom-right-radius: 5px;
+	-webkit-border-top-right-radius: 1vh;
+	-webkit-border-bottom-right-radius: 1vh;
+	-moz-border-radius-topright: 1vh;
+	-moz-border-radius-bottomright: 1vh;
+	border-top-right-radius: 1vh;
+	border-bottom-right-radius: 1vh;
 }
 .progressBar *.correct { background: #4fa637; }
 .progressBar *.incorrect { background: #db3026; }
