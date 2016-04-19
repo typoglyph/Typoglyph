@@ -5,9 +5,10 @@
 
 
 html {
-	/* Default */ font-size: 200%;
+	/* Default */ font-size: 180%;
+	font-family: 'Droid Sans', sans-serif;
+	font-weight: 700;
 }
-
 
 
 
@@ -193,7 +194,6 @@ html {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	
-	font-weight: bold;
 	/* Without this, options get offset relative to their parent gap when the viewport is small */
 	vertical-align: top;
 	
