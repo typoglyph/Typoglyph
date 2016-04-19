@@ -4,7 +4,7 @@
 
 
 html {
-	/* Default */ font-size: 300%;
+	font-size: 300%;
 }
 
 
@@ -42,7 +42,7 @@ html {
  **********************/
  
 .completionGraphic {
-	width: 30vw;
+	width: 50vw;
 }
 
 
@@ -61,10 +61,19 @@ html {
 	margin-bottom: 1vw;
 }
 
+/* Options which are inside a gap */
+.puzzleGap > .puzzleOption {
+	/* Must be the same as the element's height, without using 100% */
+	line-height: 7vw;
+}
+
 /* Options which are NOT inside a gap */
 :not(.puzzleGap) > .puzzleOption {
 	width: 10vw;
 	height: 10vw;
 	margin-left: 4vw;
 	margin-right: 4vw;
+	
+	/* Must be the same as the element's height, without using 100% */
+	line-height: 10vw;
 }

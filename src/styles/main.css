@@ -5,9 +5,10 @@
 
 
 html {
-	/* Default */ font-size: 200%;
+	/* Default */ font-size: 180%;
+	font-family: 'Droid Sans', sans-serif;
+	font-weight: 700;
 }
-
 
 
 
@@ -57,12 +58,12 @@ html {
 .progressBar {
 	width: 100%;
 	/* Default */ height: 5vh;
-	padding: 2px;
+	padding: 0.4vh;
 	
 	border: 1px solid #ccc;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
-	border-radius: 5px;
+	-webkit-border-radius: 1.2vh;
+	-moz-border-radius: 1.2vh;
+	border-radius: 1.2vh;
 }
 
 .progressBar * {
@@ -73,32 +74,35 @@ html {
 	
 	height: 100%;
 	
+	/* Prevents progress bar segments getting offset from the bar when the viewport is resized */
+	vertical-align: top;
+	
 	/* Dividing line between this bar and the next */
 	border-right: 1px solid #999;
 }
 .progressBar *:first-child {
 	/* Left corners are rounded to match .progressBar */
-	-webkit-border-top-left-radius: 5px;
-	-webkit-border-bottom-left-radius: 5px;
-	-moz-border-radius-topleft: 5px;
-	-moz-border-radius-bottomleft: 5px;
-	border-top-left-radius: 5px;
-	border-bottom-left-radius: 5px;
+	-webkit-border-top-left-radius: 1vh;
+	-webkit-border-bottom-left-radius: 1vh;
+	-moz-border-radius-topleft: 1vh;
+	-moz-border-radius-bottomleft: 1vh;
+	border-top-left-radius: 1vh;
+	border-bottom-left-radius: 1vh;
 }
 .progressBar *:last-child {
 	/* No dividing line between this bar and the next (as there isn't a next) */
 	border-right: none;
 	
 	/* Right corners are rounded to match .progressBar*/
-	-webkit-border-top-right-radius: 5px;
-	-webkit-border-bottom-right-radius: 5px;
-	-moz-border-radius-topright: 5px;
-	-moz-border-radius-bottomright: 5px;
-	border-top-right-radius: 5px;
-	border-bottom-right-radius: 5px;
+	-webkit-border-top-right-radius: 1vh;
+	-webkit-border-bottom-right-radius: 1vh;
+	-moz-border-radius-topright: 1vh;
+	-moz-border-radius-bottomright: 1vh;
+	border-top-right-radius: 1vh;
+	border-bottom-right-radius: 1vh;
 }
-.progressBar *.correct { background: green; }
-.progressBar *.incorrect { background: red; }
+.progressBar *.correct { background: #4fa637; }
+.progressBar *.incorrect { background: #db3026; }
 
 
 
@@ -107,16 +111,29 @@ html {
  * Completion graphic *
  **********************/
  
-.completionGraphic {
-	position: absolute;
-	left: 40vw;
-	top: 40vh;
-	/* Default */ width: 30vw;
-	padding: 5px;
+#completionGraphicHolder {
+	position: fixed;
+	left: 50vw;
+	top: 50vh;
+	
+	-webkit-transform: translate(-50%, -50%);
+	-moz-transform: translate(-50%, -50%);
+	-ms-transform: translate(-50%, -50%);
+	-o-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
 	
 	/* Allow click/touch events to pass through the element unaffected */
 	/* Note: This is unsupported pre-IE11 */
 	pointer-events: none;
+}
+ 
+.completionGraphic {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	
+	/* Default */ width: 30vw;
+	padding: 5px;
 }
 
 
@@ -153,19 +170,19 @@ html {
 	/* Default */ margin-top: 0.6vw;
 	/* Default */ margin-bottom: 0.6vw;
 	
-	text-align: center;
 	vertical-align: middle;
 	
 	/* Using a custom SVG for the border as "border: 1px dashed;" is broken in FFox (See: Bugzilla#382721) */
 	background-image: url("../images/border-dashed.svg");
 	background-size: 100% 100%;
+	
 	-webkit-border-radius: 999px;
 	-moz-border-radius: 999px;
 	border-radius: 999px;
 }
 
 /* Gaps which are filled with an option */
-.puzzleGap:not(:empty) { background-image: none; }
+.puzzleGap:not(:empty) {}
 
 /* Gaps which are NOT filled with an option */
 .puzzleGap:empty {}
@@ -177,9 +194,8 @@ html {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	
-	font-weight: bold;
-	text-align: center;
-	vertical-align: middle;
+	/* Without this, options get offset relative to their parent gap when the viewport is small */
+	vertical-align: top;
 	
 	background: #eee;
 	/* Using a custom SVG for the border, mainly to stay consistent with .puzzleGap */
@@ -198,6 +214,9 @@ html {
 .puzzleGap > .puzzleOption {
 	width: 100%;
 	height: 100%;
+	
+	/* Must be the same as the element's height, without using 100% */
+	/* Default */ line-height: 4vw;
 }
 
 /* Options which are NOT inside a gap */
@@ -206,6 +225,9 @@ html {
 	/* Default */ height: 5vw;
 	/* Default */ margin-left: 2vw;
 	/* Default */ margin-right: 2vw;
+	
+	/* Must be the same as the element's height, without using 100% */
+	/* Default */ line-height: 5vw;
 }
 
 /* Options which are being dragged around */
