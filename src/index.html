@@ -19,7 +19,7 @@
 	
 	<!-- see https://github.com/davidjbradshaw/iframe-resizer -->
 	<script type="text/javascript" src="scripts/lib/iframe-resizer-v3.5.0/iframeResizer.min.js"></script>
-	<script type="text/javascript" src="scripts/lib/howler.js-v1.1.29"></script>
+	<script type="text/javascript" src="scripts/lib/howler.js-v1.1.29/howler.min.js"></script>
 	<script type="text/javascript" src="scripts/common.js"></script>
 	<script type="text/javascript" src="scripts/util.js"></script>
 	<script type="text/javascript" src="scripts/dynamicStylesheets.js"></script>
@@ -92,7 +92,7 @@
 		});
 		
 		_progressBarDrawer = ProgressBarDrawer.create(PUZZLE_SET_SIZE);
-			
+		
 		fetchCompletionGraphics(null, true, function(graphics) {
 			_completionGraphicDrawer = CompletionGraphicDrawer.create(graphics[0], graphics[1]);
 			startNewPuzzleSet();
