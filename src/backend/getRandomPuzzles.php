@@ -14,6 +14,5 @@ try {
     $db = Null;
 }
 
-$json = toJson($puzzles, False);
-print($json);
+sendJsonReply($puzzles, $HTTP_STATUS_SUCCESS);
 ?>

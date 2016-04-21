@@ -12,10 +12,9 @@ $correctGraphics = ($which === "both" || $which === "correct")
 $incorrectGraphics = ($which === "both" || $which === "incorrect")
 		? $incorrectGraphics = listCompletionGraphics("../images/completion_graphics/incorrect_*.{jpg,jpeg,png,gif,bmp}")
 		: array();
-
-
-$json = toJson(array("correct" => $correctGraphics, "incorrect" => $incorrectGraphics), False);
-print($json);
+		
+$graphics = array("correct" => $correctGraphics, "incorrect" => $incorrectGraphics);
+sendJsonReply($graphics, $HTTP_STATUS_SUCCESS);
 
 
 /**
