@@ -312,6 +312,45 @@
 		req.open("GET", "backend/getCompletionGraphics.php?which=" + which, async);
 		req.send();
 	}
+	
+	/**
+	 * @param {boolean} correct True if you want to fetch sounds representing a correct answer or
+	 *     false if you want to fetch sounds representing an incorrect answer or null if you want
+	 *     to fetch all sounds
+	 * @param {boolean} async True if you want the request to be executed asynchronously
+	 * @param {function(Array<Array<String>>)} callback The function which will be called when the
+	 *     sounds have been fetched. It will be passed an array where index 0 holds an array of
+	 *     correct sounds and index 1 holds an array of incorrect sounds (although one of the
+	 *     arrays may be empty, depending on what you pass for the "correct" parameter)
+	 */
+	function fetchCompletionSounds(correct, async, callback) {
+		var which;
+		switch (correct) {
+			case null:
+				which = "both";
+				break;
+			case true:
+				which = "correct";
+				break;
+			case false:
+				which = "incorrect";
+				break;
+			default:
+				throw "IllegalArgumentException: correct=" + correct;
+		}
+		
+		var req = new XMLHttpRequest();
+		req.onreadystatechange = function() {
+			if (req.readyState === 4 && req.status === 200) {
+				var resp = req.responseText;
+				var result = JSON.parse(resp);
+				var sounds = [result["correct"], result["incorrect"]];
+				callback(sounds);
+			}
+		}
+		req.open("GET", "backend/getCompletionSounds.php?which=" + which, async);
+		req.send();
+	}
 	</script>
 </head>
 <body onload="onLoad();" onresize="onResize(event);" onorientationchange="onOrientationChange(event);">
