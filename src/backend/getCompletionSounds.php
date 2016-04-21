@@ -6,7 +6,7 @@ $which = getStringRequestParam("which", False);
 $which = ($which === null) ? "both" : strtolower($which);
 
 $supportedFileExtensions = "mp3,ogg,wav";
-$directory = "../sounds/completion_sounds";
+$directory = "../audio/completion_sounds";
 
 $correctSounds = ($which === "both" || $which === "correct")
 		? $correctSounds = listCompletionSounds($directory . "/correct_*.{" . $supportedFileExtensions . "}")
