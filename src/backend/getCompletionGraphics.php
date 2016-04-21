@@ -2,19 +2,37 @@
 require_once("common.php");
 
 
-$correct = getBooleanRequestParam("correct_answer", True);
-$pattern = "../images/completion_graphics/" . ($correct ? "correct_" : "incorrect_") . "*.{jpg,jpeg,png,gif,bmp}";
+$which = getStringRequestParam("which", False);
+$which = ($which === null) ? "both" : strtolower($which);
 
-$relativePaths = glob($pattern, GLOB_BRACE);
-$fullPaths = array();
-foreach ($relativePaths as $relativePath) {
-	// filter out directories
-	if (is_file($relativePath)) {
-		// make the path relative from the root, instead of relative from the current file
-		$fullPath = substr($relativePath, 3);
-		array_push($fullPaths, $fullPath);
+$correctGraphics = ($which === "both" || $which === "correct")
+		? $correctGraphics = listCompletionGraphics("../images/completion_graphics/correct_*.{jpg,jpeg,png,gif,bmp}")
+		: array();
+
+$incorrectGraphics = ($which === "both" || $which === "incorrect")
+		? $incorrectGraphics = listCompletionGraphics("../images/completion_graphics/incorrect_*.{jpg,jpeg,png,gif,bmp}")
+		: array();
+
+
+$json = toJson(array("correct" => $correctGraphics, "incorrect" => $incorrectGraphics), False);
+print($json);
+
+
+/**
+ * @param string
+ * @return Array<string>
+ */
+function listCompletionGraphics($filePattern) {
+	$relativePaths = glob($filePattern, GLOB_BRACE);
+	$fullPaths = array();
+	foreach ($relativePaths as $relativePath) {
+		// filter out directories
+		if (is_file($relativePath)) {
+			// make the path relative from the root, instead of relative from the current file
+			$fullPath = substr($relativePath, 3);
+			array_push($fullPaths, $fullPath);
+		}
 	}
+	return $fullPaths;
 }
-
-print(json_encode($fullPaths));
 ?>

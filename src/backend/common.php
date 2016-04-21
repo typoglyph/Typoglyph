@@ -20,7 +20,7 @@ function getDatabaseConnection() {
  * @return string
  */
 function getStringRequestParam($name, $required) {
-	$value = $_REQUEST[$name];
+	$value = array_key_exists($name, $_REQUEST) ? $_REQUEST[$name] : Null;
 	if ($value == Null || $value == "") {
 		if ($required)
 			throw new Exception("The '$name' argument must be supplied");
