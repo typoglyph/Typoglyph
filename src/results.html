@@ -67,7 +67,8 @@
 	 */
 	function onResize(event) {
 		console.debug("onResize: event=" + event);
-		_dynStylesheets.update();
+		if (_dynStylesheets !== null)
+			_dynStylesheets.update();
 	}
 	
 	/**
@@ -77,7 +78,8 @@
 	 */
 	function onOrientationChange(event) {
 		console.debug("onOrientationChange: event=" + event);
-		_dynStylesheets.update();
+		if (_dynStylesheets !== null)
+			_dynStylesheets.update();
 	}
 	
 	/**
