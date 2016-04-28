@@ -1,0 +1,65 @@
+@mixin border-radius($radius) {
+	-webkit-border-radius: $radius;
+	-moz-border-radius: $radius;
+	-ms-border-radius: $radius;
+	border-radius: $radius;
+}
+@mixin border-radius-tl($radius) {
+	-webkit-border-top-left-radius: $radius;
+	-moz-border-radius-topleft: $radius;
+	border-top-left-radius: $radius;
+}
+@mixin border-radius-tr($radius) {
+	-webkit-border-top-right-radius: $radius;
+	-moz-border-radius-topright: $radius;
+	border-top-right-radius: $radius;
+}
+@mixin border-radius-bl($radius) {
+	-webkit-border-bottom-left-radius: $radius;
+	-moz-border-radius-bottomleft: $radius;
+	border-bottom-left-radius: $radius;
+}
+@mixin border-radius-br($radius) {
+	-webkit-border-bottom-right-radius: $radius;
+	-moz-border-radius-bottomright: $radius;
+	border-bottom-right-radius: $radius;
+}
+
+
+@mixin box-sizing($sizing) {
+	-webkit-box-sizing: $sizing;
+	-moz-box-sizing: $sizing;
+	box-sizing: $sizing;
+}
+
+
+@mixin cursor-grab {
+	cursor: -webkit-grab;
+	cursor: -moz-grab;
+	cursor: grab;
+}
+@mixin cursor-grabbing {
+	cursor: -webkit-grabbing;
+	cursor: -moz-grabbing;
+	cursor: grabbing;
+}
+@mixin user-select($arg) {
+	-webkit-touch-callout: $arg;
+	-webkit-user-select: $arg;
+	-khtml-user-select: $arg;
+	-moz-user-select: $arg;
+	-ms-user-select: $arg;
+	user-select: $arg;
+}
+
+
+@mixin transform($transforms) {
+	-webkit-transform: $transforms;
+	-moz-transform: $transforms;
+	-ms-transform: $transforms;
+	-o-transform: $transforms;
+	transform: $transforms;
+}
+@mixin translate($x, $y) {
+	@include transform(translate($x, $y));
+}

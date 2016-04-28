@@ -2,6 +2,8 @@
  * stylesheet. It is included in this stylesheet as a fallback, so if for some reason the more
  * specific stylesheet isn't available, there will be something to fall back on. */
 
+@import "vendorPrefixes";
+
 
 
 html {
@@ -12,24 +14,30 @@ html {
 
 
 
-/******************
- * Helper classes *
- ******************/
+/**********
+ * Mixins *
+ **********/
 
-.centerHorizontal { text-align: center; }
-.centerHorizontal * { display: inline-block; }
-
-
-/* Spaces all children an equal distance apart, see: https://css-tricks.com/equidistant-objects-with-css/ */
-.equidistantHorizontal { text-align: justify; }
-.equidistantHorizontal:after {
-  /* Ensures there are at least 2 lines of text, so justification works */
-  content: '';
-  display: inline-block;
-  width: 100%;
+@mixin centerHorizontal {
+	text-align: center;
+	* { display: inline-block; }
 }
-.equidistantHorizontal * { display: inline-block; }
 
+
+/*
+ * Spaces children an equal distance apart
+ * See: https://css-tricks.com/equidistant-objects-with-css/
+ */
+@mixin equidistantHorizontal {
+	text-align: justify;
+	&:after {
+		/* Ensures there are at least 2 lines of text so justification works */
+		content: '';
+		display: inline-block;
+		width: 100%;
+	}
+	* { display: inline-block; }
+}
 
 
 
@@ -38,6 +46,7 @@ html {
  ***********/
 
 .buttonHolder {
+	@include equidistantHorizontal;
 	/* Default */ margin-left: 35vw;
 	/* Default */ margin-right: 35vw;
 }
@@ -61,16 +70,12 @@ html {
 	padding: 0.4vh;
 	
 	border: 1px solid #ccc;
-	-webkit-border-radius: 1.2vh;
-	-moz-border-radius: 1.2vh;
-	border-radius: 1.2vh;
+	@include border-radius(1.2vh);
 }
 
 .progressBar * {
 	display: inline-block;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
+	@include box-sizing(border-box);
 	
 	height: 100%;
 	
@@ -81,29 +86,17 @@ html {
 	border-right: 1px solid #999;
 }
 .progressBar *:first-child {
-	/* Left corners are rounded to match .progressBar */
-	-webkit-border-top-left-radius: 1vh;
-	-webkit-border-bottom-left-radius: 1vh;
-	-moz-border-radius-topleft: 1vh;
-	-moz-border-radius-bottomleft: 1vh;
-	border-top-left-radius: 1vh;
-	border-bottom-left-radius: 1vh;
+	@include border-radius-tl(1vh);
+	@include border-radius-bl(1vh);
 }
 .progressBar *:last-child {
 	/* No dividing line between this bar and the next (as there isn't a next) */
 	border-right: none;
-	
-	/* Right corners are rounded to match .progressBar*/
-	-webkit-border-top-right-radius: 1vh;
-	-webkit-border-bottom-right-radius: 1vh;
-	-moz-border-radius-topright: 1vh;
-	-moz-border-radius-bottomright: 1vh;
-	border-top-right-radius: 1vh;
-	border-bottom-right-radius: 1vh;
+	@include border-radius-tr(1vh);
+	@include border-radius-br(1vh);
 }
 .progressBar *.correct { background: #4fa637; }
 .progressBar *.incorrect { background: #db3026; }
-
 
 
 
@@ -116,11 +109,7 @@ html {
 	left: 50vw;
 	top: 50vh;
 	
-	-webkit-transform: translate(-50%, -50%);
-	-moz-transform: translate(-50%, -50%);
-	-ms-transform: translate(-50%, -50%);
-	-o-transform: translate(-50%, -50%);
-	transform: translate(-50%, -50%);
+	@include translate(-50%, -50%);
 	
 	/* Allow click/touch events to pass through the element unaffected */
 	/* Note: This is unsupported pre-IE11 */
@@ -128,14 +117,11 @@ html {
 }
  
 .completionGraphic {
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
+	@include box-sizing(border-box);
 	
 	/* Default */ width: 30vw;
 	padding: 5px;
 }
-
 
 
 
@@ -146,16 +132,12 @@ html {
 #puzzleSentence,
 #puzzleAnswer,
 #puzzleOptions {
+	@include centerHorizontal;
+	
 	/* Make all text unselectable. "Note that it's a non-standard feature (i.e. not a part of any
 	 * specification). It is not guaranteed to work everywhere [...]"
 	 *     - http://stackoverflow.com/questions/826782/css-rule-to-disable-text-selection-highlighting#4407335 */
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	
+	@include user-select(none);
 	cursor: default;
 }
 
@@ -176,9 +158,7 @@ html {
 	background-image: url("../images/border-dashed.svg");
 	background-size: 100% 100%;
 	
-	-webkit-border-radius: 999px;
-	-moz-border-radius: 999px;
-	border-radius: 999px;
+	@include border-radius(999px);
 }
 
 /* Gaps which are filled with an option */
@@ -190,9 +170,7 @@ html {
 
 .puzzleOption {
 	display: inline-block;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
+	@include box-sizing(border-box);
 	
 	/* Without this, options get offset relative to their parent gap when the viewport is small */
 	vertical-align: top;
@@ -201,13 +179,9 @@ html {
 	/* Using a custom SVG for the border, mainly to stay consistent with .puzzleGap */
 	background-image: url("../images/border-solid.svg");
 	background-size: 100% 100%;
-	-webkit-border-radius: 999px;
-	-moz-border-radius: 999px;
-	border-radius: 999px;
+	@include border-radius(999px);
 	
-	cursor: -webkit-grab;
-	cursor: -moz-grab;
-	cursor: grab;
+	@include cursor-grab;
 }
 
 /* Options which are inside a gap */
@@ -232,7 +206,5 @@ html {
 
 /* Options which are being dragged around */
 .puzzleOption.highlight {
-	cursor: -webkit-grabbing;
-	cursor: -moz-grabbing;
-	cursor: grabbing;
+	@include cursor-grabbing;
 }
