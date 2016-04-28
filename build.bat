@@ -10,4 +10,4 @@ xcopy /v /f /i /e  "%InputPath%/*" %OutputPath%
 
 REM Compile SASS files into CSS files
 REM The SASS command seems to stop execution so make sure it's the last thing you do
-cmd /k "sass --update %InputPath%/styles:%OutputPath%/styles"
+cmd /k "sass --update %OutputPath%/styles:%OutputPath%/styles"
