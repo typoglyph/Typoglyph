@@ -1,2 +1,10 @@
 # Ignore any log files
 *.log
+
+
+# Generated files
+out/*
+
+
+# Sass generated files
+.sass-cache/*
