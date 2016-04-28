@@ -7,21 +7,13 @@
 	<title>Typoglyph</title>
 	<link rel="icon" type="image/ico" href="images/favicon.ico">
 	
-	<link href='https://fonts.googleapis.com/css?family=Droid+Sans:700' rel='stylesheet' type='text/css'>
-	
-	<!-- Only one of the dynamic styles will be enabled at once, based on the current size of the browser window -->
-	<!-- @see scripts/dynamicStylesheets.js -->
+	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Droid+Sans:700">
 	<link rel="stylesheet" type="text/css" href="styles/main.css">
-	<link rel="stylesheet" type="text/css" href="styles/main-tiny.css"		class="dynamic-stylesheet max-width:768">
-	<link rel="stylesheet" type="text/css" href="styles/main-small.css"		class="dynamic-stylesheet min-width:769		max-width:1000">
-	<link rel="stylesheet" type="text/css" href="styles/main-medium.css"	class="dynamic-stylesheet min-width:1001	max-width:2048">
-	<link rel="stylesheet" type="text/css" href="styles/main-large.css"		class="dynamic-stylesheet min-width:2049">
 	
 	<!-- see https://github.com/davidjbradshaw/iframe-resizer -->
 	<script type="text/javascript" src="scripts/lib/iframe-resizer-v3.5.0/iframeResizer.min.js"></script>
 	<script type="text/javascript" src="scripts/common.js"></script>
 	<script type="text/javascript" src="scripts/util.js"></script>
-	<script type="text/javascript" src="scripts/dynamicStylesheets.js"></script>
 	<script type="text/javascript" src="scripts/puzzle.js"></script>
 	<script type="text/javascript" src="scripts/statistics.js"></script>
 	<script type="text/javascript" src="scripts/ui.js"></script>
@@ -30,7 +22,6 @@
 	
 	// Imports
 	var util = typoglyph.util;
-	var DynamicStylesheets = typoglyph.DynamicStylesheets;
 	var Puzzle = typoglyph.puzzle.Puzzle;
 	var StatisticsTracker = typoglyph.StatisticsTracker;
 	var ProgressBarDrawer = typoglyph.ui.ProgressBarDrawer;
@@ -53,7 +44,6 @@
 	
 	
 	// Global variables
-	var _dynStylesheets = null;
 	var _puzzleSet = null;
 	var _currentPuzzleIndex = null;
 	var _statistics = StatisticsTracker.create();
@@ -67,9 +57,6 @@
 	 */
 	function onLoad() {
 		console.info("onLoad");
-		
-		_dynStylesheets = DynamicStylesheets.fromDocument(document);
-		_dynStylesheets.update();
 		
 		// see https://github.com/davidjbradshaw/iframe-resizer
 		iFrameResize({
@@ -108,8 +95,6 @@
 	 */
 	function onResize(event) {
 		console.debug("onResize: event=" + event);
-		if (_dynStylesheets !== null)
-			_dynStylesheets.update();
 	}
 	
 	/**
@@ -119,8 +104,6 @@
 	 */
 	function onOrientationChange(event) {
 		console.debug("onOrientationChange: event=" + event);
-		if (_dynStylesheets !== null)
-			_dynStylesheets.update();
 	}
 	
 	

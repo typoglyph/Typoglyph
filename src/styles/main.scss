@@ -1,22 +1,28 @@
-/* Note: Any property starting with the comment "Default" will be overridden in a more specific
- * stylesheet. It is included in this stylesheet as a fallback, so if for some reason the more
- * specific stylesheet isn't available, there will be something to fall back on. */
-
 @import "vendorPrefixes";
 
-
-
-html {
-	/* Default */ font-size: 180%;
-	font-family: 'Droid Sans', sans-serif;
-	font-weight: 700;
-}
+$device-desktop-width: 1000px;
+$device-phone-width: 980px;
 
 
 
 /**********
  * Mixins *
  **********/
+
+/* In cases where one device-* mixin is used, all device-* mixins must be used */
+@mixin device-desktop {
+	// Desktop is the default so include it regardless of what @media says (but this mixin should
+	// still be used as future proofing - we may want to change the default some day
+	//@media (min-width: #{$device-desktop-width}) {
+		@content;
+	//}
+}
+@mixin device-phone {
+	@media screen and /*(min-width: #{$device-phone-width}) and*/ (max-width: #{$device-desktop-width - 1px}) {
+		@content;
+	}
+}
+
 
 @mixin centerHorizontal {
 	text-align: center;
@@ -41,19 +47,40 @@ html {
 
 
 
+html {
+	@include device-desktop	{ font-size: 180%; }
+	@include device-phone	{ font-size: 300%; }
+	font-family: 'Droid Sans', sans-serif;
+	font-weight: 700;
+}
+
+
+
 /***********
  * Buttons *
  ***********/
 
 .buttonHolder {
 	@include equidistantHorizontal;
-	/* Default */ margin-left: 35vw;
-	/* Default */ margin-right: 35vw;
+	@include device-desktop {
+		margin-left: 35vw;
+		margin-right: 35vw;
+	}
+	@include device-phone {
+		margin-left: 25vw;
+		margin-right: 25vw;
+	}
 }
 
 .button {
-	/* Default */ width: 10vw;
-	/* Default */ height: 10vw;
+	@include device-desktop {
+		width: 10vw;
+		height: 10vw;
+	}
+	@include device-phone {
+		width: 20vw;
+		height: 20vw;
+	}
 	
 	cursor: pointer;
 }
@@ -66,7 +93,8 @@ html {
 
 .progressBar {
 	width: 100%;
-	/* Default */ height: 5vh;
+	@include device-desktop	{ height: 5vh; }
+	@include device-phone	{ height: 5vh; }
 	padding: 0.4vh;
 	
 	border: 1px solid #ccc;
@@ -119,7 +147,8 @@ html {
 .completionGraphic {
 	@include box-sizing(border-box);
 	
-	/* Default */ width: 30vw;
+	@include device-desktop	{ width: 30vw; }
+	@include device-phone	{ width: 50vw; }
 	padding: 5px;
 }
 
@@ -145,19 +174,28 @@ html {
 .puzzleGap {
 	display: inline-block;
 	
-	/* Default */ width: 4vw;
-	/* Default */ height: 4vw;
-	/* Default */ margin-left: 0.6vw;
-	/* Default */ margin-right: 0.6vw;
-	/* Default */ margin-top: 0.6vw;
-	/* Default */ margin-bottom: 0.6vw;
+	@include device-desktop {
+		width: 4vw;
+		height: 4vw;
+		margin-left: 0.6vw;
+		margin-right: 0.6vw;
+		margin-top: 0.6vw;
+		margin-bottom: 0.6vw;
+	}
+	@include device-phone {
+		width: 7vw;
+		height: 7vw;
+		margin-left: 1.5vw;
+		margin-right: 1.5vw;
+		margin-top: 1vw;
+		margin-bottom: 1vw;
+	}
 	
 	vertical-align: middle;
 	
 	/* Using a custom SVG for the border as "border: 1px dashed;" is broken in FFox (See: Bugzilla#382721) */
 	background-image: url("../images/border-dashed.svg");
 	background-size: 100% 100%;
-	
 	@include border-radius(999px);
 }
 
@@ -190,18 +228,28 @@ html {
 	height: 100%;
 	
 	/* Must be the same as the element's height, without using 100% */
-	/* Default */ line-height: 4vw;
+	@include device-desktop	{ line-height: 4vw; }
+	@include device-phone	{ line-height: 7vw; }
 }
 
 /* Options which are NOT inside a gap */
 :not(.puzzleGap) > .puzzleOption {
-	/* Default */ width: 5vw;
-	/* Default */ height: 5vw;
-	/* Default */ margin-left: 2vw;
-	/* Default */ margin-right: 2vw;
+	@include device-desktop {
+		width: 5vw;
+		height: 5vw;
+		margin-left: 2vw;
+		margin-right: 2vw;
+	}
+	@include device-phone {
+		width: 10vw;
+		height: 10vw;
+		margin-left: 4vw;
+		margin-right: 4vw;
+	}
 	
 	/* Must be the same as the element's height, without using 100% */
-	/* Default */ line-height: 5vw;
+	@include device-desktop	{ line-height: 5vw; }
+	@include device-phone	{ line-height: 10vw; }
 }
 
 /* Options which are being dragged around */
