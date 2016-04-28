@@ -92,6 +92,8 @@ html {
  ****************/
 
 .progressBar {
+	@include box-sizing(border-box);
+	
 	width: 100%;
 	@include device-desktop	{ height: 5vh; }
 	@include device-phone	{ height: 5vh; }
