@@ -16,11 +16,39 @@ typoglyph.ui.Drawer = {
 	},
 	
 	/**
-	 * @param {Object} obj The object to draw
-	 * @return {HTMLElement} The drawn object
+	 * Creates and returns a new DOM element which can act as the root of the drawn element for the
+	 * given object.
+	 * Important: This method should only ever be called from within the typoglyph.ui.Drawer class.
+	 * 
+	 * @param {Object} obj
+	 * @return {HTMLElement}
+	 * @private
 	 * @abstract
 	 */
+	createRootElement(obj) {
+		throw "NotImplementedException";
+	},
+	
+	/**
+	 * Draws the given object into a new DOM element and returns the new DOM element
+	 * 
+	 * @param {Object} obj The object to draw
+	 * @return {HTMLElement} The drawn object
+	 */
 	draw: function(obj) {
+		var rootE = this.createRootElement(obj);
+		this.drawInto(rootE, obj);
+		return rootE;
+	},
+	
+	/**
+	 * Draws the given object into the given DOM element
+	 * 
+	 * @param {HTMLElement} p The DOM element to draw the given object into
+	 * @param {Object} obj The object to draw
+	 * @abstract
+	 */
+	drawInto: function(p, obj) {
 		throw "NotImplementedException";
 	},
 	
@@ -67,18 +95,25 @@ typoglyph.ui.PuzzleOptionBarDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 	},
 	
 	/**
-	 * @param {Array<Option>} options
+	 * @param {Object} obj
 	 * @return {HTMLElement}
+	 * @override
 	 */
-	draw: function(options) {
-		var list = this.newElement("ul");
+	createRootElement(obj) {
+		var msg = "This class only supports the 'drawInto' method";
+		throw "UnsupportedOperationException: " + msg;
+	},
+	
+	/**
+	 * @param {HTMLElement} p
+	 * @param {Array<Option>} options
+	 * @override
+	 */
+	drawInto: function(p, options) {
 		for (var i = 0; i < options.length; i++) {
 			var drawnOption = this.optionDrawer.draw(options[i]);
-			var listItem = this.newElement("li");
-			listItem.appendChild(drawnOption);
-			list.appendChild(listItem);
+			p.appendChild(drawnOption);
 		}
-		return list;
 	}
 });
 
@@ -99,8 +134,22 @@ typoglyph.ui.PuzzleDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 		return self;
 	},
 	
-	draw: function(puzzle) {
-		var e = this.newElement("p", "", "puzzle");
+	/**
+	 * @param {Object} obj
+	 * @return {HTMLElement}
+	 * @override
+	 */
+	createRootElement(obj) {
+		var msg = "This class only supports the 'drawInto' method";
+		throw "UnsupportedOperationException: " + msg;
+	},
+	
+	/**
+	 * @param {HTMLElement} p
+	 * @param {Puzzle} puzzle
+	 * @override
+	 */
+	drawInto: function(p, puzzle) {
 		var sentenceFragment = null;
 		
 		// Iterate length+1 in case there's a gap after the last character
@@ -110,18 +159,17 @@ typoglyph.ui.PuzzleDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 			if (gap !== null) {
 				var sentenceFragment = null; // a new one will be started for the next character
 				var drawnGap = this.gapDrawer.draw(gap);
-				e.appendChild(drawnGap);
+				p.appendChild(drawnGap);
 			}
 			
 			// Start a new sentence fragment if necessary
 			if (sentenceFragment === null) {
 				sentenceFragment = this.newTextNode("");
-				e.appendChild(sentenceFragment);
+				p.appendChild(sentenceFragment);
 			}
 			// Append character to the sentence fragment
 			sentenceFragment.textContent += puzzle.sentence.charAt(i);
 		}
-		return e;
 	}
 });
 
@@ -150,17 +198,23 @@ typoglyph.ui.PuzzleGapDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 	 * @return {HTMLElement}
 	 * @override
 	 */
-	draw: function(gap) {
-		var id = "puzzleGap-" + gap.id;
-		var e = this.newElement("span", id, "puzzleGap");
+	createRootElement: function(gap) {
+		var e = this.newElement("span", "puzzleGap-" + gap.id, "puzzleGap");
 		e.setAttribute("data-id", gap.id);
-		
+		return e;
+	},
+	
+	/**
+	 * @param {HTMLElement} p
+	 * @param {Gap} gap
+	 * @override
+	 */
+	drawInto: function(p, gap) {
 		var option = (this.showSolution) ? gap.solution : gap.currentChoice;
 		if (option !== null) {
 			var drawnOption = this.optionDrawer.draw(option);
-			e.appendChild(drawnOption);
+			p.appendChild(drawnOption);
 		}
-		return e;
 	}
 });
 
@@ -183,12 +237,19 @@ typoglyph.ui.PuzzleOptionDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 	 * @return {HTMLElement}
 	 * @override
 	 */
-	draw: function(option) {
-		var id = "puzzleOption-" + option.id;
-		var e = this.newElement("span", id, "puzzleOption");
+	createRootElement: function(option) {
+		var e = this.newElement("span", "puzzleOption-" + option.id, "puzzleOption");
 		e.setAttribute("data-id", option.id);
-		e.appendChild(this.newTextNode(option.value));
 		return e;
+	},
+	
+	/**
+	 * @param {HTMLElement} p
+	 * @param {Option} option
+	 * @override
+	 */
+	drawInto: function(p, option) {
+		p.appendChild(this.newTextNode(option.value));
 	}
 });
 
@@ -208,19 +269,27 @@ typoglyph.ui.ProgressBarDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 	},
 	
 	/**
-	 * @param {StatisticsTracker} statsTracker Information about puzzles which have been answered so far
+	 * @param {Object} obj
 	 * @return {HTMLElement}
 	 * @override
 	 */
-	draw: function(statsTracker) {
-		var e = this.newElement("div", "", "progressBar");
+	createRootElement(obj) {
+		var msg = "This class only supports the 'drawInto' method";
+		throw "UnsupportedOperationException: " + msg;
+	},
+	
+	/**
+	 * @param {HTMLElement} p
+	 * @param {StatisticsTracker} statsTracker Information about puzzles which have been answered so far
+	 * @override
+	 */
+	drawInto: function(p, statsTracker) {
 		var stats = statsTracker.getStatistics();
 		for (var i = 0; i < stats.length; i++) {
 			var progress = this.newElement("span", "", (stats[i].result ? "correct" : "incorrect"));
 			progress.style.width = (100 / this.setSize) + "%";
-			e.appendChild(progress);
+			p.appendChild(progress);
 		}
-		return e;
 	}
 });
 
@@ -242,18 +311,50 @@ typoglyph.ui.CompletionGraphicDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 	},
 	
 	/**
-	 * @param {boolean} correct
+	 * @param {Object} obj
 	 * @return {HTMLElement}
 	 * @override
 	 */
-	draw: function(correct) {
+	createRootElement(obj) {
+		var msg = "This class only supports the 'drawInto' method";
+		throw "UnsupportedOperationException: " + msg;
+	},
+	
+	/**
+	 * @param {HTMLElement} p
+	 * @param {boolean} correct
+	 * @override
+	 */
+	drawInto: function(p, correct) {
 		var util = typoglyph.util;
 		
+		/*
+		Problem: When setting both "transform:rotate()" in an element's style and
+		    "transform:translate()" in its CSS rule, one transformation will override the other and
+		    only the rotation will actually be used. Example:
+		    <style>#test { transform:translate(); }</style>
+			<div id="test" style="transform:rotate();" />
+		Solution:
+		    Wrap the element in a <div>. Apply the translation to the <div> and the rotation to the
+		    element. Example:
+		    <style>#test { transform:translate(); }</style>
+			<div style="transform:rotate();"><div id="test"></div>
+		*/
 		var graphic = util.randomElement(correct ? this.correctGraphics : this.incorrectGraphics);
-		var e = this.newElement("img", "", "completionGraphic");
-		e.src = graphic;
-		util.setImageRotation(e, util.randomInt(-50, 50));
-		
-		return e;
+		var inner = this.newElement("img");		
+		inner.src = graphic;
+		util.setImageRotation(inner, util.randomInt(-50, 50));
+		p.appendChild(inner);
+	},
+	
+	/**
+	 * Returns the given DOM element to its default state. This is usually called sometime after a
+	 * call to "drawInto(p, ?)"
+	 * 
+	 * @param {HTMLElement} p
+	 */
+	reset: function(p) {
+		var util = typoglyph.util;
+		util.removeAllChildren(p);
 	}
 });
