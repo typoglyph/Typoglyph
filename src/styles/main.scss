@@ -7,6 +7,9 @@ $device-phone-width: 320px;
 
 $margins: 1vw;
 
+$buttonSize_desktop: 10vw;
+$buttonSize_phone: 20vw;
+
 
 
 /**********
@@ -33,27 +36,19 @@ $margins: 1vw;
 	* { display: inline-block; }
 }
 
-
-/*
- * Spaces children an equal distance apart
- * See: https://css-tricks.com/equidistant-objects-with-css/
- */
-@mixin equidistantHorizontal {
-	text-align: justify;
-	&:after {
-		/* Ensures there are at least 2 lines of text so justification works */
-		content: '';
-		display: inline-block;
-		width: 100%;
+@mixin evenlySpaceHorizontal($totalWidth, $spacing, $childWidth, $childCount) {
+	margin-left: ($totalWidth - ($childCount * $childWidth + ($childCount - 1) * $spacing)) / 2;
+	* {
+		margin-right: $spacing;
+		&:last-child { margin-right: 0px; }
 	}
-	* { display: inline-block; }
 }
 
 
 
 html {
 	@include device-desktop	{ font-size: 180%; }
-	@include device-phone	{ font-size: 300%; }
+	@include device-phone	{ font-size: 150%; }
 	font: {
 		family: 'Droid Sans', sans-serif;
 		weight: 700;
@@ -81,25 +76,25 @@ iframe { width: 100% }
  ***********/
 
 .buttonHolder {
-	@include equidistantHorizontal;
+	$spacing_desktop: 5vw;
+	$spacing_phone: 8vw;
+	$buttonCount: 2;
 	@include device-desktop {
-		margin-left: 37.5vw;
-		margin-right: 37.5vw;
+		@include evenlySpaceHorizontal(100vw, $spacing_desktop, $buttonSize_desktop, $buttonCount);
 	}
 	@include device-phone {
-		margin-left: 25vw;
-		margin-right: 25vw;
+		@include evenlySpaceHorizontal(100vw, $spacing_phone, $buttonSize_phone, $buttonCount);
 	}
 }
 
 .button {
 	@include device-desktop {
-		width: 10vw;
-		height: 10vw;
+		width: $buttonSize_desktop;
+		height: $buttonSize_desktop;
 	}
 	@include device-phone {
-		width: 20vw;
-		height: 20vw;
+		width: $buttonSize_phone;
+		height: $buttonSize_phone;
 	}
 	cursor: pointer;
 }
@@ -114,7 +109,7 @@ iframe { width: 100% }
 	@include box-sizing(border-box);
 	@include calc(width, "100% - #{2 * $margins}");
 	@include device-desktop	{ height: 5vh; }
-	@include device-phone	{ height: 5vh; }
+	@include device-phone	{ height: 8vh; }
 	margin-left: $margins;
 	margin-right: $margins;
 	padding: 0.4vh;
@@ -184,7 +179,7 @@ iframe { width: 100% }
 #puzzleOptions {
 	@include centerHorizontal;
 	@include device-desktop	{ margin: 2.5vw 5vw; }
-	@include device-phone	{ margin: 2.5vw 5vw; }
+	@include device-phone	{ margin: 4vw 3vw; }
 	
 	/* Make all text unselectable. "Note that it's a non-standard feature (i.e. not a part of any
 	 * specification). It is not guaranteed to work everywhere [...]"
@@ -197,17 +192,21 @@ iframe { width: 100% }
 .puzzleGap {
 	display: inline-block;
 	
+	/* line-height helps vertically center the text of the contained option */
+	$size_desktop: 4vw;
+	$size_phone: 10vw;
 	@include device-desktop {
-		width: 4vw;
-		height: 4vw;
+		width: $size_desktop;
+		height: $size_desktop;
+		line-height: $size_desktop;
 		margin: 0.6vw;
 	}
 	@include device-phone {
-		width: 7vw;
-		height: 7vw;
-		margin: 1vw 1.5vw;
+		width: $size_phone;
+		height: $size_phone;
+		line-height: $size_phone;
+		margin: 0.8vw 1.2vw;
 	}
-	
 	vertical-align: middle;
 	
 	/* Using a custom SVG for the border as "border: 1px dashed;" is broken in FFox (See: Bugzilla#382721) */
@@ -245,33 +244,30 @@ iframe { width: 100% }
 
 /* Options which are inside a gap */
 .puzzleGap > .puzzleOption {
+	
+	/* Parent should specify "line-height" to help vertically center the text */
 	width: 100%;
 	height: 100%;
-	
-	/* Must be the same as the element's height, without using 100% */
-	/* Helps to vertically center the text */
-	@include device-desktop	{ line-height: 4vw; }
-	@include device-phone	{ line-height: 7vw; }
 }
 
 /* Options which are NOT inside a gap */
 :not(.puzzleGap) > .puzzleOption {
+	
+	/* line-height helps vertically center the text */
+	$size_desktop: 5vw;
+	$size_phone: 10vw;
 	@include device-desktop {
-		width: 5vw;
-		height: 5vw;
+		width: $size_desktop;
+		height: $size_desktop;
+		line-height: $size_desktop;
 		margin: 0.2vw 2vw;
 	}
 	@include device-phone {
-		width: 10vw;
-		height: 10vw;
-		margin-left: 4vw;
-		margin-right: 4vw;
+		width: $size_phone;
+		height: $size_phone;
+		line-height: $size_phone;
+		margin: 0.6vw 4vw;
 	}
-	
-	/* Must be the same as the element's height, without using 100% */
-	/* Helps to vertically center the text */
-	@include device-desktop	{ line-height: 5vw; }
-	@include device-phone	{ line-height: 10vw; }
 }
 
 /* Options which are being dragged around */
