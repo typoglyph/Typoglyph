@@ -50,8 +50,10 @@ $device-phone-width: 980px;
 html {
 	@include device-desktop	{ font-size: 180%; }
 	@include device-phone	{ font-size: 300%; }
-	font-family: 'Droid Sans', sans-serif;
-	font-weight: 700;
+	font: {
+		family: 'Droid Sans', sans-serif;
+		weight: 700;
+	}
 }
 
 
@@ -177,25 +179,21 @@ html {
 	@include device-desktop {
 		width: 4vw;
 		height: 4vw;
-		margin-left: 0.6vw;
-		margin-right: 0.6vw;
-		margin-top: 0.6vw;
-		margin-bottom: 0.6vw;
+		margin: 0.6vw;
 	}
 	@include device-phone {
 		width: 7vw;
 		height: 7vw;
-		margin-left: 1.5vw;
-		margin-right: 1.5vw;
-		margin-top: 1vw;
-		margin-bottom: 1vw;
+		margin: 1vw 1.5vw;
 	}
 	
 	vertical-align: middle;
 	
 	/* Using a custom SVG for the border as "border: 1px dashed;" is broken in FFox (See: Bugzilla#382721) */
-	background-image: url("../images/border-dashed.svg");
-	background-size: 100% 100%;
+	background: {
+		image: url("../images/border-dashed.svg");
+		size: 100% 100%;
+	}
 	@include border-radius(999px);
 }
 
@@ -213,12 +211,14 @@ html {
 	/* Without this, options get offset relative to their parent gap when the viewport is small */
 	vertical-align: top;
 	
-	background: #eee;
 	/* Using a custom SVG for the border, mainly to stay consistent with .puzzleGap */
-	background-image: url("../images/border-solid.svg");
-	background-size: 100% 100%;
-	@include border-radius(999px);
+	background: {
+		color: #eee;
+		image: url("../images/border-solid.svg");
+		size: 100% 100%;
+	}
 	
+	@include border-radius(999px);
 	@include cursor-grab;
 }
 
@@ -228,6 +228,7 @@ html {
 	height: 100%;
 	
 	/* Must be the same as the element's height, without using 100% */
+	/* Helps to vertically center the text */
 	@include device-desktop	{ line-height: 4vw; }
 	@include device-phone	{ line-height: 7vw; }
 }
@@ -248,6 +249,7 @@ html {
 	}
 	
 	/* Must be the same as the element's height, without using 100% */
+	/* Helps to vertically center the text */
 	@include device-desktop	{ line-height: 5vw; }
 	@include device-phone	{ line-height: 10vw; }
 }
