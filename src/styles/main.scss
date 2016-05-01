@@ -1,7 +1,9 @@
 @import "vendorPrefixes";
 
-$device-desktop-width: 1000px;
-$device-phone-width: 980px;
+/* See: http://www.mydevice.io/devices/ */
+/* Note: These are minimum values */
+$device-desktop-width: 1024px;
+$device-phone-width: 320px;
 
 $margins: 1vw;
 
@@ -15,7 +17,7 @@ $margins: 1vw;
 @mixin device-desktop {
 	// Desktop is the default so include it regardless of what @media says (but this mixin should
 	// still be used as future proofing - we may want to change the default some day
-	//@media (min-width: #{$device-desktop-width}) {
+	//@media screen and (min-width: #{$device-desktop-width}) {
 		@content;
 	//}
 }
@@ -81,8 +83,8 @@ iframe { width: 100% }
 .buttonHolder {
 	@include equidistantHorizontal;
 	@include device-desktop {
-		margin-left: 35vw;
-		margin-right: 35vw;
+		margin-left: 37.5vw;
+		margin-right: 37.5vw;
 	}
 	@include device-phone {
 		margin-left: 25vw;
@@ -99,7 +101,6 @@ iframe { width: 100% }
 		width: 20vw;
 		height: 20vw;
 	}
-	
 	cursor: pointer;
 }
 
@@ -182,6 +183,8 @@ iframe { width: 100% }
 #puzzleAnswer,
 #puzzleOptions {
 	@include centerHorizontal;
+	@include device-desktop	{ margin: 2.5vw 5vw; }
+	@include device-phone	{ margin: 2.5vw 5vw; }
 	
 	/* Make all text unselectable. "Note that it's a non-standard feature (i.e. not a part of any
 	 * specification). It is not guaranteed to work everywhere [...]"
@@ -256,8 +259,7 @@ iframe { width: 100% }
 	@include device-desktop {
 		width: 5vw;
 		height: 5vw;
-		margin-left: 2vw;
-		margin-right: 2vw;
+		margin: 0.2vw 2vw;
 	}
 	@include device-phone {
 		width: 10vw;
