@@ -3,11 +3,13 @@
 /* See: http://www.mydevice.io/devices/ */
 /* Note: These are minimum values */
 $device-desktop-width: 1024px;
+$device-tablet-width: 600px;
 $device-phone-width: 320px;
 
 $margins: 1vw;
 
 $buttonSize_desktop: 10vw;
+$buttonSize_tablet: 20vw;
 $buttonSize_phone: 20vw;
 
 
@@ -24,8 +26,13 @@ $buttonSize_phone: 20vw;
 		@content;
 	//}
 }
+@mixin device-tablet {
+	@media screen and (min-width: #{$device-tablet-width}) and (max-width: #{$device-desktop-width - 1px}) {
+		@content;
+	}
+}
 @mixin device-phone {
-	@media screen and /*(min-width: #{$device-phone-width}) and*/ (max-width: #{$device-desktop-width - 1px}) {
+	@media screen and /*(min-width: #{$device-phone-width}) and*/ (max-width: #{$device-tablet-width - 1px}) {
 		@content;
 	}
 }
@@ -48,6 +55,7 @@ $buttonSize_phone: 20vw;
 
 html {
 	@include device-desktop	{ font-size: 180%; }
+	@include device-tablet	{ font-size: 150%; }
 	@include device-phone	{ font-size: 150%; }
 	font: {
 		family: 'Droid Sans', sans-serif;
@@ -77,10 +85,14 @@ iframe { width: 100% }
 
 .buttonHolder {
 	$spacing_desktop: 5vw;
+	$spacing_tablet: 8vw;
 	$spacing_phone: 8vw;
 	$buttonCount: 2;
 	@include device-desktop {
 		@include evenlySpaceHorizontal(100vw, $spacing_desktop, $buttonSize_desktop, $buttonCount);
+	}
+	@include device-tablet {
+		@include evenlySpaceHorizontal(100vw, $spacing_tablet, $buttonSize_tablet, $buttonCount);
 	}
 	@include device-phone {
 		@include evenlySpaceHorizontal(100vw, $spacing_phone, $buttonSize_phone, $buttonCount);
@@ -91,6 +103,10 @@ iframe { width: 100% }
 	@include device-desktop {
 		width: $buttonSize_desktop;
 		height: $buttonSize_desktop;
+	}
+	@include device-tablet	{
+		width: $buttonSize_tablet;
+		height: $buttonSize_tablet;
 	}
 	@include device-phone {
 		width: $buttonSize_phone;
@@ -109,6 +125,7 @@ iframe { width: 100% }
 	@include box-sizing(border-box);
 	@include calc(width, "100% - #{2 * $margins}");
 	@include device-desktop	{ height: 5vh; }
+	@include device-tablet	{ height: 8vh; }
 	@include device-phone	{ height: 8vh; }
 	margin-left: $margins;
 	margin-right: $margins;
@@ -163,6 +180,7 @@ iframe { width: 100% }
 	* {
 		@include box-sizing(border-box);
 		@include device-desktop	{ width: 30vw; }
+		@include device-tablet	{ width: 50vw; }
 		@include device-phone	{ width: 50vw; }
 		padding: 5px;
 	}
@@ -179,6 +197,7 @@ iframe { width: 100% }
 #puzzleOptions {
 	@include centerHorizontal;
 	@include device-desktop	{ margin: 2.5vw 5vw; }
+	@include device-tablet	{ margin: 4vw 3vw; }
 	@include device-phone	{ margin: 4vw 3vw; }
 	
 	/* Make all text unselectable. "Note that it's a non-standard feature (i.e. not a part of any
@@ -194,12 +213,19 @@ iframe { width: 100% }
 	
 	/* line-height helps vertically center the text of the contained option */
 	$size_desktop: 4vw;
+	$size_tablet: 10vw;
 	$size_phone: 10vw;
 	@include device-desktop {
 		width: $size_desktop;
 		height: $size_desktop;
 		line-height: $size_desktop;
 		margin: 0.6vw;
+	}
+	@include device-tablet {
+		width: $size_tablet;
+		height: $size_tablet;
+		line-height: $size_tablet;
+		margin: 0.8vw 1.2vw;
 	}
 	@include device-phone {
 		width: $size_phone;
@@ -255,12 +281,19 @@ iframe { width: 100% }
 	
 	/* line-height helps vertically center the text */
 	$size_desktop: 5vw;
+	$size_tablet: 10vw;
 	$size_phone: 10vw;
 	@include device-desktop {
 		width: $size_desktop;
 		height: $size_desktop;
 		line-height: $size_desktop;
 		margin: 0.2vw 2vw;
+	}
+	@include device-tablet {
+		width: $size_tablet;
+		height: $size_tablet;
+		line-height: $size_tablet;
+		margin: 0.6vw 4vw;
 	}
 	@include device-phone {
 		width: $size_phone;
