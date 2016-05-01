@@ -61,7 +61,10 @@
 		// see https://github.com/davidjbradshaw/iframe-resizer
 		iFrameResize({
 			log: false,
+			bodyMargin: "0px",
 			checkOrigin: false,
+			// See: https://github.com/davidjbradshaw/iframe-resizer#heightcalculationmethod
+			heightCalculationMethod: (navigator.userAgent.indexOf("MSIE") !== -1 ? 'max' : 'lowestElement'),
 			
 			closedCallback: function(iframeId) {
 				console.debug("iFrameResize.closedCallback: iframeId=" + iframeId);
@@ -74,6 +77,10 @@
 			},
 			resizedCallback: function(iframe, height, width, type) {
 				console.debug("iFrameResize.resizedCallback: iframe=" + iframe + ", w=" + width + ", h=" + height + ", type=" + type);
+			},
+			scrollCallback: function(x, y) {
+				console.debug("iFrameResize.scrollCallback: x=" + x + ", y=" + y);
+				return true;
 			}
 		});
 		
@@ -285,6 +292,6 @@
 <body onload="onLoad();" onresize="onResize(event);" onorientationchange="onOrientationChange(event);">
 	<div id="completionGraphic"></div>
 	<div id="progressBar"></div>
-	<iframe id="main" frameborder="0" scrolling="no" seamless="seamless" style="width:100%;"></iframe>
+	<iframe id="main" frameborder="0" scrolling="no" seamless="seamless"></iframe>
 </body>
 </html>

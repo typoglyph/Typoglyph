@@ -3,6 +3,8 @@
 $device-desktop-width: 1000px;
 $device-phone-width: 980px;
 
+$margins: 1vw;
+
 
 
 /**********
@@ -56,6 +58,20 @@ html {
 	}
 }
 
+body {
+	/*
+	Disabling horizontal margins/padding is important for embeded iFrames which use @media queries.
+	If an iFrame has a smaller width than its parent and the width of the parent is close to (for
+	example) $device-tablet-width then "device-desktop" could be used by the parent and
+	"device-tablet" could be used by the iFrame.
+	*/
+	margin: $margins 0px;
+	padding: 0px;
+}
+
+/** See: https://github.com/davidjbradshaw/iframe-resizer#typical-setup */
+iframe { width: 100% }
+
 
 
 /***********
@@ -95,9 +111,11 @@ html {
 
 #progressBar {
 	@include box-sizing(border-box);
-	width: 100%;
+	@include calc(width, "100% - #{2 * $margins}");
 	@include device-desktop	{ height: 5vh; }
 	@include device-phone	{ height: 5vh; }
+	margin-left: $margins;
+	margin-right: $margins;
 	padding: 0.4vh;
 	
 	border: 1px solid #ccc;
