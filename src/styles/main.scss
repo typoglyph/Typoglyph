@@ -91,9 +91,8 @@ html {
  * Progress bar *
  ****************/
 
-.progressBar {
+#progressBar {
 	@include box-sizing(border-box);
-	
 	width: 100%;
 	@include device-desktop	{ height: 5vh; }
 	@include device-phone	{ height: 5vh; }
@@ -101,32 +100,33 @@ html {
 	
 	border: 1px solid #ccc;
 	@include border-radius(1.2vh);
-}
-
-.progressBar * {
-	display: inline-block;
-	@include box-sizing(border-box);
 	
-	height: 100%;
-	
-	/* Prevents progress bar segments getting offset from the bar when the viewport is resized */
-	vertical-align: top;
-	
-	/* Dividing line between this bar and the next */
-	border-right: 1px solid #999;
+	* {
+		display: inline-block;
+		@include box-sizing(border-box);
+		
+		height: 100%;
+		
+		/* Prevents weird bug where segments get offset when the viewport is resized */
+		vertical-align: top;
+		
+		/* Dividing line between this bar and the next */
+		border-right: 1px solid #999;
+		
+		&:first-child {
+			@include border-radius-tl(1vh);
+			@include border-radius-bl(1vh);
+		}
+		&:last-child {
+			/* Remove dividing line between this bar and the next (as there isn't a next) */
+			border-right: none;
+			@include border-radius-tr(1vh);
+			@include border-radius-br(1vh);
+		}
+		&.correct { background: #4fa637; }
+		&.incorrect { background: #db3026; }
+	}
 }
-.progressBar *:first-child {
-	@include border-radius-tl(1vh);
-	@include border-radius-bl(1vh);
-}
-.progressBar *:last-child {
-	/* No dividing line between this bar and the next (as there isn't a next) */
-	border-right: none;
-	@include border-radius-tr(1vh);
-	@include border-radius-br(1vh);
-}
-.progressBar *.correct { background: #4fa637; }
-.progressBar *.incorrect { background: #db3026; }
 
 
 
@@ -134,24 +134,22 @@ html {
  * Completion graphic *
  **********************/
  
-#completionGraphicHolder {
+#completionGraphic {
 	position: fixed;
 	left: 50vw;
 	top: 50vh;
-	
 	@include translate(-50%, -50%);
 	
 	/* Allow click/touch events to pass through the element unaffected */
 	/* Note: This is unsupported pre-IE11 */
 	pointer-events: none;
-}
- 
-.completionGraphic {
-	@include box-sizing(border-box);
 	
-	@include device-desktop	{ width: 30vw; }
-	@include device-phone	{ width: 50vw; }
-	padding: 5px;
+	* {
+		@include box-sizing(border-box);
+		@include device-desktop	{ width: 30vw; }
+		@include device-phone	{ width: 50vw; }
+		padding: 5px;
+	}
 }
 
 

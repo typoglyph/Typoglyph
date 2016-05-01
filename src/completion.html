@@ -35,16 +35,14 @@
 	 * @param {StatisticsTracker} statsTracker
 	 */
 	function showResults(statsTracker) {
-		var resultElement = document.getElementById("result"); 
-		var puzzleElement = document.getElementById("puzzleAnswer");
-		
 		var latestStat = statsTracker.getLatestStatistic();
-		var result = document.createTextNode(latestStat.result ? "Correct!" : "Incorrect!");
-		var drawnPuzzle = _puzzleDrawer.draw(latestStat.puzzle);
-		util.removeAllChildren(resultElement);
+		
+		var resultElement = document.getElementById("result");
+		resultElement.innerHTML = (latestStat.result ? "Correct!" : "Incorrect!");
+		
+		var puzzleElement = document.getElementById("puzzleAnswer");
 		util.removeAllChildren(puzzleElement);
-		resultElement.appendChild(result);
-		puzzleElement.appendChild(drawnPuzzle);
+		_puzzleDrawer.drawInto(puzzleElement, latestStat.puzzle);
 	}
 	
 	/**
@@ -100,6 +98,6 @@
 </head>
 <body onload="onLoad();" onresize="onResize(event);" onorientationchange="onOrientationChange(event);" onclick="onClickAnywhere(event, this);">
 	<h2 id="result"></h2>
-	<div id="puzzleAnswer" class="centerHorizontal"></div>
+	<div id="puzzleAnswer"></div>
 </body>
 </html>

@@ -122,18 +122,18 @@
 	 */
 	function renderCurrentPuzzle() {
 		var puzzleElement = document.getElementById("puzzleSentence");
-		var optionBarElement = document.getElementById("puzzleOptions");
-		
-		var drawnPuzzle = _puzzleDrawer.draw(_currentPuzzle);
-		var drawnOptions = _optionBarDrawer.draw(_currentPuzzle.options);
 		util.removeAllChildren(puzzleElement);
+		_puzzleDrawer.drawInto(puzzleElement, _currentPuzzle);
+		
+		var optionBarElement = document.getElementById("puzzleOptions");
 		util.removeAllChildren(optionBarElement);
-		puzzleElement.appendChild(drawnPuzzle);
-		optionBarElement.appendChild(drawnOptions);
+		_optionBarDrawer.drawInto(optionBarElement, _currentPuzzle.options);
 	}
 	
 	
 	function initTouchControls() {
+		
+		// Defines how puzzle options can be dragged
 		interact(".puzzleOption").draggable({
 			inertia: false,
 			autoScroll: false,
@@ -195,8 +195,10 @@
 			}
 		});
 		
+		// Defines how puzzle gaps (and options which are inside gaps) can be dropzones
+		// Potentially inefficient: Actually makes every element on the page a dropzone
 		interact("*").dropzone({
-			accept: ".puzzleOption",
+			accept: ".puzzleOption", // Only allow puzzle options to be dropped here
 			overlap: 0.1,
 			
 			/**
@@ -249,7 +251,8 @@
 			 * @param {Event} event
 			 */
 			ondropdeactivate: function(event) {
-				console.debug("ondropdeactivate: target=" + event.relatedTarget.id + ", origin=" + event.relatedTarget.parentNode.id + ", dest=" + event.target.id);
+				var originId = (event.relatedTarget.parentNode === null) ? null : event.relatedTarget.parentNode.id;
+				console.debug("ondropdeactivate: target=" + event.relatedTarget.id + ", origin=" + originId + ", dest=" + event.target.id);
 				renderCurrentPuzzle();
 			}
 		});
