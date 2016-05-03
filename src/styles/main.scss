@@ -1,0 +1,309 @@
+@import "vendorPrefixes";
+
+/* See: http://www.mydevice.io/devices/ */
+/* Note: These are minimum values */
+$device-desktop-width: 1024px;
+$device-tablet-width: 600px;
+$device-phone-width: 320px;
+
+$margins: 1vw;
+
+$buttonSize_desktop: 10vw;
+$buttonSize_tablet: 16vw;
+$buttonSize_phone: 20vw;
+
+
+
+/**********
+ * Mixins *
+ **********/
+
+/* In cases where one device-* mixin is used, all device-* mixins must be used */
+@mixin device-desktop {
+	// Desktop is the default so include it regardless of what @media says (but this mixin should
+	// still be used as future proofing - we may want to change the default some day
+	//@media screen and (min-width: #{$device-desktop-width}) {
+		@content;
+	//}
+}
+@mixin device-tablet {
+	@media screen and (min-width: #{$device-tablet-width}) and (max-width: #{$device-desktop-width - 1px}) {
+		@content;
+	}
+}
+@mixin device-phone {
+	@media screen and /*(min-width: #{$device-phone-width}) and*/ (max-width: #{$device-tablet-width - 1px}) {
+		@content;
+	}
+}
+
+
+@mixin centerHorizontal {
+	text-align: center;
+	* { display: inline-block; }
+}
+
+@mixin evenlySpaceHorizontal($totalWidth, $spacing, $childWidth, $childCount) {
+	margin-left: ($totalWidth - ($childCount * $childWidth + ($childCount - 1) * $spacing)) / 2;
+	* {
+		margin-right: $spacing;
+		&:last-child { margin-right: 0px; }
+	}
+}
+
+
+
+html {
+	@include device-desktop	{ font-size: 180%; }
+	@include device-tablet	{ font-size: 160%; }
+	@include device-phone	{ font-size: 150%; }
+	font: {
+		family: 'Droid Sans', sans-serif;
+		weight: 700;
+	}
+}
+
+body {
+	/*
+	Disabling horizontal margins/padding is important for embeded iFrames which use @media queries.
+	If an iFrame has a smaller width than its parent and the width of the parent is close to (for
+	example) $device-tablet-width then "device-desktop" could be used by the parent and
+	"device-tablet" could be used by the iFrame.
+	*/
+	margin: $margins 0px;
+	padding: 0px;
+}
+
+/** See: https://github.com/davidjbradshaw/iframe-resizer#typical-setup */
+iframe { width: 100% }
+
+
+
+/***********
+ * Buttons *
+ ***********/
+
+.buttonHolder {
+	$spacing_desktop: 5vw;
+	$spacing_tablet: 6vw;
+	$spacing_phone: 8vw;
+	$buttonCount: 2;
+	@include device-desktop {
+		@include evenlySpaceHorizontal(100vw, $spacing_desktop, $buttonSize_desktop, $buttonCount);
+	}
+	@include device-tablet {
+		@include evenlySpaceHorizontal(100vw, $spacing_tablet, $buttonSize_tablet, $buttonCount);
+	}
+	@include device-phone {
+		@include evenlySpaceHorizontal(100vw, $spacing_phone, $buttonSize_phone, $buttonCount);
+	}
+}
+
+.button {
+	@include device-desktop {
+		width: $buttonSize_desktop;
+		height: $buttonSize_desktop;
+	}
+	@include device-tablet	{
+		width: $buttonSize_tablet;
+		height: $buttonSize_tablet;
+	}
+	@include device-phone {
+		width: $buttonSize_phone;
+		height: $buttonSize_phone;
+	}
+	cursor: pointer;
+}
+
+
+
+/****************
+ * Progress bar *
+ ****************/
+
+#progressBar {
+	@include box-sizing(border-box);
+	@include calc(width, "100% - #{2 * $margins}");
+	@include device-desktop	{ height: 5vh; }
+	@include device-tablet	{ height: 8vh; }
+	@include device-phone	{ height: 8vh; }
+	margin-left: $margins;
+	margin-right: $margins;
+	padding: 0.4vh;
+	
+	border: 1px solid #ccc;
+	@include border-radius(1.2vh);
+	
+	* {
+		display: inline-block;
+		@include box-sizing(border-box);
+		
+		height: 100%;
+		
+		/* Prevents weird bug where segments get offset when the viewport is resized */
+		vertical-align: top;
+		
+		/* Dividing line between this bar and the next */
+		border-right: 1px solid #999;
+		
+		&:first-child {
+			@include border-radius-tl(1vh);
+			@include border-radius-bl(1vh);
+		}
+		&:last-child {
+			/* Remove dividing line between this bar and the next (as there isn't a next) */
+			border-right: none;
+			@include border-radius-tr(1vh);
+			@include border-radius-br(1vh);
+		}
+		&.correct { background: #4fa637; }
+		&.incorrect { background: #db3026; }
+	}
+}
+
+
+
+/**********************
+ * Completion graphic *
+ **********************/
+ 
+#completionGraphic {
+	position: fixed;
+	left: 50vw;
+	top: 50vh;
+	@include translate(-50%, -50%);
+	
+	/* Allow click/touch events to pass through the element unaffected */
+	/* Note: This is unsupported pre-IE11 */
+	pointer-events: none;
+	
+	* {
+		@include box-sizing(border-box);
+		@include device-desktop	{ width: 30vw; }
+		@include device-tablet	{ width: 50vw; }
+		@include device-phone	{ width: 50vw; }
+		padding: 5px;
+	}
+}
+
+
+
+/***********
+ * Puzzles *
+ ***********/
+
+#puzzleSentence,
+#puzzleAnswer,
+#puzzleOptions {
+	@include centerHorizontal;
+	@include device-desktop	{ margin: 2.5vw 5vw; }
+	@include device-tablet	{ margin: 5vw; }
+	@include device-phone	{ margin: 4vw 3vw; }
+	
+	/* Make all text unselectable. "Note that it's a non-standard feature (i.e. not a part of any
+	 * specification). It is not guaranteed to work everywhere [...]"
+	 *     - http://stackoverflow.com/questions/826782/css-rule-to-disable-text-selection-highlighting#4407335 */
+	@include user-select(none);
+	cursor: default;
+}
+
+
+.puzzleGap {
+	display: inline-block;
+	
+	/* line-height helps vertically center the text of the contained option */
+	$size_desktop: 4vw;
+	$size_tablet: 7vw;
+	$size_phone: 10vw;
+	@include device-desktop {
+		width: $size_desktop;
+		height: $size_desktop;
+		line-height: $size_desktop;
+		margin: 0.6vw;
+	}
+	@include device-tablet {
+		width: $size_tablet;
+		height: $size_tablet;
+		line-height: $size_tablet;
+		margin: 0.8vw 1.2vw;
+	}
+	@include device-phone {
+		width: $size_phone;
+		height: $size_phone;
+		line-height: $size_phone;
+		margin: 0.8vw 1.2vw;
+	}
+	vertical-align: middle;
+	
+	/* Using a custom SVG for the border as "border: 1px dashed;" is broken in FFox (See: Bugzilla#382721) */
+	background: {
+		image: url("../images/border-dashed.svg");
+		size: 100% 100%;
+	}
+	@include border-radius(999px);
+}
+
+/* Gaps which are filled with an option */
+.puzzleGap:not(:empty) {}
+
+/* Gaps which are NOT filled with an option */
+.puzzleGap:empty {}
+
+
+.puzzleOption {
+	display: inline-block;
+	@include box-sizing(border-box);
+	
+	/* Without this, options get offset relative to their parent gap when the viewport is small */
+	vertical-align: top;
+	
+	/* Using a custom SVG for the border, mainly to stay consistent with .puzzleGap */
+	background: {
+		color: #eee;
+		image: url("../images/border-solid.svg");
+		size: 100% 100%;
+	}
+	
+	@include border-radius(999px);
+	@include cursor-grab;
+}
+
+/* Options which are inside a gap */
+.puzzleGap > .puzzleOption {
+	
+	/* Parent should specify "line-height" to help vertically center the text */
+	width: 100%;
+	height: 100%;
+}
+
+/* Options which are NOT inside a gap */
+:not(.puzzleGap) > .puzzleOption {
+	
+	/* line-height helps vertically center the text */
+	$size_desktop: 5vw;
+	$size_tablet: 10vw;
+	$size_phone: 10vw;
+	@include device-desktop {
+		width: $size_desktop;
+		height: $size_desktop;
+		line-height: $size_desktop;
+		margin: 0.2vw 2vw;
+	}
+	@include device-tablet {
+		width: $size_tablet;
+		height: $size_tablet;
+		line-height: $size_tablet;
+		margin: 0.6vw 4vw;
+	}
+	@include device-phone {
+		width: $size_phone;
+		height: $size_phone;
+		line-height: $size_phone;
+		margin: 0.6vw 4vw;
+	}
+}
+
+/* Options which are being dragged around */
+.puzzleOption.highlight {
+	@include cursor-grabbing;
+}

@@ -3,30 +3,22 @@
 <head>
 	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 	<meta content="utf-8" http-equiv="encoding">
+	<meta content='width=device-width, initial-scale=1.0' name='viewport'>
 	
-	<link href='https://fonts.googleapis.com/css?family=Droid+Sans:700' rel='stylesheet' type='text/css'>
-	
-	<!-- Only one of the dynamic styles will be enabled at once, based on the current size of the browser window -->
-	<!-- @see scripts/dynamicStylesheets.js -->
+	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Droid+Sans:700">
 	<link rel="stylesheet" type="text/css" href="styles/main.css">
-	<link rel="stylesheet" type="text/css" href="styles/main-tiny.css"		class="dynamic-stylesheet max-width:768">
-	<link rel="stylesheet" type="text/css" href="styles/main-small.css"		class="dynamic-stylesheet min-width:769		max-width:1000">
-	<link rel="stylesheet" type="text/css" href="styles/main-medium.css"	class="dynamic-stylesheet min-width:1001	max-width:2048">
-	<link rel="stylesheet" type="text/css" href="styles/main-large.css"		class="dynamic-stylesheet min-width:2049">
 	
 	<!-- see https://github.com/davidjbradshaw/iframe-resizer -->
 	<script type="text/javascript" src="scripts/lib/iframe-resizer-v3.5.0/iframeResizer.contentWindow.min.js"></script>
 	<script type="text/javascript" src="scripts/lib/interact.js-v1.2.6/interact.min.js"></script>
 	<script type="text/javascript" src="scripts/common.js"></script>
 	<script type="text/javascript" src="scripts/util.js"></script>
-	<script type="text/javascript" src="scripts/dynamicStylesheets.js"></script>
 	<script type="text/javascript" src="scripts/ui.js"></script>
 	<script>
 	
 	
 	// Imports
 	var util = typoglyph.util;
-	var DynamicStylesheets = typoglyph.DynamicStylesheets;
 	var PuzzleDrawer = typoglyph.ui.PuzzleDrawer;
 	var PuzzleGapDrawer = typoglyph.ui.PuzzleGapDrawer;
 	var PuzzleOptionDrawer = typoglyph.ui.PuzzleOptionDrawer;
@@ -34,7 +26,6 @@
 	
 	
 	// Global variables
-	var _dynStylesheets = null;
 	var _currentPuzzle = null;
 	var _onPuzzleCompleteListener = null;
 	
@@ -74,9 +65,6 @@
 	function onLoad() {
 		console.debug("onLoad");
 		
-		_dynStylesheets = DynamicStylesheets.fromDocument(document);
-		_dynStylesheets.update();
-		
 		// DI would be nice here... oh well
 		var optionDrawer = PuzzleOptionDrawer.create();
 		var gapDrawer = PuzzleGapDrawer.create(optionDrawer, false);
@@ -93,7 +81,6 @@
 	 */
 	function onResize(event) {
 		console.debug("onResize: event=" + event);
-		_dynStylesheets.update();
 	}
 	
 	/**
@@ -103,7 +90,6 @@
 	 */
 	function onOrientationChange(event) {
 		console.debug("onOrientationChange: event=" + event);
-		_dynStylesheets.update();
 	}
 	
 	/**
@@ -137,18 +123,18 @@
 	 */
 	function renderCurrentPuzzle() {
 		var puzzleElement = document.getElementById("puzzleSentence");
-		var optionBarElement = document.getElementById("puzzleOptions");
-		
-		var drawnPuzzle = _puzzleDrawer.draw(_currentPuzzle);
-		var drawnOptions = _optionBarDrawer.draw(_currentPuzzle.options);
 		util.removeAllChildren(puzzleElement);
+		_puzzleDrawer.drawInto(puzzleElement, _currentPuzzle);
+		
+		var optionBarElement = document.getElementById("puzzleOptions");
 		util.removeAllChildren(optionBarElement);
-		puzzleElement.appendChild(drawnPuzzle);
-		optionBarElement.appendChild(drawnOptions);
+		_optionBarDrawer.drawInto(optionBarElement, _currentPuzzle.options);
 	}
 	
 	
 	function initTouchControls() {
+		
+		// Defines how puzzle options can be dragged
 		interact(".puzzleOption").draggable({
 			inertia: false,
 			autoScroll: false,
@@ -210,8 +196,10 @@
 			}
 		});
 		
+		// Defines how puzzle gaps (and options which are inside gaps) can be dropzones
+		// Potentially inefficient: Actually makes every element on the page a dropzone
 		interact("*").dropzone({
-			accept: ".puzzleOption",
+			accept: ".puzzleOption", // Only allow puzzle options to be dropped here
 			overlap: 0.1,
 			
 			/**
@@ -264,7 +252,8 @@
 			 * @param {Event} event
 			 */
 			ondropdeactivate: function(event) {
-				console.debug("ondropdeactivate: target=" + event.relatedTarget.id + ", origin=" + event.relatedTarget.parentNode.id + ", dest=" + event.target.id);
+				var originId = (event.relatedTarget.parentNode === null) ? null : event.relatedTarget.parentNode.id;
+				console.debug("ondropdeactivate: target=" + event.relatedTarget.id + ", origin=" + originId + ", dest=" + event.target.id);
 				renderCurrentPuzzle();
 			}
 		});
@@ -272,9 +261,9 @@
 	</script>
 </head>
 <body onload="onLoad();" onresize="onResize(event);" onorientationchange="onOrientationChange(event);">
-	<div id="puzzleOptions" class="centerHorizontal"></div>
-	<div id="puzzleSentence" class="centerHorizontal"></div>
-	<div class="buttonHolder equidistantHorizontal">
+	<div id="puzzleOptions"></div>
+	<div id="puzzleSentence"></div>
+	<div class="buttonHolder">
 		<img id="resetPuzzle" class="button" src="images/button_reset.svg" onclick="onResetPuzzleButtonClicked(event, this);" />
 		<img id="nextPuzzle" class="button" src="images/button_next.svg" onclick="onNextPuzzleButtonClicked(event, this);" />
 	</div>

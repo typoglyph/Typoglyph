@@ -3,26 +3,19 @@
 <head>
 	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 	<meta content="utf-8" http-equiv="encoding">
+	<meta content='width=device-width, initial-scale=1.0' name='viewport'>
 	
 	<title>Typoglyph</title>
 	<link rel="icon" type="image/ico" href="images/favicon.ico">
 	
-	<link href='https://fonts.googleapis.com/css?family=Droid+Sans:700' rel='stylesheet' type='text/css'>
-	
-	<!-- Only one of the dynamic styles will be enabled at once, based on the current size of the browser window -->
-	<!-- @see scripts/dynamicStylesheets.js -->
+	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Droid+Sans:700">
 	<link rel="stylesheet" type="text/css" href="styles/main.css">
-	<link rel="stylesheet" type="text/css" href="styles/main-tiny.css"		class="dynamic-stylesheet max-width:768">
-	<link rel="stylesheet" type="text/css" href="styles/main-small.css"		class="dynamic-stylesheet min-width:769		max-width:1000">
-	<link rel="stylesheet" type="text/css" href="styles/main-medium.css"	class="dynamic-stylesheet min-width:1001	max-width:2048">
-	<link rel="stylesheet" type="text/css" href="styles/main-large.css"		class="dynamic-stylesheet min-width:2049">
 	
 	<!-- see https://github.com/davidjbradshaw/iframe-resizer -->
 	<script type="text/javascript" src="scripts/lib/iframe-resizer-v3.5.0/iframeResizer.min.js"></script>
 	<script type="text/javascript" src="scripts/lib/howler.js-v1.1.29/howler.min.js"></script>
 	<script type="text/javascript" src="scripts/common.js"></script>
 	<script type="text/javascript" src="scripts/util.js"></script>
-	<script type="text/javascript" src="scripts/dynamicStylesheets.js"></script>
 	<script type="text/javascript" src="scripts/puzzle.js"></script>
 	<script type="text/javascript" src="scripts/statistics.js"></script>
 	<script type="text/javascript" src="scripts/ui.js"></script>
@@ -31,7 +24,6 @@
 	
 	// Imports
 	var util = typoglyph.util;
-	var DynamicStylesheets = typoglyph.DynamicStylesheets;
 	var Puzzle = typoglyph.puzzle.Puzzle;
 	var StatisticsTracker = typoglyph.StatisticsTracker;
 	var ProgressBarDrawer = typoglyph.ui.ProgressBarDrawer;
@@ -54,7 +46,6 @@
 	
 	
 	// Global variables
-	var _dynStylesheets = null;
 	var _puzzleSet = null;
 	var _currentPuzzleIndex = null;
 	var _statistics = StatisticsTracker.create();
@@ -69,13 +60,13 @@
 	function onLoad() {
 		console.info("onLoad");
 		
-		_dynStylesheets = DynamicStylesheets.fromDocument(document);
-		_dynStylesheets.update();
-		
 		// see https://github.com/davidjbradshaw/iframe-resizer
 		iFrameResize({
 			log: false,
+			bodyMargin: "0px",
 			checkOrigin: false,
+			// See: https://github.com/davidjbradshaw/iframe-resizer#heightcalculationmethod
+			heightCalculationMethod: (navigator.userAgent.indexOf("MSIE") !== -1 ? 'max' : 'lowestElement'),
 			
 			closedCallback: function(iframeId) {
 				console.debug("iFrameResize.closedCallback: iframeId=" + iframeId);
@@ -88,6 +79,10 @@
 			},
 			resizedCallback: function(iframe, height, width, type) {
 				console.debug("iFrameResize.resizedCallback: iframe=" + iframe + ", w=" + width + ", h=" + height + ", type=" + type);
+			},
+			scrollCallback: function(x, y) {
+				console.debug("iFrameResize.scrollCallback: x=" + x + ", y=" + y);
+				return true;
 			}
 		});
 		
@@ -106,7 +101,6 @@
 	 */
 	function onResize(event) {
 		console.debug("onResize: event=" + event);
-		_dynStylesheets.update();
 	}
 	
 	/**
@@ -116,7 +110,6 @@
 	 */
 	function onOrientationChange(event) {
 		console.debug("onOrientationChange: event=" + event);
-		_dynStylesheets.update();
 	}
 	
 	
@@ -170,10 +163,9 @@
 	function renderStatistics() {
 		console.debug("renderStatistics");
 		
-		var progressBarHolder = document.getElementById("progressBarHolder");
-		var drawnProgressBar = _progressBarDrawer.draw(_statistics);
-		util.removeAllChildren(progressBarHolder);
-		progressBarHolder.appendChild(drawnProgressBar);
+		var progressBar = document.getElementById("progressBar");
+		util.removeAllChildren(progressBar);
+		_progressBarDrawer.drawInto(progressBar, _statistics);
 	}
 	
 	/**
@@ -205,8 +197,8 @@
 		console.debug("renderPuzzleResult");
 		
 		// Get ready to show the completion graphic
-		var completionGraphicHolder = document.getElementById("completionGraphicHolder");
-		var completionGraphic = _completionGraphicDrawer.draw(_statistics.getLatestStatistic().result);
+		var completionGraphic = document.getElementById("completionGraphic");
+		var result = _statistics.getLatestStatistic().result;
 
 		// Show the results page
 		var frame = document.getElementById("main");
@@ -220,9 +212,9 @@
 				event.target.contentWindow.showResults(_statistics);
 				
 				// Show the completion graphic for a time
-				completionGraphicHolder.appendChild(completionGraphic);
+				_completionGraphicDrawer.drawInto(completionGraphic, result);
 				setTimeout(
-					function() { util.removeAllChildren(completionGraphicHolder); },
+					function() { _completionGraphicDrawer.reset(completionGraphic); },
 					COMPLETION_GRAPHIC_DISPLAY_TIME);
 			});
 		frame.src = "completion.html";
@@ -354,8 +346,8 @@
 	</script>
 </head>
 <body onload="onLoad();" onresize="onResize(event);" onorientationchange="onOrientationChange(event);">
-	<span id="completionGraphicHolder"></span>
-	<span id="progressBarHolder"></span>
-	<iframe id="main" frameborder="0" scrolling="no" seamless="seamless" style="width:100%;"></iframe>
+	<div id="completionGraphic"></div>
+	<div id="progressBar"></div>
+	<iframe id="main" frameborder="0" scrolling="no" seamless="seamless"></iframe>
 </body>
 </html>

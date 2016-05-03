@@ -3,36 +3,27 @@
 <head>
 	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 	<meta content="utf-8" http-equiv="encoding">
+	<meta content='width=device-width, initial-scale=1.0' name='viewport'>
 	
-	<link href='https://fonts.googleapis.com/css?family=Droid+Sans:700' rel='stylesheet' type='text/css'>
-	
-	<!-- Only one of the dynamic styles will be enabled at once, based on the current size of the browser window -->
-	<!-- @see scripts/dynamicStylesheets.js -->
+	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Droid+Sans:700">
 	<link rel="stylesheet" type="text/css" href="styles/main.css">
-	<link rel="stylesheet" type="text/css" href="styles/main-tiny.css"		class="dynamic-stylesheet max-width:768">
-	<link rel="stylesheet" type="text/css" href="styles/main-small.css"		class="dynamic-stylesheet min-width:769		max-width:1000">
-	<link rel="stylesheet" type="text/css" href="styles/main-medium.css"	class="dynamic-stylesheet min-width:1001	max-width:2048">
-	<link rel="stylesheet" type="text/css" href="styles/main-large.css"		class="dynamic-stylesheet min-width:2049">
 	
 	<!-- see https://github.com/davidjbradshaw/iframe-resizer -->
 	<script type="text/javascript" src="scripts/lib/iframe-resizer-v3.5.0/iframeResizer.contentWindow.min.js"></script>
 	<script type="text/javascript" src="scripts/common.js"></script>
 	<script type="text/javascript" src="scripts/util.js"></script>
-	<script type="text/javascript" src="scripts/dynamicStylesheets.js"></script>
 	<script type="text/javascript" src="scripts/ui.js"></script>
 	<script>
 	
 	
 	// Imports
 	var util = typoglyph.util;
-	var DynamicStylesheets = typoglyph.DynamicStylesheets;
 	var PuzzleDrawer = typoglyph.ui.PuzzleDrawer;
 	var PuzzleGapDrawer = typoglyph.ui.PuzzleGapDrawer;
 	var PuzzleOptionDrawer = typoglyph.ui.PuzzleOptionDrawer;
 	
 	
 	// Global variables
-	var _dynStylesheets = null;
 	var _currentPuzzle = null;	
 	var _puzzleDrawer = null;
 	var _onSkipListener = null;
@@ -45,16 +36,14 @@
 	 * @param {StatisticsTracker} statsTracker
 	 */
 	function showResults(statsTracker) {
-		var resultElement = document.getElementById("result"); 
-		var puzzleElement = document.getElementById("puzzleAnswer");
-		
 		var latestStat = statsTracker.getLatestStatistic();
-		var result = document.createTextNode(latestStat.result ? "Correct!" : "Incorrect!");
-		var drawnPuzzle = _puzzleDrawer.draw(latestStat.puzzle);
-		util.removeAllChildren(resultElement);
+		
+		var resultElement = document.getElementById("result");
+		resultElement.innerHTML = (latestStat.result ? "Correct!" : "Incorrect!");
+		
+		var puzzleElement = document.getElementById("puzzleAnswer");
 		util.removeAllChildren(puzzleElement);
-		resultElement.appendChild(result);
-		puzzleElement.appendChild(drawnPuzzle);
+		_puzzleDrawer.drawInto(puzzleElement, latestStat.puzzle);
 	}
 	
 	/**
@@ -74,9 +63,6 @@
 	function onLoad() {
 		console.debug("onLoad");
 		
-		_dynStylesheets = DynamicStylesheets.fromDocument(document);
-		_dynStylesheets.update();
-		
 		var optionDrawer = PuzzleOptionDrawer.create();
 		var gapDrawer = PuzzleGapDrawer.create(optionDrawer, true);
 		_puzzleDrawer = PuzzleDrawer.create(gapDrawer);
@@ -89,7 +75,6 @@
 	 */
 	function onResize(event) {
 		console.debug("onResize: event=" + event);
-		_dynStylesheets.update();
 	}
 	
 	/**
@@ -99,7 +84,6 @@
 	 */
 	function onOrientationChange(event) {
 		console.debug("onOrientationChange: event=" + event);
-		_dynStylesheets.update();
 	}
 	
 	/**
@@ -115,6 +99,6 @@
 </head>
 <body onload="onLoad();" onresize="onResize(event);" onorientationchange="onOrientationChange(event);" onclick="onClickAnywhere(event, this);">
 	<h2 id="result"></h2>
-	<div id="puzzleAnswer" class="centerHorizontal"></div>
+	<div id="puzzleAnswer"></div>
 </body>
 </html>
