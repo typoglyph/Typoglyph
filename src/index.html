@@ -28,6 +28,7 @@
 	var StatisticsTracker = typoglyph.StatisticsTracker;
 	var ProgressBarDrawer = typoglyph.ui.ProgressBarDrawer;
 	var CompletionGraphicDrawer = typoglyph.ui.CompletionGraphicDrawer;
+	var CompletionSoundPlayer = typoglyph.ui.CompletionSoundPlayer;
 	
 	
 	// Constant variables
@@ -51,6 +52,7 @@
 	var _statistics = StatisticsTracker.create();
 	var _progressBarDrawer = null;
 	var _completionGraphicDrawer = null;
+	var _completionSoundPlayer = null;
 	
 	
 	// Event handlers
@@ -89,8 +91,11 @@
 		_progressBarDrawer = ProgressBarDrawer.create(PUZZLE_SET_SIZE);
 		
 		fetchCompletionGraphics(null, true, function(graphics) {
-			_completionGraphicDrawer = CompletionGraphicDrawer.create(graphics[0], graphics[1]);
-			startNewPuzzleSet();
+			fetchCompletionSounds(null, true, function(sounds) {
+				_completionGraphicDrawer = CompletionGraphicDrawer.create(graphics[0], graphics[1]);
+				_completionSoundPlayer = CompletionSoundPlayer.create(sounds[0], sounds[1]);
+				startNewPuzzleSet();
+			});
 		});
 	}
 	
@@ -213,6 +218,7 @@
 				
 				// Show the completion graphic for a time
 				_completionGraphicDrawer.drawInto(completionGraphic, result);
+				_completionSoundPlayer.playSound(result);
 				setTimeout(
 					function() { _completionGraphicDrawer.reset(completionGraphic); },
 					COMPLETION_GRAPHIC_DISPLAY_TIME);
