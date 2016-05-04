@@ -25,7 +25,7 @@ typoglyph.ui.Drawer = {
 	 * @private
 	 * @abstract
 	 */
-	createRootElement(obj) {
+	createRootElement: function(obj) {
 		throw "NotImplementedException";
 	},
 	
@@ -99,7 +99,7 @@ typoglyph.ui.PuzzleOptionBarDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 	 * @return {HTMLElement}
 	 * @override
 	 */
-	createRootElement(obj) {
+	createRootElement: function(obj) {
 		var msg = "This class only supports the 'drawInto' method";
 		throw "UnsupportedOperationException: " + msg;
 	},
@@ -139,7 +139,7 @@ typoglyph.ui.PuzzleDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 	 * @return {HTMLElement}
 	 * @override
 	 */
-	createRootElement(obj) {
+	createRootElement: function(obj) {
 		var msg = "This class only supports the 'drawInto' method";
 		throw "UnsupportedOperationException: " + msg;
 	},
@@ -273,7 +273,7 @@ typoglyph.ui.ProgressBarDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 	 * @return {HTMLElement}
 	 * @override
 	 */
-	createRootElement(obj) {
+	createRootElement: function(obj) {
 		var msg = "This class only supports the 'drawInto' method";
 		throw "UnsupportedOperationException: " + msg;
 	},
@@ -315,7 +315,7 @@ typoglyph.ui.CompletionGraphicDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 	 * @return {HTMLElement}
 	 * @override
 	 */
-	createRootElement(obj) {
+	createRootElement: function(obj) {
 		var msg = "This class only supports the 'drawInto' method";
 		throw "UnsupportedOperationException: " + msg;
 	},
@@ -402,4 +402,4 @@ typoglyph.ui.CompletionSoundPlayer = {
 			onend:			function() { console.debug("Howl.onEnd: " + urls); }
 		});
 	}
-}
+};
