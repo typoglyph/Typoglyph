@@ -27,6 +27,7 @@
 	var Puzzle = typoglyph.puzzle.Puzzle;
 	var StatisticsTracker = typoglyph.StatisticsTracker;
 	var ProgressBarDrawer = typoglyph.ui.ProgressBarDrawer;
+	var ToggleButtonDrawer = typoglyph.ui.ToggleButtonDrawer;
 	var CompletionGraphicDrawer = typoglyph.ui.CompletionGraphicDrawer;
 	var CompletionSoundPlayer = typoglyph.ui.CompletionSoundPlayer;
 	
@@ -45,12 +46,16 @@
 	 */
 	var COMPLETION_GRAPHIC_DISPLAY_TIME = 600;
 	
+	var BUTTON_AUDIO_MUTE = "images/button_audio_disable.svg";
+	var BUTTON_AUDIO_UNMUTE = "images/button_audio_enable.svg";
+	
 	
 	// Global variables
 	var _puzzleSet = null;
 	var _currentPuzzleIndex = null;
 	var _statistics = StatisticsTracker.create();
 	var _progressBarDrawer = null;
+	var _muteButtonDrawer = null;
 	var _completionGraphicDrawer = null;
 	var _completionSoundPlayer = null;
 	
@@ -90,6 +95,21 @@
 		
 		_progressBarDrawer = ProgressBarDrawer.create(PUZZLE_SET_SIZE);
 		
+		// Muted when the button is "on" (when muted, display the button to unmute)
+		_muteButtonDrawer = ToggleButtonDrawer.create(BUTTON_AUDIO_UNMUTE, BUTTON_AUDIO_MUTE);
+		_muteButtonDrawer.setOnStateChangeListener(function(oldValue, newValue) {
+			console.debug("mute-button.onStateChange: old=" + oldValue + ", new=" + newValue);
+			
+			var muteButton = document.getElementById("muteButton");
+			_muteButtonDrawer.drawInto(muteButton);
+			if (newValue) {
+				Howler.mute();
+			} else {
+				Howler.unmute();
+			}
+		});
+		_muteButtonDrawer.setEnabled(false);
+		
 		fetchCompletionGraphics(null, true, function(graphics) {
 			fetchCompletionSounds(null, true, function(sounds) {
 				_completionGraphicDrawer = CompletionGraphicDrawer.create(graphics[0], graphics[1]);
@@ -115,6 +135,15 @@
 	 */
 	function onOrientationChange(event) {
 		console.debug("onOrientationChange: event=" + event);
+	}
+	
+	/**
+	 * @param {MouseEvent} event Information about the click event
+	 * @param {HTMLElement} element The DOM element which was clicked
+	 */
+	function onMuteButtonClicked(event, element) {
+		console.debug("onMuteButtonClicked: event=" + event + ", element=" + element);
+		_muteButtonDrawer.toggle(); // Also triggers the event listener setup in onLoad()
 	}
 	
 	
@@ -353,7 +382,10 @@
 </head>
 <body onload="onLoad();" onresize="onResize(event);" onorientationchange="onOrientationChange(event);">
 	<div id="completionGraphic"></div>
-	<div id="progressBar"></div>
+	<div id="topBar">
+		<img id="muteButton" class="toggleButton" onclick="onMuteButtonClicked(event, this);" />
+		<div id="progressBar"></div>
+	</div>
 	<iframe id="main" frameborder="0" scrolling="no" seamless="seamless"></iframe>
 </body>
 </html>

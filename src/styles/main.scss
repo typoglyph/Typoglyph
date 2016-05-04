@@ -12,6 +12,10 @@ $buttonSize_desktop: 10vw;
 $buttonSize_tablet: 16vw;
 $buttonSize_phone: 20vw;
 
+$progressBarHeight_desktop: 6vh;
+$progressBarHeight_tablet: 8vh;
+$progressBarHeight_phone: 8vh;
+
 
 
 /**********
@@ -114,22 +118,46 @@ iframe { width: 100% }
 	}
 	cursor: pointer;
 }
+.toggleButton {
+	@extend .button;
+}
 
 
 
-/****************
- * Progress bar *
- ****************/
+/***********
+ * Top bar *
+ ***********/
+
+#topBar {
+	@include device-desktop	{ height: $progressBarHeight_desktop; }
+	@include device-tablet	{ height: $progressBarHeight_tablet; }
+	@include device-phone	{ height: $progressBarHeight_phone; }
+	padding-left: $margins;
+	padding-right: $margins;
+}
+
+
+#muteButton {
+	@include device-desktop	{ width: $progressBarHeight_desktop; }
+	@include device-tablet	{ width: $progressBarHeight_tablet; }
+	@include device-phone	{ width: $progressBarHeight_phone; }
+	height: 100%;
+	margin-right: $margins;
+	
+	float: left;
+}
+
 
 #progressBar {
 	@include box-sizing(border-box);
-	@include calc(width, "100% - #{2 * $margins}");
-	@include device-desktop	{ height: 5vh; }
-	@include device-tablet	{ height: 8vh; }
-	@include device-phone	{ height: 8vh; }
-	margin-left: $margins;
-	margin-right: $margins;
+	
+	@include device-desktop	{ @include calc("width", "100% - #{$margins} - #{$progressBarHeight_desktop}"); }
+	@include device-tablet	{ @include calc("width", "100% - #{$margins} - #{$progressBarHeight_tablet}"); }
+	@include device-phone	{ @include calc("width", "100% - #{$margins} - #{$progressBarHeight_phone}"); }
+	height: 100%;
 	padding: 0.4vh;
+	
+	float: right;
 	
 	border: 1px solid #ccc;
 	@include border-radius(1.2vh);
