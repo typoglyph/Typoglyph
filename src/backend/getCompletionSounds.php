@@ -5,23 +5,26 @@ require_once("common.php");
 $which = getStringRequestParam("which", False);
 $which = ($which === null) ? "both" : strtolower($which);
 
-$correctGraphics = ($which === "both" || $which === "correct")
-		? $correctGraphics = listCompletionGraphics("../images/completion_graphics/correct_*.{jpg,jpeg,png,gif,bmp}")
+$supportedFileExtensions = "mp3,ogg,wav";
+$directory = "../audio/completion_sounds";
+
+$correctSounds = ($which === "both" || $which === "correct")
+		? $correctSounds = listCompletionSounds($directory . "/correct_*.{" . $supportedFileExtensions . "}")
 		: array();
 
-$incorrectGraphics = ($which === "both" || $which === "incorrect")
-		? $incorrectGraphics = listCompletionGraphics("../images/completion_graphics/incorrect_*.{jpg,jpeg,png,gif,bmp}")
+$incorrectSounds = ($which === "both" || $which === "incorrect")
+		? $incorrectSounds = listCompletionSounds($directory . "/incorrect_*.{" . $supportedFileExtensions . "}")
 		: array();
 		
-$graphics = array("correct" => $correctGraphics, "incorrect" => $incorrectGraphics);
-sendJsonReply($graphics, $HTTP_STATUS_SUCCESS);
+$sounds = array("correct" => $correctSounds, "incorrect" => $incorrectSounds);
+sendJsonReply($sounds, $HTTP_STATUS_SUCCESS);
 
 
 /**
  * @param string
  * @return Array<string>
  */
-function listCompletionGraphics($filePattern) {
+function listCompletionSounds($filePattern) {
 	$relativePaths = glob($filePattern, GLOB_BRACE);
 	$fullPaths = array();
 	foreach ($relativePaths as $relativePath) {

@@ -25,7 +25,7 @@ typoglyph.ui.Drawer = {
 	 * @private
 	 * @abstract
 	 */
-	createRootElement(obj) {
+	createRootElement: function(obj) {
 		throw "NotImplementedException";
 	},
 	
@@ -99,7 +99,7 @@ typoglyph.ui.PuzzleOptionBarDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 	 * @return {HTMLElement}
 	 * @override
 	 */
-	createRootElement(obj) {
+	createRootElement: function(obj) {
 		var msg = "This class only supports the 'drawInto' method";
 		throw "UnsupportedOperationException: " + msg;
 	},
@@ -139,7 +139,7 @@ typoglyph.ui.PuzzleDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 	 * @return {HTMLElement}
 	 * @override
 	 */
-	createRootElement(obj) {
+	createRootElement: function(obj) {
 		var msg = "This class only supports the 'drawInto' method";
 		throw "UnsupportedOperationException: " + msg;
 	},
@@ -273,7 +273,7 @@ typoglyph.ui.ProgressBarDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 	 * @return {HTMLElement}
 	 * @override
 	 */
-	createRootElement(obj) {
+	createRootElement: function(obj) {
 		var msg = "This class only supports the 'drawInto' method";
 		throw "UnsupportedOperationException: " + msg;
 	},
@@ -315,7 +315,7 @@ typoglyph.ui.CompletionGraphicDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 	 * @return {HTMLElement}
 	 * @override
 	 */
-	createRootElement(obj) {
+	createRootElement: function(obj) {
 		var msg = "This class only supports the 'drawInto' method";
 		throw "UnsupportedOperationException: " + msg;
 	},
@@ -358,3 +358,117 @@ typoglyph.ui.CompletionGraphicDrawer = Objects.subclass(typoglyph.ui.Drawer, {
 		util.removeAllChildren(p);
 	}
 });
+
+
+typoglyph.ui.ToggleButtonDrawer = Objects.subclass(typoglyph.ui.Drawer, {
+	/**
+	 * @param {string} onImage Image used to represent the button when in the "on" state
+	 * @param {string} offImage Image used to represent the button when in the "off" state
+	 * @constructor
+	 */
+	create: function(onImage, offImage) {
+		var self = typoglyph.ui.Drawer.create.call(this);
+		self.onImage = onImage;
+		self.offImage = offImage;
+		self.enabled = false;
+		self.stateListener = null;
+		return self;
+	},
+	
+	
+	/**
+	 * @param {function(boolean, boolean)}
+	 */
+	setOnStateChangeListener: function(listener) {
+		this.stateListener = listener;
+	},
+	
+	
+	/**
+	 * @return {boolean}
+	 */
+	isEnabled: function() {
+		return this.enabled;
+	},
+	
+	/**
+	 * @param {boolean} newValue
+	 */
+	setEnabled: function(newValue) {
+		var oldValue = this.enabled;
+		
+		this.enabled = newValue;
+		if (this.stateListener !== null) {
+			this.stateListener(oldValue, newValue);
+		}
+	},
+	
+	toggle: function() {
+		this.setEnabled(!this.isEnabled());
+	},
+	
+	
+	/**
+	 * @param {Object} obj Unused
+	 * @return {HTMLElement}
+	 * @override
+	 */
+	createRootElement: function(obj) {
+		var e = this.newElement("img", "", "toggleButton");
+		return e;
+	},
+	
+	/**
+	 * @param {HTMLElement} p
+	 * @param {Object} obj Unused
+	 * @override
+	 */
+	drawInto: function(p, obj) {
+		p.src = this.isEnabled() ? this.onImage : this.offImage;
+	}
+});
+
+
+typoglyph.ui.CompletionSoundPlayer = {
+	/**
+	 * @param {Array<String>} correctSounds
+	 * @param {Array<String>} incorrectSounds
+	 * @constructor
+	 */
+	create: function(correctSounds, incorrectSounds) {
+		var self = Objects.subclass(this);
+		self.correctSounds = correctSounds;
+		self.incorrectSounds = incorrectSounds;
+		
+		// May need to be tweaked depending on the sounds being played
+		self.volume = 1.0;
+		return self;
+	},
+	
+	/**
+	 * @param {boolean} correct
+	 */
+	playSound: function(correct) {
+		var util = typoglyph.util;
+		var sound = util.randomElement(correct ? this.correctSounds : this.incorrectSounds);
+		this.initPlayer([sound], this.volume).play();
+	},
+	
+	/**
+	 * @private
+	 */
+	initPlayer: function(urls, volumne) {
+		return new Howl({
+			urls: urls,
+			volume: this.volume,
+			autoplay: false,
+			loop: false,
+			
+			onload:			function() { console.debug("Howl.onLoad: " + urls); },
+			onloaderror:	function() { console.warn("Howl.onLoadError: " + urls); },
+			onplay:			function() { console.debug("Howl.onPlay: " + urls); },
+			onpause:		function() { console.debug("Howl.onPause: " + urls); },
+			onend:			function() { console.debug("Howl.onEnd: " + urls); }
+		});
+	}
+};
