@@ -1,0 +1,59 @@
+@import "vendorPrefixes";
+@import "main";
+
+$puzzleGapSize: 2vw;
+
+
+html {
+	font: {
+		size: 120%;
+		weight: 300;
+	}
+}
+
+body {
+	margin: $margins;
+}
+
+
+/* Based on http://www.w3schools.com/Css/css_table.asp */
+table#puzzles {
+	width: 100%;
+	border: 1px solid black;
+	border-collapse: collapse;
+	
+	tr:nth-child(even) { background-color: #f2f2f2; }
+	th, td {
+		padding: 0.5vw 0px;
+		border-right: 1px solid black;
+		&:last-child { border-right: none; }
+	}
+	th {
+		background-color: #4caf50;
+		color: white;
+	}
+}
+
+
+.puzzleSentence,
+.puzzleOptions {
+	margin: 0vw;	
+	&, * { cursor: pointer; }
+}
+
+.puzzleGap {
+	$size: $puzzleGapSize;
+	width: $size;
+	height: $size;
+	line-height: $size;
+	margin: 0px 0.3vw;
+}
+
+/* Options which are NOT inside a gap */
+:not(.puzzleGap) > .puzzleOption {
+	$size: 2vw;
+	width: $size;
+	height: $size;
+	line-height: $size;
+	margin: 0.1vw 0.2vw;
+}
