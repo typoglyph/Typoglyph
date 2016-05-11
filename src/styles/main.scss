@@ -142,9 +142,8 @@ iframe { width: 100% }
 	@include device-tablet	{ width: $progressBarHeight_tablet; }
 	@include device-phone	{ width: $progressBarHeight_phone; }
 	height: 100%;
-	margin-right: $margins;
 	
-	float: left;
+	float: right;
 }
 
 
@@ -155,9 +154,10 @@ iframe { width: 100% }
 	@include device-tablet	{ @include calc("width", "100% - #{$margins} - #{$progressBarHeight_tablet}"); }
 	@include device-phone	{ @include calc("width", "100% - #{$margins} - #{$progressBarHeight_phone}"); }
 	height: 100%;
+	margin-right: $margins;
 	padding: 0.4vh;
 	
-	float: right;
+	float: left;
 	
 	border: 1px solid #ccc;
 	@include border-radius(1.2vh);
