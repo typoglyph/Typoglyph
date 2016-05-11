@@ -3,7 +3,7 @@
  * 
  * @author jakemarsden
  */
-define(["./Gap", "./Option", "./Puzzle"], function(Gap, Option, Puzzle) {
+define(["jquery", "./Gap", "./Option", "./Puzzle"], function($, Gap, Option, Puzzle) {
 	return {
 		/**
 		 * @param {function(Array<puzzle/Puzzle>)} callback The function to call on success
@@ -63,7 +63,7 @@ define(["./Gap", "./Option", "./Puzzle"], function(Gap, Option, Puzzle) {
 				var option = Option.create(jsonOption.value);
 				options.push(option);
 			}
-			var puzzle = Puzzle.create(jsonPuzzle.sentence, options, gaps);
+			var puzzle = Puzzle.create(jsonPuzzle.id, jsonPuzzle.sentence, options, gaps);
 			puzzles.push(puzzle);
 		}
 		return puzzles;

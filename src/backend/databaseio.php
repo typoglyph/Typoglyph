@@ -79,6 +79,7 @@ class DatabaseWrapper {
 	 */
 	private function parsePuzzle($dbPuzzle) {
 		$puzzle = new Puzzle();
+		$puzzle->id = $dbPuzzle->_id;
 		
 		// Sort out the options
 		// For each character

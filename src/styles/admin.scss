@@ -35,11 +35,13 @@ table#puzzles {
 }
 
 
+.puzzleId,
 .puzzleSentence,
 .puzzleOptions {
 	margin: 0vw;	
 	&, * { cursor: pointer; }
 }
+.puzzleId { @include centerHorizontal; }
 
 .puzzleGap {
 	$size: $puzzleGapSize;
