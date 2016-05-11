@@ -120,24 +120,6 @@
 	}
 	
 	/**
-	 * Called whenever the size of the viewport changes
-	 * 
-	 * @param {Event} event
-	 */
-	function onResize(event) {
-		console.debug("onResize: event=" + event);
-	}
-	
-	/**
-	 * Called whenever the orientation of the device changes. Note browser support is spotty - some
-	 * may call onResize(), some may call onOrientationChange(), some may all both, some may not
-	 * call either
-	 */
-	function onOrientationChange(event) {
-		console.debug("onOrientationChange: event=" + event);
-	}
-	
-	/**
 	 * @param {MouseEvent} event Information about the click event
 	 * @param {HTMLElement} element The DOM element which was clicked
 	 */
@@ -380,7 +362,7 @@
 	}
 	</script>
 </head>
-<body onload="onLoad();" onresize="onResize(event);" onorientationchange="onOrientationChange(event);">
+<body onload="onLoad();">
 	<div id="completionGraphic"></div>
 	<div id="topBar">
 		<div id="progressBar"></div>
