@@ -1,5 +1,6 @@
 <?php
 class Puzzle {
+	public $id;
 	public $sentence = "";
 	public $gaps = array();
 	public $options = array();

@@ -7,6 +7,7 @@
 define(["util/Objects"], function(Objects) {
 	return {
 		/**
+		 * @param {int} id
 		 * @param {String} sentence The main part of a puzzle
 		 * @param {Array<Option>} options The values which can be used to populate the puzzle's gaps
 		 *     (each option can be used zero or more times)
@@ -14,8 +15,9 @@ define(["util/Objects"], function(Objects) {
 		 *     inserted
 		 * @constructor
 		 */
-		create: function(sentence, options, gaps) {
+		create: function(id, sentence, options, gaps) {
 			var self = Objects.subclass(this, {
+				id: id,
 				sentence: sentence,
 				options: options,
 				gaps: gaps
