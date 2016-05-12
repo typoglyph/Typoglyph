@@ -68,18 +68,9 @@ html {
 }
 
 body {
-	/*
-	Disabling horizontal margins/padding is important for embeded iFrames which use @media queries.
-	If an iFrame has a smaller width than its parent and the width of the parent is close to (for
-	example) $device-tablet-width then "device-desktop" could be used by the parent and
-	"device-tablet" could be used by the iFrame.
-	*/
 	margin: $margins 0px;
 	padding: 0px;
 }
-
-/** See: https://github.com/davidjbradshaw/iframe-resizer#typical-setup */
-iframe { width: 100% }
 
 
 

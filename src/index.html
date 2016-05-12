@@ -11,14 +11,14 @@
 	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Droid+Sans:700">
 	<link rel="stylesheet" type="text/css" href="styles/main.css">
 	
-	<!-- see https://github.com/davidjbradshaw/iframe-resizer -->
-	<script type="text/javascript" src="scripts/lib/iframeResizer-v3.5.0/iframeResizer.min.js"></script>
 	<script type="text/javascript" src="scripts/lib/howler-v1.1.29/howler.min.js"></script>
+	<script type="text/javascript" src="scripts/lib/interact-v1.2.6/interact.min.js"></script>
 	<script type="text/javascript" src="scripts/common.js"></script>
 	<script type="text/javascript" src="scripts/util.js"></script>
 	<script type="text/javascript" src="scripts/puzzle.js"></script>
 	<script type="text/javascript" src="scripts/statistics.js"></script>
 	<script type="text/javascript" src="scripts/ui.js"></script>
+	<script type="text/javascript" src="scripts/contentController.js"></script>
 	<script>
 	
 	
@@ -30,6 +30,10 @@
 	var ToggleButtonDrawer = typoglyph.ui.ToggleButtonDrawer;
 	var CompletionGraphicDrawer = typoglyph.ui.CompletionGraphicDrawer;
 	var CompletionSoundPlayer = typoglyph.ui.CompletionSoundPlayer;
+	// var MasterController
+	// var PuzzleContentController
+	// var CompletionContentController
+	// var ResultsContentController
 	
 	
 	// Constant variables
@@ -59,6 +63,11 @@
 	var _completionGraphicDrawer = null;
 	var _completionSoundPlayer = null;
 	
+	var _masterController = null;
+	var _puzzleController = null;
+	var _completionController = null;
+	var _resultsController = null;
+	
 	
 	// Event handlers
 	/**
@@ -67,31 +76,11 @@
 	function onLoad() {
 		console.info("onLoad");
 		
-		// see https://github.com/davidjbradshaw/iframe-resizer
-		iFrameResize({
-			log: false,
-			bodyMargin: "0px",
-			checkOrigin: false,
-			// See: https://github.com/davidjbradshaw/iframe-resizer#heightcalculationmethod
-			heightCalculationMethod: (navigator.userAgent.indexOf("MSIE") !== -1 ? 'max' : 'lowestElement'),
-			
-			closedCallback: function(iframeId) {
-				console.debug("iFrameResize.closedCallback: iframeId=" + iframeId);
-			},
-			initCallback: function(iframe) {
-				console.debug("iFrameResize.initCallback: iframe=" + iframe);
-			},
-			messageCallback: function(iframe, message) {
-				console.debug("iFrameResize.messageCallback: iframe=" + iframe + ", msg=" + message);
-			},
-			resizedCallback: function(iframe, height, width, type) {
-				console.debug("iFrameResize.resizedCallback: iframe=" + iframe + ", w=" + width + ", h=" + height + ", type=" + type);
-			},
-			scrollCallback: function(x, y) {
-				console.debug("iFrameResize.scrollCallback: x=" + x + ", y=" + y);
-				return true;
-			}
-		});
+		_masterController = MasterController.create([
+			_puzzleController = PuzzleContentController.create(document.getElementById("puzzleContent")),
+			_completionController = CompletionContentController.create(document.getElementById("completionContent")),
+			_resultsController = ResultsContentController.create(document.getElementById("resultsContent"))
+		]);
 		
 		_progressBarDrawer = ProgressBarDrawer.create(PUZZLE_SET_SIZE);
 		
@@ -193,14 +182,9 @@
 	function renderCurrentPuzzle(onPuzzleCompleteListener) {
 		console.debug("renderCurrentPuzzle");
 		
-		var frame = document.getElementById("main");
-		util.addOneOffEventListener(frame, "load",
-			function(event) {
-				var currentPuzzle = _puzzleSet[_currentPuzzleIndex];
-				event.target.contentWindow.setOnPuzzleCompleteListener(onPuzzleCompleteListener);
-				event.target.contentWindow.showPuzzle(currentPuzzle);
-			});
-		frame.src = "puzzle.html";
+		_puzzleController.setOnPuzzleCompleteListener(onPuzzleCompleteListener);
+		_puzzleController.showPuzzle(_puzzleSet[_currentPuzzleIndex]);
+		_masterController.show(_puzzleController);
 	}
 	
 	/**
@@ -217,24 +201,20 @@
 		var result = _statistics.getLatestStatistic().result;
 
 		// Show the results page
-		var frame = document.getElementById("main");
-		util.addOneOffEventListener(frame, "load",
-			function(event) {				
-				var finishTimeout = setTimeout(onFinishListener, PUZZLE_RESULT_DISPLAY_TIME);
-				event.target.contentWindow.setOnSkipListener(function() {
-					clearTimeout(finishTimeout);
-					onFinishListener();
-				});
-				event.target.contentWindow.showResults(_statistics);
-				
-				// Show the completion graphic for a time
-				_completionGraphicDrawer.drawInto(completionGraphic, result);
-				_completionSoundPlayer.playSound(result);
-				setTimeout(
-					function() { _completionGraphicDrawer.reset(completionGraphic); },
-					COMPLETION_GRAPHIC_DISPLAY_TIME);
-			});
-		frame.src = "completion.html";
+		var finishTimeout = setTimeout(onFinishListener, PUZZLE_RESULT_DISPLAY_TIME);
+		_completionController.setOnSkipListener(function() {
+			clearTimeout(finishTimeout);
+			onFinishListener();
+		});
+		_completionController.showResults(_statistics);
+		_masterController.show(_completionController);
+		
+		// Show the completion graphic for a time
+		_completionGraphicDrawer.drawInto(completionGraphic, result);
+		_completionSoundPlayer.playSound(result);
+		setTimeout(
+			function() { _completionGraphicDrawer.reset(completionGraphic); },
+			COMPLETION_GRAPHIC_DISPLAY_TIME);
 	}
 	
 	/**
@@ -247,13 +227,9 @@
 	function renderPuzzleSetResults(onFinishListener) {
 		console.debug("renderPuzzleSetResults");
 		
-		var frame = document.getElementById("main");
-		util.addOneOffEventListener(frame, "load",
-			function(event) {
-				event.target.contentWindow.setOnNextPuzzleSetListener(onFinishListener);
-				event.target.contentWindow.showResults(_statistics);
-			});
-		frame.src = "results.html";
+		_resultsController.setOnNextPuzzleSetListener(onFinishListener);
+		_resultsController.showResults(_statistics);
+		_masterController.show(_resultsController)
 	}
 	
 	
@@ -368,6 +344,36 @@
 		<div id="progressBar"></div>
 		<img id="muteButton" class="toggleButton" onclick="onMuteButtonClicked(event, this);" />
 	</div>
-	<iframe id="main" frameborder="0" scrolling="no" seamless="seamless"></iframe>
+	
+	
+	<div id="masterContent">
+		<div id="puzzleContent">
+			<div id="puzzleOptions" class="puzzleOptions"></div>
+			<div id="puzzleSentence" class="puzzleSentence"></div>
+			<div class="buttonHolder">
+				<img id="resetPuzzle" class="button" src="images/button_reset.svg" />
+				<img id="nextPuzzle" class="button" src="images/button_next.svg" />
+			</div>
+		</div>
+		
+		<div id="completionContent">
+			<h2 id="result"></h2>
+			<div id="puzzleAnswer" class="puzzleAnswer"></div>
+		</div>
+		
+		<div id="resultsContent">
+			<table>
+				<tr>
+					<td>
+						<h1>Results</h1>
+						<p><span id="correct"></span> / <span id="total"></span></p>
+					</td>
+					<td class="buttonHolder">
+						<img id="nextPuzzleSet" class="button" src="images/button_next_set.svg" />
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
 </body>
 </html>
