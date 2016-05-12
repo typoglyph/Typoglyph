@@ -11,363 +11,46 @@
 	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Droid+Sans:700">
 	<link rel="stylesheet" type="text/css" href="styles/main.css">
 	
-	<!-- see https://github.com/davidjbradshaw/iframe-resizer -->
-	<script type="text/javascript" src="scripts/lib/iframe-resizer-v3.5.0/iframeResizer.min.js"></script>
-	<script type="text/javascript" src="scripts/lib/howler.js-v1.1.29/howler.min.js"></script>
-	<script type="text/javascript" src="scripts/common.js"></script>
-	<script type="text/javascript" src="scripts/util.js"></script>
-	<script type="text/javascript" src="scripts/puzzle.js"></script>
-	<script type="text/javascript" src="scripts/statistics.js"></script>
-	<script type="text/javascript" src="scripts/ui.js"></script>
-	<script>
+	<script type="text/javascript" src="scripts/lib/require-v2.2.0/require.min.js"></script>
+	<script type="text/javascript" src="scripts/requireConfig.js" data-main="index"></script>
 	
-	
-	// Imports
-	var util = typoglyph.util;
-	var Puzzle = typoglyph.puzzle.Puzzle;
-	var StatisticsTracker = typoglyph.StatisticsTracker;
-	var ProgressBarDrawer = typoglyph.ui.ProgressBarDrawer;
-	var ToggleButtonDrawer = typoglyph.ui.ToggleButtonDrawer;
-	var CompletionGraphicDrawer = typoglyph.ui.CompletionGraphicDrawer;
-	var CompletionSoundPlayer = typoglyph.ui.CompletionSoundPlayer;
-	
-	
-	// Constant variables
-	/**
-	 * How many puzzles should be in each set
-	 */
-	var PUZZLE_SET_SIZE = 5;
-	/**
-	 * How long to display the answer page between each puzzle for, in milliseconds
-	 */
-	var PUZZLE_RESULT_DISPLAY_TIME = 5000;
-	/**
-	 * How long to display the completion graphic for, in milliseconds
-	 */
-	var COMPLETION_GRAPHIC_DISPLAY_TIME = 600;
-	
-	var BUTTON_AUDIO_MUTE = "images/button_audio_disable.svg";
-	var BUTTON_AUDIO_UNMUTE = "images/button_audio_enable.svg";
-	
-	
-	// Global variables
-	var _puzzleSet = null;
-	var _currentPuzzleIndex = null;
-	var _statistics = StatisticsTracker.create();
-	var _progressBarDrawer = null;
-	var _muteButtonDrawer = null;
-	var _completionGraphicDrawer = null;
-	var _completionSoundPlayer = null;
-	
-	
-	// Event handlers
-	/**
-	 * Called when the browser has finished (re)loading the document
-	 */
-	function onLoad() {
-		console.info("onLoad");
-		
-		// see https://github.com/davidjbradshaw/iframe-resizer
-		iFrameResize({
-			log: false,
-			bodyMargin: "0px",
-			checkOrigin: false,
-			// See: https://github.com/davidjbradshaw/iframe-resizer#heightcalculationmethod
-			heightCalculationMethod: (navigator.userAgent.indexOf("MSIE") !== -1 ? 'max' : 'lowestElement'),
-			
-			closedCallback: function(iframeId) {
-				console.debug("iFrameResize.closedCallback: iframeId=" + iframeId);
-			},
-			initCallback: function(iframe) {
-				console.debug("iFrameResize.initCallback: iframe=" + iframe);
-			},
-			messageCallback: function(iframe, message) {
-				console.debug("iFrameResize.messageCallback: iframe=" + iframe + ", msg=" + message);
-			},
-			resizedCallback: function(iframe, height, width, type) {
-				console.debug("iFrameResize.resizedCallback: iframe=" + iframe + ", w=" + width + ", h=" + height + ", type=" + type);
-			},
-			scrollCallback: function(x, y) {
-				console.debug("iFrameResize.scrollCallback: x=" + x + ", y=" + y);
-				return true;
-			}
-		});
-		
-		_progressBarDrawer = ProgressBarDrawer.create(PUZZLE_SET_SIZE);
-		
-		// Muted when the button is "on" (when muted, display the button to unmute)
-		_muteButtonDrawer = ToggleButtonDrawer.create(BUTTON_AUDIO_UNMUTE, BUTTON_AUDIO_MUTE);
-		_muteButtonDrawer.setOnStateChangeListener(function(oldValue, newValue) {
-			console.debug("mute-button.onStateChange: old=" + oldValue + ", new=" + newValue);
-			
-			var muteButton = document.getElementById("muteButton");
-			_muteButtonDrawer.drawInto(muteButton);
-			if (newValue) {
-				Howler.mute();
-			} else {
-				Howler.unmute();
-			}
-		});
-		_muteButtonDrawer.setEnabled(false);
-		
-		fetchCompletionGraphics(null, true, function(graphics) {
-			fetchCompletionSounds(null, true, function(sounds) {
-				_completionGraphicDrawer = CompletionGraphicDrawer.create(graphics[0], graphics[1]);
-				_completionSoundPlayer = CompletionSoundPlayer.create(sounds[0], sounds[1]);
-				startNewPuzzleSet();
-			});
-		});
-	}
-	
-	/**
-	 * @param {MouseEvent} event Information about the click event
-	 * @param {HTMLElement} element The DOM element which was clicked
-	 */
-	function onMuteButtonClicked(event, element) {
-		console.debug("onMuteButtonClicked: event=" + event + ", element=" + element);
-		_muteButtonDrawer.toggle(); // Also triggers the event listener setup in onLoad()
-	}
-	
-	
-	/**
-	 * Loads and starts a new set of puzzles for the user to solve
-	 */
-	function startNewPuzzleSet() {
-		console.info("startNewPuzzleSet");
-		fetchPuzzlesFromBackend(PUZZLE_SET_SIZE, true, function(puzzles) {
-			console.debug("startNewPuzzleSet.onPuzzlesLoaded: " + puzzles);
-			_puzzleSet = puzzles;
-			_currentPuzzleIndex = 0;
-			_statistics.reset();
-			
-			renderCurrentPuzzle(onPuzzleComplete);
-			renderStatistics();
-		});
-	}
-	
-	/**
-	 * @param {MouseEvent} event Information about the event which completed the puzzle
-	 * @param {Puzzle} puzzle
-	 * @param {boolean} correct
-	 */
-	function onPuzzleComplete(event, puzzle, correct) {
-		console.info("onPuzzleComplete: event=" + event + ", puzzle=" + puzzle + ", correct=" + correct);
-		
-		_statistics.onPuzzleAnswered(puzzle, correct);
-		_currentPuzzleIndex++;
-		
-		renderStatistics();
-		renderPuzzleResult(
-			function() {
-				// Move on to the next puzzle
-				if (_currentPuzzleIndex < _puzzleSet.length) {
-					// Not all puzzles have yet been completed
-					renderCurrentPuzzle(onPuzzleComplete);
-				} else {
-					// All puzzles have been completed
-					// Load the results page
-					renderPuzzleSetResults(function() { startNewPuzzleSet(); });
-				}
-			});
-	}
-	
-	
-	// Rendering functions
-	/**
-	 * Updates sections of the UI which show how far the user is through the puzzle set, etc.
-	 */
-	function renderStatistics() {
-		console.debug("renderStatistics");
-		
-		var progressBar = document.getElementById("progressBar");
-		util.removeAllChildren(progressBar);
-		_progressBarDrawer.drawInto(progressBar, _statistics);
-	}
-	
-	/**
-	 * Update the UI to (re)draw the puzzle currently being solved
-	 * 
-	 * @param {function(Puzzle, boolean)} onPuzzleCompleteListener The listener to call once the
-	 *     user has completed the given puzzle
-	 */
-	function renderCurrentPuzzle(onPuzzleCompleteListener) {
-		console.debug("renderCurrentPuzzle");
-		
-		var frame = document.getElementById("main");
-		util.addOneOffEventListener(frame, "load",
-			function(event) {
-				var currentPuzzle = _puzzleSet[_currentPuzzleIndex];
-				event.target.contentWindow.setOnPuzzleCompleteListener(onPuzzleCompleteListener);
-				event.target.contentWindow.showPuzzle(currentPuzzle);
-			});
-		frame.src = "puzzle.html";
-	}
-	
-	/**
-	 * Show the completion graphic and the puzzle result page for a specified amount of time
-	 * 
-	 * @param {function()} onFinishListener The listener to call once the results page has finished
-	 *     been shown
-	 */
-	function renderPuzzleResult(onFinishListener) {
-		console.debug("renderPuzzleResult");
-		
-		// Get ready to show the completion graphic
-		var completionGraphic = document.getElementById("completionGraphic");
-		var result = _statistics.getLatestStatistic().result;
-
-		// Show the results page
-		var frame = document.getElementById("main");
-		util.addOneOffEventListener(frame, "load",
-			function(event) {				
-				var finishTimeout = setTimeout(onFinishListener, PUZZLE_RESULT_DISPLAY_TIME);
-				event.target.contentWindow.setOnSkipListener(function() {
-					clearTimeout(finishTimeout);
-					onFinishListener();
-				});
-				event.target.contentWindow.showResults(_statistics);
-				
-				// Show the completion graphic for a time
-				_completionGraphicDrawer.drawInto(completionGraphic, result);
-				_completionSoundPlayer.playSound(result);
-				setTimeout(
-					function() { _completionGraphicDrawer.reset(completionGraphic); },
-					COMPLETION_GRAPHIC_DISPLAY_TIME);
-			});
-		frame.src = "completion.html";
-	}
-	
-	/**
-	 * At the end of each full set of puzzles, show the set result page and then move on to the
-	 * next set
-	 * 
-	 * @param {function()} onFinishListener The function to execute when the results page has
-	 *     finsished being shown
-	 */
-	function renderPuzzleSetResults(onFinishListener) {
-		console.debug("renderPuzzleSetResults");
-		
-		var frame = document.getElementById("main");
-		util.addOneOffEventListener(frame, "load",
-			function(event) {
-				event.target.contentWindow.setOnNextPuzzleSetListener(onFinishListener);
-				event.target.contentWindow.showResults(_statistics);
-			});
-		frame.src = "results.html";
-	}
-	
-	
-	// Functions which call the backend	
-	/**
-	 * Fetches the specified number of puzzles from the backend, and then passes them to a
-	 * specified callback function. Puzzles can be fetched asynchronously if required.
-	 * 
-	 * @param {int} count How many puzzles to fetch. Note that the number of fetched puzzles could
-	 *     be smaller if there aren't that many unique puzzles available.
-	 * @param {boolean} async True if you want the puzzles should be fetched asynchronously. Note:
-	 *     Specifying false means this function will not return until after the specified callback
-	 *     function has been called and has returned.
-	 * @param {function(Array<Puzzle>)} The function which will be called when the puzzles have
-	 *     finished being loaded.
-	 */
-	function fetchPuzzlesFromBackend(count, async, callback) {
-		var req = new XMLHttpRequest();
-		req.onreadystatechange = function() {
-			if (req.readyState === 4 && req.status === 200) {
-				var resp = req.responseText;
-				var puzzles = Puzzle.fromJsonArray(resp);
-				callback(puzzles);
-			}
-		};
-		req.open("GET", "backend/getRandomPuzzles.php?count=" + count, async);
-		req.send();
-	}
-	
-	/**
-	 * @param {boolean} correct True if you want to fetch graphics representing a correct answer or
-	 *     false if you want to fetch graphics representing an incorrect answer or null if you want
-	 *     to fetch all graphics
-	 * @param {boolean} async True if you want the graphics to be fetched asynchronously
-	 * @param {function(Array<Array<String>>)} callback The function to call when the graphics have
-	 *     been fetched. It will be passed an array where index 0 holds an array of correct
-	 *     graphics and index 1 holds an array of incorrect graphics (although one of the arrays
-	 *     may be empty, depending on what you pass for the "correct" parameter)
-	 */
-	function fetchCompletionGraphics(correct, async, callback) {
-		var which;
-		switch (correct) {
-			case null:
-				which = "both";
-				break;
-			case true:
-				which = "correct";
-				break;
-			case false:
-				which = "incorrect";
-				break;
-			default:
-				throw "IllegalArgumentException: correct=" + correct;
-		}
-		
-		var req = new XMLHttpRequest();
-		req.onreadystatechange = function() {
-			if (req.readyState === 4 && req.status === 200) {
-				var resp = req.responseText;
-				var result = JSON.parse(resp);
-				var graphics = [result["correct"], result["incorrect"]];
-				callback(graphics);
-			}
-		}
-		req.open("GET", "backend/getCompletionGraphics.php?which=" + which, async);
-		req.send();
-	}
-	
-	/**
-	 * @param {boolean} correct True if you want to fetch sounds representing a correct answer or
-	 *     false if you want to fetch sounds representing an incorrect answer or null if you want
-	 *     to fetch all sounds
-	 * @param {boolean} async True if you want the request to be executed asynchronously
-	 * @param {function(Array<Array<String>>)} callback The function which will be called when the
-	 *     sounds have been fetched. It will be passed an array where index 0 holds an array of
-	 *     correct sounds and index 1 holds an array of incorrect sounds (although one of the
-	 *     arrays may be empty, depending on what you pass for the "correct" parameter)
-	 */
-	function fetchCompletionSounds(correct, async, callback) {
-		var which;
-		switch (correct) {
-			case null:
-				which = "both";
-				break;
-			case true:
-				which = "correct";
-				break;
-			case false:
-				which = "incorrect";
-				break;
-			default:
-				throw "IllegalArgumentException: correct=" + correct;
-		}
-		
-		var req = new XMLHttpRequest();
-		req.onreadystatechange = function() {
-			if (req.readyState === 4 && req.status === 200) {
-				var resp = req.responseText;
-				var result = JSON.parse(resp);
-				var sounds = [result["correct"], result["incorrect"]];
-				callback(sounds);
-			}
-		}
-		req.open("GET", "backend/getCompletionSounds.php?which=" + which, async);
-		req.send();
-	}
-	</script>
 </head>
-<body onload="onLoad();">
+<body>
 	<div id="completionGraphic"></div>
 	<div id="topBar">
 		<div id="progressBar"></div>
-		<img id="muteButton" class="toggleButton" onclick="onMuteButtonClicked(event, this);" />
+		<img id="muteButton" class="toggleButton" />
 	</div>
-	<iframe id="main" frameborder="0" scrolling="no" seamless="seamless"></iframe>
+	
+	
+	<div id="masterContent">
+		<div id="puzzleContent">
+			<div id="puzzleOptions" class="puzzleOptions"></div>
+			<div id="puzzleSentence" class="puzzleSentence"></div>
+			<div class="buttonHolder">
+				<img id="resetPuzzle" class="button" src="images/button_reset.svg" />
+				<img id="nextPuzzle" class="button" src="images/button_next.svg" />
+			</div>
+		</div>
+		
+		<div id="completionContent">
+			<h2 id="result"></h2>
+			<div id="puzzleAnswer" class="puzzleAnswer"></div>
+		</div>
+		
+		<div id="resultsContent">
+			<table>
+				<tr>
+					<td>
+						<h1>Results</h1>
+						<p><span id="correct"></span> / <span id="total"></span></p>
+					</td>
+					<td class="buttonHolder">
+						<img id="nextPuzzleSet" class="button" src="images/button_next_set.svg" />
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
 </body>
 </html>
