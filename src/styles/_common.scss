@@ -43,3 +43,8 @@ $device-phone-width: 320px;
 		&:last-child { margin-right: 0px; }
 	}
 }
+
+
+/* All content must start hidden as sometimes it can show up during page load, before the
+ * JavaScript gets a chance to hide it */
+#masterContent > .content { display: none; }
