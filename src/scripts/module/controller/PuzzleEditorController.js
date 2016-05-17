@@ -35,7 +35,7 @@ define([
 			
 			idElement.innerHTML = puzzle.id;
 			this.puzzleDrawer.drawInto(sentenceElement, puzzle);
-			this.optionsDrawer.drawInto(optionsElement, puzzle);
+			this.optionsDrawer.drawInto(optionsElement, puzzle.options);
 		},
 		
 		/**
