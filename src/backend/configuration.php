@@ -19,6 +19,11 @@ class ApplicationConfig {
 		$dbConfig = static::$config["DatabaseConnection"];
 		return new DatabaseConfig($dbConfig["ConnectionString"], $dbConfig["Username"], $dbConfig["Password"]);
 	}
+	
+	function getPrivilegedDatabaseConfig() {
+		$dbConfig = static::$config["PrivilegedDatabaseConnection"];
+		return new DatabaseConfig($dbConfig["ConnectionString"], $dbConfig["Username"], $dbConfig["Password"]);
+	}
 }
 ApplicationConfig::initStatic();
 
