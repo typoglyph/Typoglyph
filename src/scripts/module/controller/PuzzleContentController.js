@@ -81,13 +81,26 @@ define([
 				}
 				self.renderCurrentPuzzle();
 			});
-			self.initTouchControls();
 		},
+		
+		/**
+		 * @override
+		 */
+		onPrepare: function() {
+			this.prepareTouchControls();
+		},
+		/**
+		 * @override
+		 */
+		onDestroy: function() {
+			this.destroyTouchControls();
+		},
+		
 		
 		/**
 		 * @private
 		 */
-		initTouchControls: function() {
+		prepareTouchControls: function() {
 			var self = this;
 			
 			// Defines how puzzle options can be dragged
@@ -213,6 +226,13 @@ define([
 					self.renderCurrentPuzzle();
 				}
 			});
+		},
+		/**
+		 * @private
+		 */
+		destroyTouchControls: function() {
+			Interact(".puzzleOption").draggable({ enabled: false });
+			Interact("*").dropzone({ enabled: false });
 		}
 	});
 });
