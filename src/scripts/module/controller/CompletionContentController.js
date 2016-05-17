@@ -2,10 +2,14 @@
  * @author jakemarsden
  */
 define([
-	"ui/PuzzleDrawer", "ui/PuzzleGapDrawer", "ui/PuzzleOptionDrawer",
-	"util/Objects", "util/Utils",
+	"ui/PuzzleDrawer",
+	"ui/PuzzleOptionDrawer",
+	"ui/SolutionShowingPuzzleGapDrawer",
+	"util/Objects",
+	"util/Utils",
 	"./ContentController"
-], function(PuzzleDrawer, PuzzleGapDrawer, PuzzleOptionDrawer, Objects, Utils, ContentController) {
+], function(PuzzleDrawer, PuzzleOptionDrawer, SolutionShowingPuzzleGapDrawer, Objects, Utils,
+		ContentController) {
 	
 	return Objects.subclass(ContentController, {
 		/**
@@ -14,8 +18,7 @@ define([
 		create: function(e) {
 			var self = ContentController.create.call(this, e);
 			self.puzzleDrawer = PuzzleDrawer.create(
-					PuzzleGapDrawer.create(
-					PuzzleOptionDrawer.create(), true));
+					SolutionShowingPuzzleGapDrawer.create(PuzzleOptionDrawer.create()));
 			self.skipListener = null;
 			return self;
 		},
@@ -28,10 +31,10 @@ define([
 		showResults: function(statsTracker) {
 			var latestStat = statsTracker.getLatestStatistic();
 			var resultElement = this.element.querySelector("#result");
-			resultElement.innerHTML = (latestStat.result ? "Correct!" : "Incorrect!");
+			resultElement.innerHTML = (latestStat.result) ? "correct" : "incorrect";
+			Utils.addClass(resultElement, latestStat.result ? "correct" : "incorrect");
 			
 			var puzzleElement = this.element.querySelector("#puzzleAnswer");
-			Utils.removeAllChildren(puzzleElement);
 			this.puzzleDrawer.drawInto(puzzleElement, latestStat.puzzle);
 		},
 		
@@ -55,6 +58,17 @@ define([
 					self.skipListener();
 				}
 			});
+		},
+		
+		/**
+		 * @override
+		 */
+		onDestroy: function() {
+			var resultElement = this.element.querySelector("#result");
+			Utils.removeAllChildren(resultElement);
+			Utils.removeClass(resultElement, "correct");
+			Utils.removeClass(resultElement, "incorrect");
+			Utils.removeAllChildren(this.element.querySelector("#puzzleAnswer"));
 		}
 	});
 });

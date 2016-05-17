@@ -282,3 +282,30 @@ body {
 .puzzleOption.highlight {
 	@include cursor-grabbing;
 }
+
+
+
+/******************
+ * Puzzle answers *
+ ******************/
+
+#result {
+	&.correct { color: green; }
+	&.incorrect { color: red; }
+}
+.puzzleGap {
+	&.correctlyFilled:not(:empty()),
+	&.correctlyFilled > .puzzleOption {
+		background: {
+			color: #b0dab0;
+			image: url("../images/border-solid-green.svg");
+		}
+	}
+	&.incorrectlyFilled,
+	&.incorrectlyFilled > .puzzleOption {
+		background: {
+			color: #dab0b0;
+			image: url("../images/border-solid-red.svg");
+		}
+	}
+}

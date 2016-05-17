@@ -3,8 +3,13 @@
  */
 define([
 	"interact",
-	"ui/PuzzleDrawer", "ui/PuzzleGapDrawer", "ui/PuzzleOptionBarDrawer", "ui/PuzzleOptionDrawer",
-	"util/Arrays", "util/Objects", "util/Utils",
+	"ui/PuzzleDrawer",
+	"ui/PuzzleGapDrawer",
+	"ui/PuzzleOptionBarDrawer",
+	"ui/PuzzleOptionDrawer",
+	"util/Arrays",
+	"util/Objects",
+	"util/Utils",
 	"./ContentController"
 ], function(Interact, PuzzleDrawer, PuzzleGapDrawer, PuzzleOptionBarDrawer, PuzzleOptionDrawer,
 		Arrays, Objects, Utils, ContentController) {
@@ -15,10 +20,9 @@ define([
 		 */
 		create: function(e) {
 			var optionDrawer = PuzzleOptionDrawer.create();
-			var gapDrawer = PuzzleGapDrawer.create(optionDrawer, false);
 			
 			var self = ContentController.create.call(this, e);
-			self.puzzleDrawer = PuzzleDrawer.create(gapDrawer);
+			self.puzzleDrawer = PuzzleDrawer.create(PuzzleGapDrawer.create(optionDrawer));
 			self.optionBarDrawer = PuzzleOptionBarDrawer.create(optionDrawer);
 			self.shownPuzzle = null;
 			self.puzzleCompleteListener = null;
