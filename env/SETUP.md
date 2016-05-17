@@ -8,5 +8,7 @@
  5. Create tables and test data using the provided *[/env/mysql_\*.sql]()* scripts
  6. Create a configuration file for Typoglyph by refering to *[/config/default.ini.template](../config/default.ini.template)*
  7. Build the project using *[/build.bat](../build.bat)*
- 8. Link the Typoglyph output directory to XAMPP's *htdocs* using ***mklink /d "/path/to/xampp/install/htdocs/typoglyph" "/path/to/typoglyph/out"***
- 9. Navigate to [http://localhost:\[your-apache-port\]/typoglyph](http://localhost/typoglyph)
+ 8. Link the Typoglyph output directory to XAMPP's *htdocs* using ***mklink /d "/path/to/xampp/install/htdocs" "/path/to/typoglyph/out"***
+ 9. Navigate to [http://localhost:\[your-apache-port\]/](http://localhost/)
+ 10. Also verify the admin page is working [http://localhost:\[your-apache-port\]/admin](http://localhost/admin)
+ 

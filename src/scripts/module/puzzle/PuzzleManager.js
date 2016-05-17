@@ -4,12 +4,14 @@
  * @author jakemarsden
  */
 define(["./Gap", "./Option", "./Puzzle"], function(Gap, Option, Puzzle) {
+	
+	var BACKEND_BASE_URL = "/backend/";
 	return {
 		/**
 		 * @param {function(Array<puzzle/Puzzle>)} callback The function to call on success
 		 */
 		fetchAllPuzzles: function(callback) {
-			var url = "backend/getAllPuzzles.php";
+			var url = BACKEND_BASE_URL + "getAllPuzzles.php";
 			fetchPuzzles(url, callback)
 		},
 		
@@ -18,7 +20,7 @@ define(["./Gap", "./Option", "./Puzzle"], function(Gap, Option, Puzzle) {
 		 * @param {function(Array<puzzle/Puzzle>)} callback The function to call on success
 		 */
 		fetchRandomPuzzles: function(count, callback) {
-			var url = "backend/getRandomPuzzles.php?count=" + count;
+			var url = BACKEND_BASE_URL + "getRandomPuzzles.php?count=" + count;
 			fetchPuzzles(url, callback);
 		}
 	};
