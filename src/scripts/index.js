@@ -65,8 +65,6 @@ require([
 			_resultsController = ResultsContentController.create(document.getElementById("resultsContent"))
 		]);
 		
-		_progressBarDrawer = ProgressBarDrawer.create(PUZZLE_SET_SIZE);
-		
 		// Muted when the button is "on" (when muted, display the button to unmute)
 		_muteButtonDrawer = ToggleButtonDrawer.create(BUTTON_AUDIO_UNMUTE, BUTTON_AUDIO_MUTE);
 		_muteButtonDrawer.setOnStateChangeListener(function(oldValue, newValue) {
@@ -104,6 +102,7 @@ require([
 		console.info("startNewPuzzleSet");
 		PuzzleManager.fetchRandomPuzzles(PUZZLE_SET_SIZE, function(puzzles) {
 			console.debug("startNewPuzzleSet.onPuzzlesLoaded: " + puzzles);
+			_progressBarDrawer = ProgressBarDrawer.create(puzzles.length);
 			_puzzleSet = puzzles;
 			_currentPuzzleIndex = 0;
 			_statistics.reset();
