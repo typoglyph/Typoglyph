@@ -1,54 +1,80 @@
 @import "vendorPrefixes";
-@import "main";
-
-$puzzleGapSize: 2vw;
+@import "common";
 
 
 html {
 	font: {
-		size: 120%;
+		family: "Droid Sans", sans-serif;
+		size: 100%;
 		weight: 300;
 	}
-}
-
-body {
-	margin: $margins;
 }
 
 
 /* Based on http://www.w3schools.com/Css/css_table.asp */
 table#puzzles {
 	width: 100%;
+	margin-bottom: 0.5vw;
 	border: 1px solid black;
 	border-collapse: collapse;
 	
 	tr:nth-child(even) { background-color: #f2f2f2; }
 	th, td {
-		padding: 0.5vw 0px;
+		@include leftAlign;
+		padding: 0.5vw 0.5vw;
 		border-right: 1px solid black;
 		&:last-child { border-right: none; }
 	}
 	th {
+		@include centerHorizontal;
 		background-color: #4caf50;
 		color: white;
 	}
 }
 
-
 .puzzleId,
 .puzzleSentence,
 .puzzleOptions {
-	margin: 0vw;	
 	&, * { cursor: pointer; }
 }
-.puzzleId { @include centerHorizontal; }
+
 
 .puzzleGap {
-	$size: $puzzleGapSize;
+	$size: 2vw;
+	display: inline-block;
 	width: $size;
 	height: $size;
 	line-height: $size;
 	margin: 0px 0.3vw;
+	vertical-align: middle;
+	
+	background: {
+		image: url("../images/border-dashed.svg");
+		size: 100% 100%;
+	}
+	@include border-radius(999px);
+}
+
+
+.puzzleOption {
+	display: inline-block;
+	@include box-sizing(border-box);
+	@include centerHorizontal;
+	
+	vertical-align: top;
+	
+	background: {
+		color: #eee;
+		image: url("../images/border-solid.svg");
+		size: 100% 100%;
+	}
+	@include border-radius(999px);
+}
+
+/* Options which are inside a gap */
+.puzzleGap > .puzzleOption {
+	width: 100%;
+	height: 100%;
 }
 
 /* Options which are NOT inside a gap */

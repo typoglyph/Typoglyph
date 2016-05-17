@@ -1,0 +1,45 @@
+
+
+/* See: http://www.mydevice.io/devices/ */
+/* Note: These are minimum values */
+$device-desktop-width: 1024px;
+$device-tablet-width: 600px;
+$device-phone-width: 320px;
+
+
+/* In cases where one device-* mixin is used, all device-* mixins must be used */
+@mixin device-desktop {
+	// Desktop is the default so include it regardless of what @media says (but this mixin should
+	// still be used as future proofing - we may want to change the default some day
+	//@media screen and (min-width: #{$device-desktop-width}) {
+		@content;
+	//}
+}
+@mixin device-tablet {
+	@media screen and (min-width: #{$device-tablet-width}) and (max-width: #{$device-desktop-width - 1px}) {
+		@content;
+	}
+}
+@mixin device-phone {
+	@media screen and /*(min-width: #{$device-phone-width}) and*/ (max-width: #{$device-tablet-width - 1px}) {
+		@content;
+	}
+}
+
+
+@mixin centerHorizontal {
+	text-align: center;
+	* { display: inline-block; }
+}
+
+@mixin leftAlign {
+	text-align: left;
+}
+
+@mixin evenlySpaceHorizontal($totalWidth, $spacing, $childWidth, $childCount) {
+	margin-left: ($totalWidth - ($childCount * $childWidth + ($childCount - 1) * $spacing)) / 2;
+	* {
+		margin-right: $spacing;
+		&:last-child { margin-right: 0px; }
+	}
+}
