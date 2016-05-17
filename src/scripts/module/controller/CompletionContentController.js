@@ -2,10 +2,14 @@
  * @author jakemarsden
  */
 define([
-	"ui/PuzzleDrawer", "ui/PuzzleGapDrawer", "ui/PuzzleOptionDrawer",
-	"util/Objects", "util/Utils",
+	"ui/PuzzleDrawer",
+	"ui/PuzzleOptionDrawer",
+	"ui/SolutionShowingPuzzleGapDrawer",
+	"util/Objects",
+	"util/Utils",
 	"./ContentController"
-], function(PuzzleDrawer, PuzzleGapDrawer, PuzzleOptionDrawer, Objects, Utils, ContentController) {
+], function(PuzzleDrawer, PuzzleOptionDrawer, SolutionShowingPuzzleGapDrawer, Objects, Utils,
+		ContentController) {
 	
 	return Objects.subclass(ContentController, {
 		/**
@@ -14,8 +18,7 @@ define([
 		create: function(e) {
 			var self = ContentController.create.call(this, e);
 			self.puzzleDrawer = PuzzleDrawer.create(
-					PuzzleGapDrawer.create(
-					PuzzleOptionDrawer.create(), true));
+					SolutionShowingPuzzleGapDrawer.create(PuzzleOptionDrawer.create()));
 			self.skipListener = null;
 			return self;
 		},

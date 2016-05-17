@@ -2,15 +2,15 @@
  * @author jakemarsden
  */
 define([
+	"ui/AlwaysCorrectPuzzleGapDrawer",
 	"ui/PuzzleDrawer",
-	"ui/PuzzleGapDrawer",
 	"ui/PuzzleOptionBarDrawer",
 	"ui/PuzzleOptionDrawer",
 	"util/Objects",
 	"util/Utils",
 	"./ContentController"
-], function(PuzzleDrawer, PuzzleGapDrawer, PuzzleOptionBarDrawer, PuzzleOptionDrawer, Objects,
-		Utils, ContentController) {
+], function(AlwaysCorrectPuzzleGapDrawer, PuzzleDrawer, PuzzleOptionBarDrawer, PuzzleOptionDrawer,
+		Objects, Utils, ContentController) {
 	
 	return Objects.subclass(ContentController, {
 		/**
@@ -19,7 +19,7 @@ define([
 		create: function(e) {
 			var optionDrawer = PuzzleOptionDrawer.create();
 			var self = ContentController.create.call(this, e);
-			self.puzzleDrawer = PuzzleDrawer.create(PuzzleGapDrawer.create(optionDrawer, true));
+			self.puzzleDrawer = PuzzleDrawer.create(AlwaysCorrectPuzzleGapDrawer.create(optionDrawer));
 			self.optionsDrawer = PuzzleOptionBarDrawer.create(optionDrawer);
 			self.navigateBackListener = null;
 			return self;

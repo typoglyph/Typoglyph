@@ -4,17 +4,15 @@
  * @author jakemarsden
  */
 define(["util/Objects", "./Drawer"], function(Objects, Drawer) {
+	
 	return Objects.subclass(Drawer, {
 		/**
 		 * @param {PuzzleOptionDrawer} optionDrawer
-		 * @param {boolean} showSolution True if you want the solution to be shown, false if you want
-		 *     the current choice to be shown
 		 * @constructor
 		 */
-		create: function(optionDrawer, showSolution) {
+		create: function(optionDrawer) {
 			var self = Drawer.create.call(this);
 			self.optionDrawer = optionDrawer;
-			self.showSolution = showSolution;
 			return self;
 		},
 		
@@ -35,11 +33,22 @@ define(["util/Objects", "./Drawer"], function(Objects, Drawer) {
 		 * @override
 		 */
 		drawInto: function(p, gap) {
-			var option = (this.showSolution) ? gap.solution : gap.currentChoice;
+			var option = this.getOptionToDraw(gap);
 			if (option !== null) {
 				var drawnOption = this.optionDrawer.draw(option);
 				p.appendChild(drawnOption);
 			}
+		},
+		
+		/**
+		 * Provided for subclasses to override if required
+		 * 
+		 * @param {puzzle/Gap} gap The gap which is being drawn
+		 * @return {puzzle/Option} option The option which should be drawn into this gap, or null
+		 *     if no option is to be drawn
+		 */
+		getOptionToDraw: function(gap) {
+			return gap.currentChoice;
 		}
 	});
 });
