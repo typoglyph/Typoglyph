@@ -21,7 +21,7 @@ require([
 	/**
 	 * How many puzzles should be in each set
 	 */
-	var PUZZLE_SET_SIZE = 5;
+	var PUZZLE_SET_SIZE = 10;
 	/**
 	 * How long to display the answer page between each puzzle for, in milliseconds
 	 */
