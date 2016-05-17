@@ -1,87 +1,69 @@
 require([
+	"controller/MasterController",
+	"controller/PuzzleEditorController",
+	"controller/PuzzleSelectorController",
 	"puzzle/PuzzleManager",
-	"ui/PuzzleDrawer", "ui/PuzzleGapDrawer", "ui/PuzzleOptionBarDrawer", "ui/PuzzleOptionDrawer",
 	"util/Utils"
-], function(PuzzleManager, PuzzleDrawer, PuzzleGapDrawer, PuzzleOptionBarDrawer, PuzzleOptionDrawer, Utils) {
-		
-	var optionDrawer = PuzzleOptionDrawer.create();
-	var optionBarDrawer = PuzzleOptionBarDrawer.create(optionDrawer);
-	var puzzleDrawer = PuzzleDrawer.create(PuzzleGapDrawer.create(optionDrawer, true));
+], function(MasterController, PuzzleEditorController, PuzzleSelectorController, PuzzleManager,
+		Utils) {
 	
-	var puzzles = null;
-	var currentPuzzle = null;
+	var masterController = null;
+	var editorController = null;
+	var selectorController = null;
 	
-	
-	PuzzleManager.fetchAllPuzzles(function(ps) {
-		puzzles = ps;
-		puzzles.sort(alphabeticalPuzzleComparator);
-	
-		document.getElementById("menuButton").addEventListener("click", function(event) {
-			console.debug("onclick: event=" + event);
-			currentPuzzle = null;
-			refreshDisplayedPuzzle();
-		});
-		refreshDisplayedPuzzle();
-	});
-	
-	
-	function refreshDisplayedPuzzle() {
-		// DOM manipulation is much easier if we temperarily remove header
-		var table = document.getElementById("puzzles");
-		var headerRow = table.rows[0];
-		Utils.removeAllChildren(table);
-		
-		if (currentPuzzle === null) {
-			// Let user choose a puzzle
-			for (var i = 0; i < puzzles.length; i++) {
-				drawPuzzleIntoTable(puzzles[i], table);
-			}
-			for (var i = 0; i < table.childNodes.length; i++) {
-				(function(index) {
-					var tr = table.childNodes[i];
-					tr.addEventListener("click", function(event) {
-						console.debug("onclick: event=" + event);
-						currentPuzzle = index;
-						refreshDisplayedPuzzle();
-					});
-				})(i);
-			}
-		} else {
-			drawPuzzleIntoTable(puzzles[currentPuzzle], table);
-		}
-		
-		// Replace table header
-		table.insertBefore(headerRow, table.firstChild);
-	}
 	
 	/**
-	 * Draw the given puzzle into the table as a new row
-	 * 
-	 * @param {puzzle/Puzzle} puzzle
-	 * @param {HTMLTableElement} table
+	 * Called when the browser has finished (re)loading the document
 	 */
-	function drawPuzzleIntoTable(puzzle, table) {
-		var idTd = document.createElement("td");
-		idTd.innerHTML = puzzle.id;
-		idTd.className = "puzzleId";
+	(function() {
+		editorController = PuzzleEditorController.create(document.getElementById("puzzleEditor"));
+		selectorController = PuzzleSelectorController.create(document.getElementById("puzzleSelector"));
+		masterController = MasterController.create([selectorController, editorController]);
 		
-		var puzzleTd = document.createElement("td");
-		puzzleDrawer.drawInto(puzzleTd, puzzle);
-		puzzleTd.className = "puzzleSentence"
-		
-		var optionsTd = document.createElement("td");
-		optionBarDrawer.drawInto(optionsTd, puzzle.options);
-		optionsTd.className = "puzzleOptions";
-		
-		var tr = document.createElement("tr");
-		tr.appendChild(idTd);
-		tr.appendChild(puzzleTd);
-		tr.appendChild(optionsTd);
-		table.appendChild(tr);
+		PuzzleManager.fetchAllPuzzles(function(puzzles) {
+			puzzles.sort(alphabeticalPuzzleComparator);
+			showPuzzleSelector(puzzles);
+		});
+	})();
+	
+	
+	/**
+	 * @param {Array<puzzle/Puzzle>} puzzles
+	 */
+	function showPuzzleSelector(puzzles) {
+		/**
+		 * Called when the user selects a puzzle
+		 * 
+		 * @param {puzzle/Puzzle} puzzle The selected puzzle
+		 */
+		function onPuzzleSelected(puzzle) {
+			console.debug("onPuzzleSelected: puzzle=" + puzzle);
+			showPuzzleEditor(puzzle, puzzles);
+		}
+		selectorController.setOnPuzzleSelectedListener(onPuzzleSelected);
+		selectorController.showPuzzlesForSelection(puzzles);
+		masterController.show(selectorController);
 	}
 	
 	/**
-	 * Useful when you want to sort an array of puzzles alphabetically by their sentences
+	 * @param {puzzle/Puzzle} puzzle
+	 * @param {Array<puzzle/Puzzle>} allPuzzles
+	 */
+	function showPuzzleEditor(puzzle, allPuzzles) {
+		/**
+		 * Called when the user wants to navigate back to the puzzle selection menu
+		 */
+		function onNavigateBack() {
+			console.debug("onNavigateBack");
+			showPuzzleSelector(allPuzzles);
+		}
+		editorController.setOnNavigateBackListener(onNavigateBack);
+		editorController.showPuzzleForEditing(puzzle);
+		masterController.show(editorController);
+	}
+	
+	/**
+	 * Used for sorting an array of puzzles alphabetically by sentence
 	 * 
 	 * @param {puzzle/Puzzle} puzzleA
 	 * @param {puzzle/Puzzle} puzzleB
