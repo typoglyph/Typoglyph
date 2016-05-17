@@ -23,7 +23,7 @@ define([
 		/**
 		 * @override
 		 */
-		createRootElement(gap) {
+		createRootElement: function(gap) {
 			var e = AlwaysCorrectPuzzleGapDrawer.createRootElement.call(this, gap);
 			Utils.addClass(e, gap.isFilledCorrectly() ? "correctlyFilled" : "incorrectlyFilled");
 			return e;
