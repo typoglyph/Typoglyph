@@ -1,7 +1,8 @@
 require.config({
-	baseUrl: "scripts/module",
+	baseUrl: "/scripts/module/",
 	paths: {
 		// Entry points
+		admin: "../admin",
 		index: "../index",
 		
 		// Libraries

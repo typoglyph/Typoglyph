@@ -10,10 +10,11 @@ require([
 	"ui/CompletionSoundPlayer",
 	"ui/ProgressBarDrawer",
 	"ui/ToggleButtonDrawer",
+	"util/Config",
 	"util/Utils",
 ], function(Howler, CompletionContentController, MasterController, PuzzleContentController,
 		ResultsContentController, PuzzleManager, StatisticsTracker, CompletionGraphicDrawer,
-		CompletionSoundPlayer, ProgressBarDrawer, ToggleButtonDrawer, Utils) {
+		CompletionSoundPlayer, ProgressBarDrawer, ToggleButtonDrawer, Config, Utils) {
 	
 	
 	// Constant variables
@@ -32,6 +33,8 @@ require([
 	
 	var BUTTON_AUDIO_MUTE = "images/button_audio_disable.svg";
 	var BUTTON_AUDIO_UNMUTE = "images/button_audio_enable.svg";
+	
+	var BACKEND_BASE_URL = Config.getBackendBaseUrl();
 	
 	
 	// Global variables
@@ -245,7 +248,7 @@ require([
 				callback(graphics);
 			}
 		}
-		req.open("GET", "backend/getCompletionGraphics.php?which=" + which, async);
+		req.open("GET", BACKEND_BASE_URL + "getCompletionGraphics.php?which=" + which, async);
 		req.send();
 	}
 	
@@ -284,7 +287,7 @@ require([
 				callback(sounds);
 			}
 		}
-		req.open("GET", "backend/getCompletionSounds.php?which=" + which, async);
+		req.open("GET", BACKEND_BASE_URL + "getCompletionSounds.php?which=" + which, async);
 		req.send();
 	}
 });

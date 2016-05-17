@@ -3,13 +3,15 @@
  * 
  * @author jakemarsden
  */
-define(["./Gap", "./Option", "./Puzzle"], function(Gap, Option, Puzzle) {
+define(["./Gap", "./Option", "./Puzzle", "util/Config"], function(Gap, Option, Puzzle, Config) {
+	
+	var BACKEND_BASE_URL = Config.getBackendBaseUrl();
 	return {
 		/**
 		 * @param {function(Array<puzzle/Puzzle>)} callback The function to call on success
 		 */
 		fetchAllPuzzles: function(callback) {
-			var url = "backend/getAllPuzzles.php";
+			var url = BACKEND_BASE_URL + "getAllPuzzles.php";
 			fetchPuzzles(url, callback)
 		},
 		
@@ -18,7 +20,7 @@ define(["./Gap", "./Option", "./Puzzle"], function(Gap, Option, Puzzle) {
 		 * @param {function(Array<puzzle/Puzzle>)} callback The function to call on success
 		 */
 		fetchRandomPuzzles: function(count, callback) {
-			var url = "backend/getRandomPuzzles.php?count=" + count;
+			var url = BACKEND_BASE_URL + "getRandomPuzzles.php?count=" + count;
 			fetchPuzzles(url, callback);
 		}
 	};
