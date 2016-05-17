@@ -3,9 +3,9 @@
  * 
  * @author jakemarsden
  */
-define(["./Gap", "./Option", "./Puzzle"], function(Gap, Option, Puzzle) {
+define(["./Gap", "./Option", "./Puzzle", "util/Config"], function(Gap, Option, Puzzle, Config) {
 	
-	var BACKEND_BASE_URL = "/backend/";
+	var BACKEND_BASE_URL = Config.getBackendBaseUrl();
 	return {
 		/**
 		 * @param {function(Array<puzzle/Puzzle>)} callback The function to call on success
