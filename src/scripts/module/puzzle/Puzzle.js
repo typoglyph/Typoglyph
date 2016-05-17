@@ -92,7 +92,9 @@ define(["util/Objects"], function(Objects) {
 		 * @return {String}
 		 */
 		toString: function() {
-			var str = "";
+			var str = "Puzzle[";
+			str += "id=" + this.id;
+			str += ", sentence=";
 			for (var i = 0; i <= this.sentence.length; i++) {
 				var gap = this.getGapAtPosition(i);
 				if (gap !== null) {
@@ -100,6 +102,7 @@ define(["util/Objects"], function(Objects) {
 				}
 				str += this.sentence.charAt(i);
 			}
+			str += "]";
 			return str;
 		},
 		/**
