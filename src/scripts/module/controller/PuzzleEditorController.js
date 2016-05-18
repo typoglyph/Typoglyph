@@ -193,8 +193,8 @@ define([
 					if (draggedFromPuzzleGap) {
 						var originGapId = parseInt(event.relatedTarget.parentNode.getAttribute("data-id"));
 						var originGap = self.puzzle.getGapById(originGapId);
+						draggedOption = originGap.solution;
 						originGap.solution = null;
-						draggedOption = self.puzzle.getOptionById(draggedOptionId);
 						
 					} else if (draggedFromPuzzleOptions) {
 						draggedOption = self.puzzle.getOptionById(draggedOptionId);
