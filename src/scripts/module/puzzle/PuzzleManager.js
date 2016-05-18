@@ -8,6 +8,25 @@ define(["./Gap", "./Option", "./Puzzle", "util/Config"], function(Gap, Option, P
 	var BACKEND_BASE_URL = Config.getBackendBaseUrl();
 	return {
 		/**
+		 * Global options only have meaning on the admin page. They are the options which can be
+		 * used to build puzzles. Custom global options can be added by the user, but these aren't
+		 * currently persisted.
+		 * 
+		 * @param {function(Array<puzzle/Option>)} callback
+		 */
+		getDefaultGlobalOptions: function(callback) {
+			var options = [
+				Option.create("."),
+				Option.create(","),
+				Option.create("'"),
+				Option.create("?"),
+				Option.create("!")
+			];
+			callback(options);
+		},
+		
+		
+		/**
 		 * @param {function(Array<puzzle/Puzzle>)} callback The function to call on success
 		 */
 		fetchAllPuzzles: function(callback) {

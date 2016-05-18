@@ -57,6 +57,16 @@ define(["./Arrays"], function(Arrays) {
 				height: h };
 			return rect;
 		},
+		
+		/**
+		 * @param {HTMLElement} e
+		 * @param {String} clazz
+		 * @return {boolean}
+		 */
+		isOfClass: function(e, clazz) {
+			var clazzes = this.getClasses(e);
+			return Arrays.contains(clazzes, clazz);
+		},
 
 		/**
 		 * @param {HTMLElement} e The DOM element to get the classes of

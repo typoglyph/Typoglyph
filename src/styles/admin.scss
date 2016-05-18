@@ -30,6 +30,10 @@ table#puzzles {
 		background-color: #4caf50;
 		color: white;
 	}
+	td.newGlobalOption {
+		align: right;
+		text-align: right;
+	}
 }
 
 .puzzleId,
@@ -85,3 +89,16 @@ table#puzzles {
 	line-height: $size;
 	margin: 0.1vw 0.2vw;
 }
+
+
+#globalOptions {
+	#custom { float: right; }
+	#list .puzzleOption {
+		$size: 3vw;
+		width: $size;
+		height: $size;
+		line-height: $size;
+	}
+	margin: 1.2vw;
+}
+
