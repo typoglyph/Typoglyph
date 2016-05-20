@@ -3,17 +3,18 @@
  */
 define([
 	"interact",
+	"puzzle/Gap",
 	"puzzle/Option",
-	"ui/PuzzleDrawer",
 	"ui/PuzzleGapDrawer",
 	"ui/PuzzleOptionBarDrawer",
 	"ui/PuzzleOptionDrawer",
+	"ui/TabulatedPuzzleDrawer",
 	"util/Arrays",
 	"util/Objects",
 	"util/Utils",
 	"./ContentController"
-], function(Interact, Option, PuzzleDrawer, PuzzleGapDrawer, PuzzleOptionBarDrawer,
-		PuzzleOptionDrawer, Arrays, Objects, Utils, ContentController) {
+], function(Interact, Gap, Option, PuzzleGapDrawer, PuzzleOptionBarDrawer, PuzzleOptionDrawer,
+		TabulatedPuzzleDrawer, Arrays, Objects, Utils, ContentController) {
 	
 	return Objects.subclass(ContentController, {
 		/**
@@ -22,7 +23,7 @@ define([
 		create: function(e) {
 			var optionDrawer = PuzzleOptionDrawer.create();
 			var self = ContentController.create.call(this, e);
-			self.puzzleDrawer = PuzzleDrawer.create(PuzzleGapDrawer.create(optionDrawer, true));
+			self.puzzleDrawer = TabulatedPuzzleDrawer.create(PuzzleGapDrawer.create(optionDrawer, true));
 			self.optionsDrawer = PuzzleOptionBarDrawer.create(optionDrawer);
 			self.puzzle = null;
 			self.globalOptions = null;
@@ -194,6 +195,7 @@ define([
 				var draggedFromGlobalOptions = draggedElement.parentNode.id === "list";
 				
 				// To
+				var droppedIntoPuzzleSentence = dropzone.tagName.toLowerCase() === "td" && dropzone.parentNode.id === "puzzleSentence";
 				var droppedIntoPuzzleGap = Utils.isOfClass(dropzone, "puzzleGap");
 				var droppedOntoPopulatedPuzzleGap = Utils.isOfClass(dropzone, "puzzleOption") && Utils.isOfClass(dropzone.parentNode, "puzzleGap");
 				var droppedIntoPuzzleOptions = dropzone.id === "puzzleOptions";
@@ -221,7 +223,14 @@ define([
 				}
 				
 				// To
-				if (droppedIntoPuzzleGap || droppedOntoPopulatedPuzzleGap) {
+				if (droppedIntoPuzzleSentence) {
+					var position = getGapPositionFromTableCell(dropzone);
+					if (self.puzzle.getGapAtPosition(position) === null) {
+						var gap = Gap.create(position, Option.create(draggedOption.value));
+						self.puzzle.gaps.push(gap);
+					}
+					
+				} else if (droppedIntoPuzzleGap || droppedOntoPopulatedPuzzleGap) {
 					var gapElement = (droppedIntoPuzzleGap) ? dropzone : dropzone.parentNode;
 					var gapId = parseInt(gapElement.getAttribute("data-id"));
 					var gap = self.puzzle.getGapById(gapId);
@@ -237,6 +246,17 @@ define([
 						options.push(draggedOption);
 					}
 				}
+			}
+			
+			function getGapPositionFromTableCell(tableCell) {
+				var position = tableCell.cellIndex;
+				for (var i = 0; i < (position - 1); i++) {
+					if (self.puzzle.getGapAtPosition(i)) {
+						// Other gaps don't count as a position, but do take up a table cell
+						position--;
+					}
+				}
+				return position;
 			}
 		},
 		/**
