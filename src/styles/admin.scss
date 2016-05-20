@@ -46,6 +46,13 @@ table#puzzleSentenceTable {
 		min-width: 0.7vw;
 		padding: 0px 0.2vw;
 	}
+	
+	/* You can't see spaces properly otherwise */
+	td.space { border: 1px solid gray; }
+	
+	/* User is dragging something over this element */
+	td.dropTarget { border-left: 0.3vw solid green; }
+	
 	border-collapse: collapse;
 }
 
@@ -70,6 +77,8 @@ table#puzzleSentenceTable {
 		size: 100% 100%;
 	}
 	@include border-radius(999px);
+	
+	&.dropTarget { background-image: url("../images/border-solid-green.svg"); }
 }
 
 
@@ -92,6 +101,7 @@ table#puzzleSentenceTable {
 .puzzleGap > .puzzleOption {
 	width: 100%;
 	height: 100%;
+	&.dropTarget { background-image: url("../images/border-solid-green.svg"); }
 }
 
 /* Options which are NOT inside a gap */
@@ -101,6 +111,7 @@ table#puzzleSentenceTable {
 	height: $size;
 	line-height: $size;
 	margin: 0.1vw 0.2vw;
+	&.dropTarget { border-right: 0.3vw solid green; }
 }
 
 

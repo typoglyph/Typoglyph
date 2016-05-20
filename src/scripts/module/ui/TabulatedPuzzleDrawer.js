@@ -40,8 +40,14 @@ define(["util/Objects", "util/Utils", "./PuzzleDrawer"], function(Objects, Utils
 					var drawnGap = this.gapDrawer.draw(gap);
 					p.appendChild(wrapWithTd(drawnGap));
 				}
-				var sentenceChar = this.newTextNode(puzzle.sentence.charAt(i));
-				p.appendChild(wrapWithTd(sentenceChar));
+				var sentenceChar = wrapWithTd(this.newTextNode(puzzle.sentence.charAt(i)));
+				if (puzzle.sentence.charAt(i) === "") {
+					Utils.addClass(sentenceChar, "blank");
+				}
+				if (puzzle.sentence.charAt(i) === " ") {
+					Utils.addClass(sentenceChar, "space");
+				}
+				p.appendChild(sentenceChar);
 			}
 		}
 	});

@@ -175,6 +175,12 @@ define([
 					console.debug("ondrop: target=" + event.relatedTarget.id + ", origin=" + event.relatedTarget.parentNode.id + ", dest=" + event.target.id);
 					onDropPuzzleOption(event, event.relatedTarget, event.target);
 				},
+				ondragenter: function(event) {
+					Utils.addClass(event.target, "dropTarget");
+				},
+				ondragleave: function(event) {
+					Utils.removeClass(event.target, "dropTarget");
+				},
 				ondropactivate: function(event) {
 				},
 				ondropdeactivate: function(event) {
