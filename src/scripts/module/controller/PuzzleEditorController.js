@@ -172,60 +172,7 @@ define([
 				
 				ondrop: function(event) {
 					console.debug("ondrop: target=" + event.relatedTarget.id + ", origin=" + event.relatedTarget.parentNode.id + ", dest=" + event.target.id);
-					
-					var draggedOptionId = parseInt(event.relatedTarget.getAttribute("data-id"));
-					var draggedOption = null;
-					
-					
-					// From
-					var draggedFromPuzzleGap = Utils.isOfClass(event.relatedTarget.parentNode, "puzzleGap");
-					var draggedFromPuzzleOptions = event.relatedTarget.parentNode.id === "puzzleOptions";
-					var draggedFromGlobalOptions = event.relatedTarget.parentNode.id === "list";
-					
-					// To
-					var droppedIntoPuzzleGap = Utils.isOfClass(event.target, "puzzleGap");
-					var droppedOntoPopulatedPuzzleGap = Utils.isOfClass(event.target, "puzzleOption") && Utils.isOfClass(event.target.parentNode, "puzzleGap");
-					var droppedIntoPuzzleOptions = event.target.id === "puzzleOptions";
-					var droppedOntoOtherPuzzleOption = Utils.isOfClass(event.target, "puzzleOption") && event.target.parentNode.id === "puzzleOptions";
-					
-					
-					// From
-					if (draggedFromPuzzleGap) {
-						var originGapId = parseInt(event.relatedTarget.parentNode.getAttribute("data-id"));
-						var originGap = self.puzzle.getGapById(originGapId);
-						draggedOption = originGap.solution;
-						originGap.solution = null;
-						
-					} else if (draggedFromPuzzleOptions) {
-						draggedOption = self.puzzle.getOptionById(draggedOptionId);
-						if (!droppedIntoPuzzleGap && !droppedOntoPopulatedPuzzleGap) {
-							Arrays.remove(self.puzzle.options, draggedOption);
-						}
-						
-					} else if (draggedFromGlobalOptions) {
-						var index = Arrays.findIndex(self.globalOptions, function(item, index, array) {
-							return item.id === draggedOptionId;
-						});
-						draggedOption = self.globalOptions[index];	
-					}
-					
-					// To
-					if (droppedIntoPuzzleGap || droppedOntoPopulatedPuzzleGap) {
-						var gapElement = (droppedIntoPuzzleGap) ? event.target : event.target.parentNode;
-						var gapId = parseInt(gapElement.getAttribute("data-id"));
-						var gap = self.puzzle.getGapById(gapId);
-						gap.solution = draggedOption;
-						
-					} else if (droppedIntoPuzzleOptions || droppedOntoOtherPuzzleOption) {
-						var options = self.puzzle.options;
-						var existingIndex = Arrays.findIndex(options, function(item, index, array) {
-							return item.value === draggedOption.value;
-						});
-						if (existingIndex === -1) {
-							// doesn't exist yet
-							options.push(draggedOption);
-						}
-					}
+					onDropPuzzleOption(event, event.relatedTarget, event.target);
 				},
 				ondropactivate: function(event) {
 				},
@@ -234,6 +181,63 @@ define([
 					self.redrawGlobalOptions();
 				}
 			});
+			
+			
+			function onDropPuzzleOption(event, draggedElement, dropzone) {
+				var draggedOptionId = parseInt(draggedElement.getAttribute("data-id"));
+				var draggedOption = null;
+				
+				
+				// From
+				var draggedFromPuzzleGap = Utils.isOfClass(draggedElement.parentNode, "puzzleGap");
+				var draggedFromPuzzleOptions = draggedElement.parentNode.id === "puzzleOptions";
+				var draggedFromGlobalOptions = draggedElement.parentNode.id === "list";
+				
+				// To
+				var droppedIntoPuzzleGap = Utils.isOfClass(dropzone, "puzzleGap");
+				var droppedOntoPopulatedPuzzleGap = Utils.isOfClass(dropzone, "puzzleOption") && Utils.isOfClass(dropzone.parentNode, "puzzleGap");
+				var droppedIntoPuzzleOptions = dropzone.id === "puzzleOptions";
+				var droppedOntoOtherPuzzleOption = Utils.isOfClass(dropzone, "puzzleOption") && dropzone.parentNode.id === "puzzleOptions";
+				
+				
+				// From
+				if (draggedFromPuzzleGap) {
+					var originGapId = parseInt(draggedElement.parentNode.getAttribute("data-id"));
+					var originGap = self.puzzle.getGapById(originGapId);
+					draggedOption = originGap.solution;
+					originGap.solution = null;
+					
+				} else if (draggedFromPuzzleOptions) {
+					draggedOption = self.puzzle.getOptionById(draggedOptionId);
+					if (!droppedIntoPuzzleGap && !droppedOntoPopulatedPuzzleGap) {
+						Arrays.remove(self.puzzle.options, draggedOption);
+					}
+					
+				} else if (draggedFromGlobalOptions) {
+					var index = Arrays.findIndex(self.globalOptions, function(item, index, array) {
+						return item.id === draggedOptionId;
+					});
+					draggedOption = self.globalOptions[index];	
+				}
+				
+				// To
+				if (droppedIntoPuzzleGap || droppedOntoPopulatedPuzzleGap) {
+					var gapElement = (droppedIntoPuzzleGap) ? dropzone : dropzone.parentNode;
+					var gapId = parseInt(gapElement.getAttribute("data-id"));
+					var gap = self.puzzle.getGapById(gapId);
+					gap.solution = draggedOption;
+					
+				} else if (droppedIntoPuzzleOptions || droppedOntoOtherPuzzleOption) {
+					var options = self.puzzle.options;
+					var existingIndex = Arrays.findIndex(options, function(item, index, array) {
+						return item.value === draggedOption.value;
+					});
+					if (existingIndex === -1) {
+						// doesn't exist yet
+						options.push(draggedOption);
+					}
+				}
+			}
 		},
 		/**
 		 * @private
