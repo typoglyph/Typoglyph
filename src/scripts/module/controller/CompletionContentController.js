@@ -18,7 +18,7 @@ define([
 		create: function(e) {
 			var self = ContentController.create.call(this, e);
 			self.puzzleDrawer = PuzzleDrawer.create(
-					SolutionShowingPuzzleGapDrawer.create(PuzzleOptionDrawer.create()));
+					SolutionShowingPuzzleGapDrawer.create(PuzzleOptionDrawer.create(), false));
 			self.skipListener = null;
 			return self;
 		},
