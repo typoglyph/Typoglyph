@@ -1,6 +1,6 @@
 /**
  * Similar to a standard PuzzleDrawer except every single gap and every single sentence character
- * is wrapped in a <td>. It would be strange to use drawInto() with anything other than a <tr>.
+ * is wrapped in a <span class="puzzleSentenceChar">.
  * 
  * @author jakemarsden
  */
@@ -22,12 +22,13 @@ define(["util/Objects", "util/Utils", "./PuzzleDrawer"], function(Objects, Utils
 		 */
 		drawInto: function(p, puzzle) {
 			var self = this;
+			
 			/**
 			 * @param {HTMLElement} e
-			 * @return {HTMLTableDataCellElement}
+			 * @return {HTMLElement}
 			 */
 			function wrapWithTd(e) {
-				var td = self.newElement("td");
+				var td = self.newElement("span", "", "puzzleSentenceChar");
 				td.appendChild(e);
 				return td;
 			}

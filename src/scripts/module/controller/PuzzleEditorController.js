@@ -201,7 +201,7 @@ define([
 				var draggedFromGlobalOptions = draggedElement.parentNode.id === "list";
 				
 				// To
-				var droppedIntoPuzzleSentence = dropzone.tagName.toLowerCase() === "td" && dropzone.parentNode.id === "puzzleSentence";
+				var droppedIntoPuzzleSentence = Utils.isOfClass(dropzone, "puzzleSentenceChar");
 				var droppedIntoPuzzleGap = Utils.isOfClass(dropzone, "puzzleGap");
 				var droppedOntoPopulatedPuzzleGap = Utils.isOfClass(dropzone, "puzzleOption") && Utils.isOfClass(dropzone.parentNode, "puzzleGap");
 				var droppedIntoPuzzleOptions = dropzone.id === "puzzleOptions";
@@ -230,7 +230,7 @@ define([
 				
 				// To
 				if (droppedIntoPuzzleSentence) {
-					var position = getGapPositionFromTableCell(dropzone);
+					var position = getGapPosition(dropzone);
 					if (self.puzzle.getGapAtPosition(position) === null) {
 						var gap = Gap.create(position, Option.create(draggedOption.value));
 						self.puzzle.gaps.push(gap);
@@ -254,9 +254,9 @@ define([
 				}
 			}
 			
-			function getGapPositionFromTableCell(tableCell) {
-				var position = tableCell.cellIndex;
-				for (var i = 0; i < (position - 1); i++) {
+			function getGapPosition(characterElement) {
+				var position = Utils.indexOfElement(characterElement);
+				for (var i = 0; i < position; i++) {
 					if (self.puzzle.getGapAtPosition(i)) {
 						// Other gaps don't count as a position, but do take up a table cell
 						position--;

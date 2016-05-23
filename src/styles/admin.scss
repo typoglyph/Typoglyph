@@ -36,24 +36,18 @@ table#puzzles {
 	}
 }
 
-table#puzzleSentenceTable {
-	&, tr, td {
-		margin: 0px;
-		padding: 0px;
-		border: none;
-	}
-	td {
+.puzzleSentence {
+	.puzzleSentenceChar {
+		display: inline-block;
 		min-width: 0.7vw;
-		padding: 0px 0.2vw;
+		padding: 0.2vw;
+		
+		/* You can't see spaces properly otherwise */
+		&.space { border: 1px solid gray; }
+		
+		/* User is dragging something over this element */
+		&.dropTarget { border-left: 0.3vw solid green;  }
 	}
-	
-	/* You can't see spaces properly otherwise */
-	td.space { border: 1px solid gray; }
-	
-	/* User is dragging something over this element */
-	td.dropTarget { border-left: 0.3vw solid green; }
-	
-	border-collapse: collapse;
 }
 
 .puzzleId,
