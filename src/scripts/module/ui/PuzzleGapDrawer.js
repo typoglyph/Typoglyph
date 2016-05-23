@@ -8,11 +8,15 @@ define(["util/Objects", "./Drawer"], function(Objects, Drawer) {
 	return Objects.subclass(Drawer, {
 		/**
 		 * @param {PuzzleOptionDrawer} optionDrawer
+		 * @param {boolean} [optional] True if you want empty gaps to be shown or false if they
+		 *     should be replaced with spaces. Defaults to true.
 		 * @constructor
 		 */
 		create: function(optionDrawer) {
+			var showEmptyGaps = (arguments.length >= 2 && arguments[1] !== null) ? arguments[1] : true;
 			var self = Drawer.create.call(this);
 			self.optionDrawer = optionDrawer;
+			self.showEmptyGaps = showEmptyGaps;
 			return self;
 		},
 		
@@ -22,8 +26,13 @@ define(["util/Objects", "./Drawer"], function(Objects, Drawer) {
 		 * @override
 		 */
 		createRootElement: function(gap) {
-			var e = this.newElement("span", "puzzleGap-" + gap.id, "puzzleGap");
-			e.setAttribute("data-id", gap.id);
+			var e;
+			if (this.showEmptyGaps || this.getOptionToDraw(gap) !== null) {
+				e = this.newElement("span", "puzzleGap-" + gap.id, "puzzleGap");
+				e.setAttribute("data-id", gap.id);
+			} else {
+				e = this.newTextNode(" ");
+			}
 			return e;
 		},
 		

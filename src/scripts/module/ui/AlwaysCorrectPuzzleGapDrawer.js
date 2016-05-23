@@ -9,10 +9,12 @@ define(["util/Objects", "./PuzzleGapDrawer"], function(Objects, PuzzleGapDrawer)
 	return Objects.subclass(PuzzleGapDrawer, {
 		/**
 		 * @param {PuzzleOptionDrawer} optionDrawer
+		 * @param {boolean} [optional] True if you want empty gaps to be shown or false if they
+		 *     should be replaced with spaces. Defaults to true.
 		 * @constructor
 		 */
 		create: function(optionDrawer) {
-			return PuzzleGapDrawer.create.call(this, optionDrawer);
+			return PuzzleGapDrawer.create.call(this, optionDrawer, (arguments.length >= 2) ? arguments[1] : null);
 		},
 		
 		/**
