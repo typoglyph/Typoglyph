@@ -43,3 +43,10 @@ $device-phone-width: 320px;
 		&:last-child { margin-right: 0px; }
 	}
 }
+
+/* Replaces the default bullet points/numbers with the given string when used on a <ul> or <ol> */
+@mixin customCharListStyle($char) {
+	list-style-type: none;
+	li { list-style-type: none; }
+	li:before { content: $char; }
+}

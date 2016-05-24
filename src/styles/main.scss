@@ -313,7 +313,11 @@ body {
 
 
 #resultsContent {
-	* { font-size: 90%; }
+	* {
+		@include device-desktop { font-size: 100%; }
+		@include device-tablet { font-size: 100%; }
+		@include device-phone	{ font-size: 90%; }
+	}
 	strong { font-size: 150%; }
 	
 	.header {
@@ -346,13 +350,34 @@ body {
 	#correctPuzzles,
 	#incorrectPuzzles {
 		margin: 1.5vw 0px;
+		ul, ol {
+			@include customCharListStyle("- ");
+			padding-left: 3vw;
+		}
 	}
 	
 	.puzzleGap {
-		width: 2.5vw;
-		height: 2.5vw;
-		line-height: 2.5vw;
-		margin: 0.4vw;
+		$size_desktop: 2.5vw;
+		$size_tablet: 4.4vw;
+		$size_phone: 6vw;
+		@include device-desktop {
+			width: $size_desktop;
+			height: $size_desktop;
+			line-height: $size_desktop;
+			margin: 0.4vw;
+		}
+		@include device-tablet {
+			width: $size_tablet;
+			height: $size_tablet;
+			line-height: $size_tablet;
+			margin: 0.8vw;
+		}
+		@include device-phone {
+			width: $size_phone;
+			height: $size_phone;
+			line-height: $size_phone;
+			margin: 0.8vw;
+		}
 		text-align: center;
 	}
 }

@@ -32,7 +32,7 @@ define([
 			var correctList = this.element.querySelector("#correctPuzzlesList");
 			var incorrectList = this.element.querySelector("#incorrectPuzzlesList");
 			for (var i = (stats.length - 1); i >= 0; i--) {
-				var puzzleElement = document.createElement("div");
+				var puzzleElement = document.createElement("li");
 				this.puzzleDrawer.drawInto(puzzleElement, stats[i].puzzle);
 				(stats[i].result ? correctList : incorrectList).appendChild(puzzleElement);
 			}
