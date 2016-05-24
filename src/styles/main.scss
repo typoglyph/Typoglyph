@@ -24,7 +24,7 @@ html {
 }
 
 body {
-	margin: $margins 0px;
+	margin: $margins;
 	padding: 0px;
 }
 
@@ -79,8 +79,6 @@ body {
 	@include device-desktop	{ height: $progressBarHeight_desktop; }
 	@include device-tablet	{ height: $progressBarHeight_tablet; }
 	@include device-phone	{ height: $progressBarHeight_phone; }
-	padding-left: $margins;
-	padding-right: $margins;
 }
 
 
@@ -289,23 +287,75 @@ body {
  * Puzzle answers *
  ******************/
 
-#result {
-	&.correct { color: green; }
-	&.incorrect { color: red; }
-}
-.puzzleGap {
-	&.correctlyFilled:not(:empty()),
-	&.correctlyFilled > .puzzleOption {
-		background: {
-			color: #b0dab0;
-			image: url("../images/border-solid-green.svg");
+#completionContent,
+#resultsContent {
+	#result {
+		&.correct { color: green; }
+		&.incorrect { color: red; }
+	}
+	.puzzleGap {
+		&.correctlyFilled:not(:empty()),
+		&.correctlyFilled > .puzzleOption {
+			background: {
+				color: #b0dab0;
+				image: url("../images/border-solid-green.svg");
+			}
+		}
+		&.incorrectlyFilled,
+		&.incorrectlyFilled > .puzzleOption {
+			background: {
+				color: #dab0b0;
+				image: url("../images/border-solid-red.svg");
+			}
 		}
 	}
-	&.incorrectlyFilled,
-	&.incorrectlyFilled > .puzzleOption {
-		background: {
-			color: #dab0b0;
-			image: url("../images/border-solid-red.svg");
+}
+
+
+#resultsContent {
+	* { font-size: 90%; }
+	strong { font-size: 150%; }
+	
+	.header {
+		@include device-desktop {
+			height: $buttonSize_desktop;
+			line-height: $buttonSize_desktop;
 		}
+		@include device-tablet {
+			height: $buttonSize_tablet;
+			line-height: $buttonSize_tablet;
+		}
+		@include device-phone {
+			height: $buttonSize_phone;
+			line-height: $buttonSize_phone;
+		}
+		vertical-align: middle;
+		*:last-child { float: right; }
+		
+		overflow: hidden;
+		
+		.button {
+			@include box-sizing(border-box);
+			padding: 1vw;
+			padding-right: 0px;
+		}
+	}
+	
+	#correctPuzzles,
+	#incorrectPuzzles {
+		margin: 1.5vw 0px;
+	}
+	
+	#correctPuzzlesList,
+	#incorrectPuzzlesList {
+		margin-left: 0.5vw;
+	}
+	
+	.puzzleGap {
+		width: 2.5vw;
+		height: 2.5vw;
+		line-height: 2.5vw;
+		margin: 0.4vw;
+		text-align: center;
 	}
 }
