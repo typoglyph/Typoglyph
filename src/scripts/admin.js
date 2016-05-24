@@ -24,6 +24,9 @@ require([
 			puzzles.sort(alphabeticalPuzzleComparator);
 			showPuzzleSelector(puzzles);
 		});
+		PuzzleManager.getDefaultGlobalOptions(function(options) {
+			editorController.setGlobalOptions(options);
+		});
 	})();
 	
 	

@@ -30,6 +30,24 @@ table#puzzles {
 		background-color: #4caf50;
 		color: white;
 	}
+	td.newGlobalOption {
+		align: right;
+		text-align: right;
+	}
+}
+
+.puzzleSentence {
+	.puzzleSentenceChar {
+		display: inline-block;
+		min-width: 0.7vw;
+		padding: 0.2vw;
+		
+		/* You can't see spaces properly otherwise */
+		&.space { border: 1px solid gray; }
+		
+		/* User is dragging something over this element */
+		&.dropTarget { border-left: 0.3vw solid green;  }
+	}
 }
 
 .puzzleId,
@@ -53,6 +71,8 @@ table#puzzles {
 		size: 100% 100%;
 	}
 	@include border-radius(999px);
+	
+	&.dropTarget { background-image: url("../images/border-solid-green.svg"); }
 }
 
 
@@ -75,6 +95,7 @@ table#puzzles {
 .puzzleGap > .puzzleOption {
 	width: 100%;
 	height: 100%;
+	&.dropTarget { background-image: url("../images/border-solid-green.svg"); }
 }
 
 /* Options which are NOT inside a gap */
@@ -84,4 +105,17 @@ table#puzzles {
 	height: $size;
 	line-height: $size;
 	margin: 0.1vw 0.2vw;
+	&.dropTarget { border-right: 0.3vw solid green; }
+}
+
+
+#globalOptions {
+	#custom { float: right; }
+	#list .puzzleOption {
+		$size: 3vw;
+		width: $size;
+		height: $size;
+		line-height: $size;
+	}
+	margin: 1.2vw;
 }

@@ -57,6 +57,16 @@ define(["./Arrays"], function(Arrays) {
 				height: h };
 			return rect;
 		},
+		
+		/**
+		 * @param {HTMLElement} e
+		 * @param {String} clazz
+		 * @return {boolean}
+		 */
+		isOfClass: function(e, clazz) {
+			var clazzes = this.getClasses(e);
+			return Arrays.contains(clazzes, clazz);
+		},
 
 		/**
 		 * @param {HTMLElement} e The DOM element to get the classes of
@@ -100,7 +110,23 @@ define(["./Arrays"], function(Arrays) {
 			Arrays.removeAll(clazzes, clazz);
 			this.setClasses(e, clazzes);
 		},
-
+		
+		/**
+		 * @param {HTMLElement} e
+		 * @return {int} The index of the given element within its parent, ignoring any text nodes
+		 *     containing only whitespace
+		 */
+		indexOfElement: function(e) {
+			var index = 0;
+			while ((e = e.previousSibling) !== null) {
+				var whitespaceOnly = e.nodeType === 3 && /^\s*$/.test(e.data);
+				if (!whitespaceOnly) {
+					index++;
+				}
+			}
+			return index;
+		},
+		
 		/**
 		 * @param {HTMLElement} e The DOM element to translate
 		 * @param {float} deltaX How much to translate the element along the X axis

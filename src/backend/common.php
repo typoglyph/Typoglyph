@@ -17,6 +17,18 @@ function getDatabaseConnection() {
 }
 
 /**
+ * @return DatabaseWrapper
+ */
+function getPrivilegedDatabaseConnection() {
+	$dbConfig = (new ApplicationConfig())->getPrivilegedDatabaseConfig();
+	$dbConnString = $dbConfig->getConnectionString();
+	$dbUsername = $dbConfig->getUsername();
+	$dbPassword = $dbConfig->getPassword();
+	return new DatabaseWrapper($dbConnString, $dbUsername, $dbPassword);
+}
+
+
+/**
  * @param string $name
  * @param boolean $required
  * @return string

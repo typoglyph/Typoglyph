@@ -27,6 +27,7 @@ class DatabaseWrapper {
 		$this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	}
 	
+	
 	/**
 	 * @return Array<Puzzle> An array containing all of the puzzles currently stored in the
 	 *     database
@@ -38,7 +39,7 @@ class DatabaseWrapper {
 		static::$logger->debug("Executing statement on '{$this->connectionString}': {$statement->queryString}");
 		$statement->execute();
 		$puzzles = $statement->fetchAll(PDO::FETCH_OBJ);
-		return $this->parsePuzzles($puzzles);
+		return PuzzleDecoder::decodePuzzles($puzzles);
 	}
 	
 	/**
@@ -57,17 +58,145 @@ class DatabaseWrapper {
 		static::$logger->debug("Executing statement on '{$this->connectionString}': {$statement->queryString}");
 		$statement->execute();
 		$puzzles = $statement->fetchAll(PDO::FETCH_OBJ);
-		return $this->parsePuzzles($puzzles);
+		return PuzzleDecoder::decodePuzzles($puzzles);
 	}
 	
+	/**
+	 * @param Array<Puzzle> $puzzles The puzzles to update. Only puzzles with an ID matching a
+	 *     database row will actually be updated.
+	 */
+	function updatePuzzles($puzzles) {
+		$statement = $this->connection->prepare('
+			UPDATE `puzzles`
+			SET `sentence`=:sentence, `options`=:options
+			WHERE `_id`=:id;');
+		foreach ($puzzles as $puzzle) {
+			$statement->bindParam(":id", $puzzle->id);
+			$statement->bindParam(":sentence", PuzzleEncoder::encodePuzzleSentence($puzzle));
+			$statement->bindParam(":options", PuzzleEncoder::encodePuzzleOptions($puzzle));
+			static::$logger->debug("Executing statement on '{$this->connectionString}': {$statement->queryString}");
+			$statement->execute();
+		}
+	}
+	
+	/**
+	 * @param Array<Puzzle> $puzzles The puzzles to insert. Any specified IDs will be ignored.
+	 */
+	function insertPuzzles($puzzles) {
+		$statement = $this->connection->prepare('
+			INSERT INTO `puzzles` (`sentence`, `options`)
+			VALUES (:sentence, :options)');
+		foreach ($puzzles as $puzzle) {
+			$statement->bindParam(":sentence", PuzzleEncoder::encodePuzzleSentence($puzzle));
+			$statement->bindParam(":options", PuzzleEncoder::encodePuzzleOptions($puzzle));
+			static::$logger->debug("Executing statement on '{$this->connectionString}': {$statement->queryString}");
+			$statement->execute();
+		}
+	}
+	
+	/**
+	 * @param Array<int> $puzzleIds The IDs of the puzzles to remove
+	 */
+	function removePuzzles($puzzleIds) {
+		$statement = $this->connection->prepare('
+			DELETE FROM `puzzles`
+			WHERE `_id`=:id');
+		foreach ($puzzleIds as $puzzleId) {
+			$statement->bindParam(":id", $puzzleId);
+			static::$logger->debug("Executing statement on '{$this->connectionString}': {$statement->queryString}");
+			$statement->execute();
+		}
+	}
+}
+DatabaseWrapper::staticInit();
+
+
+/**
+ * Translates from a puzzle object into database format
+ */
+class PuzzleEncoder {
+	/**
+	 * @param Puzzle $puzzle
+	 * @return string The puzzle's sentence as stored in the database
+	 */
+	static function encodePuzzleSentence($puzzle) {		
+		$encodedSentence = "";
+		for ($i = 0; $i <= strlen($puzzle->sentence); $i++) {
+			$gap = static::getGapAtPosition($puzzle, $i);
+			if ($gap !== Null) {
+				$encodedSentence .= "{";
+				$option = $gap->solution;
+				if ($option !== Null) {
+					for ($j = 0; $j < strlen($option->value); $j++) {
+						$encodedSentence .= static::escapeSentenceChar($option->value[$j]);
+					}
+				}
+				$encodedSentence .= "}";
+			}
+			
+			if ($i < strlen($puzzle->sentence)) {
+				$char = $puzzle->sentence[$i];
+				$encodedSentence .= static::escapeSentenceChar($char);
+			}
+		}
+		return $encodedSentence;
+	}
+	
+	/**
+	 * @param Puzzle $puzzle
+	 * @return string The puzzle's options as stored in the database
+	 */
+	static function encodePuzzleOptions($puzzle) {
+		$encodedOptions = "";
+		foreach ($puzzle->options as $option) {
+			$optionValue = $option->value;
+			if (strlen($optionValue) !== 1)
+				throw new Exception("Unexpected option value: " . $optionValue);
+			
+			$encodedOptions .= $optionValue;
+		}
+		return $encodedOptions;
+	}
+	
+	
+	private static function getGapAtPosition($puzzle, $position) {
+		foreach ($puzzle->gaps as $gap) {
+			if ($gap->position === $position) {
+				return $gap;
+			}
+		}
+		return Null;
+	}
+	
+	private static function escapeSentenceChar($char) {
+		if ($char === "{")
+			return "\\{";
+		if ($char === "}")
+			return "\\}";
+		if ($char === "\\")
+			return "\\\\";
+		return $char;
+	}
+	
+	
+	private function __construct() {
+		throw new Exception("Use the static methods instead");
+	}
+}
+
+
+/**
+ * Translates from database format into a puzzle object
+ */
+class PuzzleDecoder {	
 	/**
 	 * @param Array<object> $dbPuzzles The puzzles as stored in the database
 	 * @return Array<Puzzle> The puzzles as represented by the Puzzle class
 	 */
-	private function parsePuzzles($dbPuzzles) {
+	static function decodePuzzles($dbPuzzles) {
 		$results = array();
 		foreach ($dbPuzzles as $dbPuzzle) {
-			$result = $this->parsePuzzle($dbPuzzle);
+			$result = static::decodePuzzle($dbPuzzle);
 			array_push($results, $result);
 		}
 		return $results;
@@ -77,7 +206,7 @@ class DatabaseWrapper {
 	 * @param object $dbPuzzle The puzzle as stored in the database
 	 * @return Puzzle The puzzle as represented by the Puzzle class
 	 */
-	private function parsePuzzle($dbPuzzle) {
+	static function decodePuzzle($dbPuzzle) {
 		$puzzle = new Puzzle();
 		$puzzle->id = $dbPuzzle->_id;
 		
@@ -150,6 +279,10 @@ class DatabaseWrapper {
 		}
 		return $puzzle;
 	}
+	
+	
+	private function __construct() {
+		throw new Exception("Use the static methods instead");
+	}
 }
-DatabaseWrapper::staticInit();
 ?>

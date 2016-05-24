@@ -7,12 +7,11 @@ define([
 	"ui/PuzzleGapDrawer",
 	"ui/PuzzleOptionBarDrawer",
 	"ui/PuzzleOptionDrawer",
-	"util/Arrays",
 	"util/Objects",
 	"util/Utils",
 	"./ContentController"
 ], function(Interact, PuzzleDrawer, PuzzleGapDrawer, PuzzleOptionBarDrawer, PuzzleOptionDrawer,
-		Arrays, Objects, Utils, ContentController) {
+		Objects, Utils, ContentController) {
 	
 	return Objects.subclass(ContentController, {
 		/**
@@ -132,8 +131,6 @@ define([
 				 * @param {Event} event
 				 */
 				onmove: function(event) {
-					console.debug("onmove: target=" + event.target.id);
-					
 					var dragDistanceX = parseFloat(event.target.getAttribute("data-dragDistanceX")) || 0;
 					var dragDistanceY = parseFloat(event.target.getAttribute("data-dragDistanceY")) || 0;
 					event.target.setAttribute("data-dragDistanceX", dragDistanceX += event.dx);
@@ -184,24 +181,24 @@ define([
 				ondrop: function(event) {
 					console.debug("ondrop: target=" + event.relatedTarget.id + ", origin=" + event.relatedTarget.parentNode.id + ", dest=" + event.target.id);
 					
-					if (Arrays.contains(Utils.getClasses(event.relatedTarget), "puzzleOption")) {
+					if (Utils.isOfClass(event.relatedTarget, "puzzleOption")) {
 						// A puzzle option is being dropped somewhere
 						var optionId = parseInt(event.relatedTarget.getAttribute("data-id"));
 						var option = self.shownPuzzle.getOptionById(optionId);
 						
-						if (Arrays.contains(Utils.getClasses(event.relatedTarget.parentNode), "puzzleGap")) {
+						if (Utils.isOfClass(event.relatedTarget.parentNode, "puzzleGap")) {
 							// A puzzle option is being dragged from a puzzle gap
 							var originGapId = parseInt(event.relatedTarget.parentNode.getAttribute("data-id"));
 							self.shownPuzzle.getGapById(originGapId).currentChoice = null;
 						}
 						
-						if (Arrays.contains(Utils.getClasses(event.target), "puzzleGap")) {
+						if (Utils.isOfClass(event.target, "puzzleGap")) {
 							// A puzzle option is being dropped into a puzzle gap
 							var destinationGapId = parseInt(event.target.getAttribute("data-id"));
 							self.shownPuzzle.getGapById(destinationGapId).currentChoice = option;
 							
-						} else if (Arrays.contains(Utils.getClasses(event.target), "puzzleOption")
-								&& Arrays.contains(Utils.getClasses(event.target.parentNode), "puzzleGap")) {
+						} else if (Utils.isOfClass(event.target, "puzzleOption")
+								&& Utils.isOfClasses(event.target.parentNode, "puzzleGap")) {
 							// A puzzle option is being dropped into an already-populated gap
 							var destinationGapId = parseInt(event.target.parentNode.getAttribute("data-id"));
 							self.shownPuzzle.getGapById(destinationGapId).currentChoice = option;
@@ -215,7 +212,6 @@ define([
 				 * @param {Event} event
 				 */
 				ondropactivate: function(event) {
-					console.debug("ondropactivate: target=" + event.relatedTarget.id + ", origin=" + event.relatedTarget.parentNode.id + ", dest=" + event.target.id);
 				},
 				/**
 				 * Called when event.relatedTarget has been dropped. If event.relatedTarget is inside
@@ -225,8 +221,6 @@ define([
 				 * @param {Event} event
 				 */
 				ondropdeactivate: function(event) {
-					var originId = (event.relatedTarget.parentNode === null) ? null : event.relatedTarget.parentNode.id;
-					console.debug("ondropdeactivate: target=" + event.relatedTarget.id + ", origin=" + originId + ", dest=" + event.target.id);
 					self.renderCurrentPuzzle();
 				}
 			});
