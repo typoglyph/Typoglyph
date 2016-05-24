@@ -1,13 +1,24 @@
 /**
  * @author jakemarsden
  */
-define(["util/Objects", "./ContentController"], function(Objects, ContentController) {
+define([
+	"ui/PuzzleDrawer",
+	"ui/PuzzleOptionDrawer",
+	"ui/SolutionShowingPuzzleGapDrawer",
+	"util/Objects",
+	"util/Utils",
+	"./ContentController"
+], function(PuzzleDrawer, PuzzleOptionDrawer, SolutionShowingPuzzleGapDrawer, Objects, Utils,
+		ContentController) {
+	
 	return Objects.subclass(ContentController, {
 		/**
 		 * @constructor
 		 */
 		create: function(e) {
 			var self = ContentController.create.call(this, e);
+			self.puzzleDrawer = PuzzleDrawer.create(
+					SolutionShowingPuzzleGapDrawer.create(PuzzleOptionDrawer.create(), false));
 			self.nextPuzzleSetListener = null;
 			return self;
 		},
@@ -15,11 +26,27 @@ define(["util/Objects", "./ContentController"], function(Objects, ContentControl
 		/**
 		 * @param {stats/StatisticsTracker} statsTracker
 		 */
-		showResults: function(statsTracker) {
-			var allStats = statsTracker.getStatistics();
-			var correctStats = statsTracker.getCorrectlyAnsweredStatistics();
-			this.element.querySelector("#correct").innerHTML = correctStats.length;
-			this.element.querySelector("#total").innerHTML = allStats.length;
+		showResults: function(statsTracker) {			
+			var stats = statsTracker.getStatistics();
+			
+			var correctList = this.element.querySelector("#correctPuzzlesList");
+			var incorrectList = this.element.querySelector("#incorrectPuzzlesList");
+			for (var i = (stats.length - 1); i >= 0; i--) {
+				var puzzleElement = document.createElement("li");
+				this.puzzleDrawer.drawInto(puzzleElement, stats[i].puzzle);
+				(stats[i].result ? correctList : incorrectList).appendChild(puzzleElement);
+			}
+			
+			this.element.querySelector("#correctlyAnsweredCount").innerHTML = correctList.childNodes.length;
+			this.element.querySelector("#totalAnsweredCount").innerHTML = stats.length;
+			
+			// Hide a section if it doesn't contain any puzzles
+			if (correctList.childNodes.length === 0) {
+				this.element.querySelector("#correctPuzzles").style.display = "none";
+			}
+			if (incorrectList.childNodes.length === 0) {
+				this.element.querySelector("#incorrectPuzzles").style.display = "none";
+			}
 		},
 		
 		/**
@@ -39,6 +66,18 @@ define(["util/Objects", "./ContentController"], function(Objects, ContentControl
 					self.nextPuzzleSetListener();
 				}
 			});
+		},
+		
+		/**
+		 * @override
+		 */
+		onDestroy: function() {
+			Utils.removeAllChildren(this.element.querySelector("#correctPuzzlesList"));
+			Utils.removeAllChildren(this.element.querySelector("#incorrectPuzzlesList"));
+			this.element.querySelector("#correctlyAnsweredCount").innerHTML = "";
+			this.element.querySelector("#totalAnsweredCount").innerHTML = "";
+			this.element.querySelector("#correctPuzzles").style.display = "initial";
+			this.element.querySelector("#incorrectPuzzles").style.display = "initial";
 		}
 	});
 });

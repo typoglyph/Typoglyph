@@ -39,17 +39,21 @@
 		</div>
 		
 		<div id="resultsContent" class="content">
-			<table>
-				<tr>
-					<td>
-						<h1>Results</h1>
-						<p><span id="correct"></span> / <span id="total"></span></p>
-					</td>
-					<td class="buttonHolder">
-						<img id="nextPuzzleSet" class="button" src="images/button_next_set.svg" />
-					</td>
-				</tr>
-			</table>
+			<div class="header">
+				<strong>Results</strong>
+				<div><strong>Try again?</strong>&nbsp;<img id="nextPuzzleSet" class="button" src="images/button_next_set.svg" /></div>
+			</div>
+			
+			<div><span id="correctlyAnsweredCount"></span>&nbsp;/&nbsp;<span id="totalAnsweredCount"></span></div>
+			
+			<div id="correctPuzzles">
+				<span style="color:green;">Correct</span>
+				<ul id="correctPuzzlesList"></ul>
+			</div>
+			<div id="incorrectPuzzles">
+				<span style="color:red;">Incorrect</span>
+				<ul id="incorrectPuzzlesList"></ul>
+			</div>
 		</div>
 	</div>
 </body>

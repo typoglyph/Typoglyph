@@ -1,5 +1,6 @@
 /**
- * Used to track statistics about the puzzles the user has answered
+ * Used to track information about the puzzles the user has answered in the current set. This
+ * information is stored as <code>Statistic</code> instances.
  * 
  * @author jakemarsden
  */
@@ -16,44 +17,40 @@ define(["util/Objects", "./Statistic"], function(Objects, Statistic) {
 		},
 		
 		/**
-		 * @return {Array<Statistic>} All recorded statistics
+		 * @return {Array<Statistic>} All recorded statistics, ordered with the oldest at index 0
 		 */
 		getStatistics: function() {
 			return this.stats;
 		},
 		/**
-		 * @return {Array<Statistic>} All recorded statistics whcih represent a correctly answered
-		 *     puzzle
+		 * @return {Array<Statistic>} All recorded statistics representing a correctly answered
+		 *     puzzle, ordered with the oldest at index 0
 		 */
 		getCorrectlyAnsweredStatistics: function() {
-			return this.stats.filter(
-				function(item) {
-					return item.result;
-				});
+			return this.getStatistics().filter(function(item) {
+				return item.result;
+			});
 		},
 		/**
-		 * @return {Array<Statistic>} All recorded statistics which represent an incorrectly
-		 *     answered puzzle
+		 * @return {Array<Statistic>} All recorded statistics representing an incorrectly answered
+		 *     puzzle, ordered with the oldest at index 0
 		 */
 		getIncorrectlyAnsweredStatistics: function() {
-			return this.stats.filter(
-				function(item) {
-					return !item.result;
-				});
+			return this.getStatistics().filter(function(item) {
+				return !item.result;
+			});
 		},
 		/**
 		 * @return {Statistic} The most recently recorded statistic, or null if no statistics have
-		 *     yet been recorded
+		 *     been recorded yet
 		 */
 		getLatestStatistic: function() {
-			if (this.stats.length === 0)
-				return null;
-			var stat = this.stats[this.stats.length - 1];
-			return stat;
+			var stats = this.getStatistics();
+			return (stats.length === 0) ? null : stats[stats.length - 1];
 		},
 		
 		/**
-		 * Used to clear all stored statistics
+		 * Clears all stored statistics
 		 */
 		reset: function() {
 			this.stats = [];
