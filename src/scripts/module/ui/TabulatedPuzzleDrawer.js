@@ -4,7 +4,14 @@
  * 
  * @author jakemarsden
  */
-define(["util/Objects", "util/Utils", "./PuzzleDrawer"], function(Objects, Utils, PuzzleDrawer) {
+define([
+	"./PuzzleDrawer",
+	"puzzle/Character",
+	"puzzle/Gap",
+	"util/Objects",
+	"util/Utils"
+], function(PuzzleDrawer, Character, Gap, Objects, Utils) {
+
 	return Objects.subclass(PuzzleDrawer, {
 		/**
 		 * @param {PuzzleGapDrawer} gapDrawer
@@ -33,22 +40,25 @@ define(["util/Objects", "util/Utils", "./PuzzleDrawer"], function(Objects, Utils
 				return td;
 			}
 			
-			// Iterate length+1 in case there's a gap after the last character
-			for (var i = 0; i < puzzle.sentence.length + 1; i++) {
-			
-				var gap = puzzle.getGapAtPosition(i);
-				if (gap !== null) {
-					var drawnGap = this.gapDrawer.draw(gap);
+			for (var i = 0; i < puzzle.length(); i++) {
+				var fragment = puzzle.getSentenceFragmentAt(i);
+				if (Objects.isInstanceOf(fragment, Character)) {
+					var drawnChar = wrapWithTd(this.newTextNode(fragment.value));
+					if (fragment.value === "") {
+						Utils.addClass(drawnChar, "blank");
+					}
+					if (fragment.value === " ") {
+						Utils.addClass(drawnChar, "space");
+					}
+					p.appendChild(drawnChar);
+					
+				} else if (Objects.isInstanceOf(fragment, Gap)) {
+					var drawnGap = this.gapDrawer.draw(fragment);
 					p.appendChild(wrapWithTd(drawnGap));
+					
+				} else {
+					throw "Unknown SentenceFragment type: " + fragment;
 				}
-				var sentenceChar = wrapWithTd(this.newTextNode(puzzle.sentence.charAt(i)));
-				if (puzzle.sentence.charAt(i) === "") {
-					Utils.addClass(sentenceChar, "blank");
-				}
-				if (puzzle.sentence.charAt(i) === " ") {
-					Utils.addClass(sentenceChar, "space");
-				}
-				p.appendChild(sentenceChar);
 			}
 		}
 	});

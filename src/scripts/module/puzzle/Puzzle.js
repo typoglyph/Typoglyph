@@ -4,31 +4,33 @@
  * 
  * @author jakemarsden
  */
-define(["util/Objects"], function(Objects) {
+define([
+	"./Character",
+	"./Gap",
+	"util/Objects"
+], function(Character, Gap, Objects) {
+	
 	return {
 		/**
 		 * @param {int} id
-		 * @param {String} sentence The main part of a puzzle
+		 * @param {Array<SentenceFragment>} sentenceFragments The main part of the puzzle which is
+		 *     made up of fixed characters and places where options can be inserted
 		 * @param {Array<Option>} options The values which can be used to populate the puzzle's gaps
 		 *     (each option can be used zero or more times)
-		 * @param {Array<Gap>} gaps Represents the places in the sentence where an option can be
-		 *     inserted
 		 * @constructor
 		 */
-		create: function(id, sentence, options, gaps) {
-			var self = Objects.subclass(this, {
+		create: function(id, sentenceFragments, options) {
+			return Objects.subclass(this, {
 				id: id,
-				sentence: sentence,
-				options: options,
-				gaps: gaps
+				sentenceFragments: sentenceFragments,
+				options: options
 			});
-			return self;
 		},
 		
 		/**
 		 * @param {int} id
 		 * @return {Option} The option of this puzzle which has the specified ID, or null if the puzzle
-		 *     doesn't have any options with that ID
+		 *     doesn't have an option with that ID
 		 */
 		getOptionById: function(id) {
 			for (var i = 0; i < this.options.length; i++) {
@@ -38,39 +40,84 @@ define(["util/Objects"], function(Objects) {
 			}
 			return null;
 		},
+		
 		/**
-		 * @param {int} id
-		 * @return {Gap} The gap of this puzzle which has the specified ID, or null if the puzzle
-		 *     doesn't have any gaps with that ID
+		 * <pre>
+		 * var puzzle = //...
+		 *
+		 * for (var i = 0; i < puzzle.length(); i++) {
+		 *   var fragment = puzzle.getSentenceFragmentAt(i);
+		 *   if (Objects.isInstanceOf(fragment, Character)) {
+		 *     //...
+		 *   } else if (Objects.isInstanceOf(fragment, Gap)) {
+		 *     //...
+		 *   } else {
+		 *     throw "Unknown SentenceFragment type: " + fragment;
+		 *   }
+		 * }
+		 * </pre>
+		 *
+		 * @return {int} How many sentence fragments (gaps and characters) are in this puzzle's
+		 *     sentence
 		 */
-		getGapById: function(id) {
-			for (var i = 0; i < this.gaps.length; i++) {
-				if (this.gaps[i].id === id) {
-					return this.gaps[i];
-				}
-			}
-			return null;
+		length: function() {
+			return this.sentenceFragments.length;
 		},
+
 		/**
 		 * @param {int} position
-		 * @return {Gap} The gap of this puzzle which has the specified position, or null if the puzzle
-		 *     doesn't have any gaps at that position
+		 * @return {SentenceFragment} The fragment of this puzzle's sentence which is at the specified
+		 *     position. An exception is thrown if there is no fragment at the given position.
 		 */
-		getGapAtPosition: function(position) {
-			for (var i = 0; i < this.gaps.length; i++) {
-				if (this.gaps[i].position === position) {
-					return this.gaps[i];
+		getSentenceFragmentAt: function(position) {
+			if (position < 0 || position >= this.length()) {
+				throw "IndexOutOfBoundsException: " + position;
+			}
+			return this.sentenceFragments[position];
+		},
+		/**
+		 * @param {int} id
+		 * @return {SentenceFragment} The fragment of this puzzle's sentence which has the specified
+		 *     ID, or null if the sentence doesn't have a fragment with that ID
+		 */
+		getSentenceFragmentById: function(id) {
+			for (var i = 0; i < this.length(); i++) {
+				var frag = this.getSentenceFragmentAt(i);
+				if (frag.id === id) {
+					return frag;
 				}
 			}
 			return null;
 		},
-		
+
+		listSentenceCharacters: function() {
+			var characters = [];
+			for (var i = 0; i < this.length(); i++) {
+				var frag = this.getSentenceFragmentAt(i);
+				if (Objects.isInstanceOf(frag, Character)) {
+					characters.push(frag);
+				}
+			}
+			return characters;
+		},
+		listSentenceGaps: function() {
+			var gaps = [];
+			for (var i = 0; i < this.length(); i++) {
+				var frag = this.getSentenceFragmentAt(i);
+				if (Objects.isInstanceOf(frag, Gap)) {
+					gaps.push(frag);
+				}
+			}
+			return gaps;
+		},
+
 		/**
 		 * @return {boolean}
 		 */
 		areAllGapsFilled: function() {
-			for (var i = 0; i < this.gaps.length; i++) {
-				if (!this.gaps[i].isFilled()) {
+			var gaps = this.listSentenceGaps();
+			for (var i = 0; i < gaps.length; i++) {
+				if (!gaps[i].isFilled()) {
 					return false;
 				}
 			}
@@ -80,39 +127,34 @@ define(["util/Objects"], function(Objects) {
 		 * @return {boolean}
 		 */
 		areAllGapsFilledCorrectly: function() {
-			for (var i = 0; i < this.gaps.length; i++) {
-				if (!this.gaps[i].isFilledCorrectly()) {
+			var gaps = this.listSentenceGaps();
+			for (var i = 0; i < gaps.length; i++) {
+				if (!gaps[i].isFilledCorrectly()) {
 					return false;
 				}
 			}
 			return true;
 		},
-		
+
 		/**
 		 * @return {String}
 		 */
 		toString: function() {
-			var str = "Puzzle[";
-			str += "id=" + this.id;
-			str += ", sentence=";
-			for (var i = 0; i <= this.sentence.length; i++) {
-				var gap = this.getGapAtPosition(i);
-				if (gap !== null) {
-					str += gap;
-				}
-				str += this.sentence.charAt(i);
+			var str = "Puzzle[id=" + this.id + ", sentence=";
+			for (var i = 0; i < this.length(); i++) {
+				var frag = this.getSentenceFragmentAt(i);
+				str += frag.toString();
 			}
-			str += "]";
-			return str;
+			return str + "]";
 		},
 		/**
+		 * @param {Puzzle} other
 		 * @return {boolean}
 		 */
 		equals: function(other) {
 			return other !== null
-				&& Objects.equals(this.sentence, other.sentence)
-				&& Objects.equals(this.options, other.options)
-				&& Objects.equals(this.gaps, other.gaps);
+				&& Objects.equals(this.sentenceFragments, other.sentenceFragments)
+				&& Objects.equals(this.options, other.options);
 		}
 	};
 });

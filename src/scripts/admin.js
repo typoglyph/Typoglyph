@@ -2,10 +2,12 @@ require([
 	"controller/MasterController",
 	"controller/PuzzleEditorController",
 	"controller/PuzzleSelectorController",
+	"puzzle/Character",
+	"puzzle/Gap",
 	"puzzle/PuzzleManager",
-	"util/Utils"
-], function(MasterController, PuzzleEditorController, PuzzleSelectorController, PuzzleManager,
-		Utils) {
+	"util/Objects"
+], function(MasterController, PuzzleEditorController, PuzzleSelectorController, Character, Gap,
+		PuzzleManager, Objects) {
 	
 	var masterController = null;
 	var editorController = null;
@@ -73,8 +75,17 @@ require([
 	 * @return {int}
 	 */
 	function alphabeticalPuzzleComparator(puzzleA, puzzleB) {
-		var a = puzzleA.sentence.toLowerCase();
-		var b = puzzleB.sentence.toLowerCase();
-		return a.localeCompare(b);
+		var charsA = puzzleA.listSentenceCharacters();
+		var charsB = puzzleB.listSentenceCharacters();
+		for (var i = 0; i < Math.min(charsA.length, charsB.length); i++) {
+			var valueA = charsA[i].value.toLowerCase();
+			var valueB = charsB[i].value.toLowerCase();
+			var cmp = valueA.localeCompare(valueB);
+			if (cmp !== 0) {
+				return cmp;
+			}
+		}
+		// Rank the shorter sentence first
+		return charsB.length - charsA.length;
 	}
 });

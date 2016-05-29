@@ -3,6 +3,7 @@
  */
 define([
 	"interact",
+	"puzzle/Gap",
 	"ui/PuzzleDrawer",
 	"ui/PuzzleGapDrawer",
 	"ui/PuzzleOptionBarDrawer",
@@ -10,7 +11,7 @@ define([
 	"util/Objects",
 	"util/Utils",
 	"./ContentController"
-], function(Interact, PuzzleDrawer, PuzzleGapDrawer, PuzzleOptionBarDrawer, PuzzleOptionDrawer,
+], function(Interact, Gap, PuzzleDrawer, PuzzleGapDrawer, PuzzleOptionBarDrawer, PuzzleOptionDrawer,
 		Objects, Utils, ContentController) {
 	
 	return Objects.subclass(ContentController, {
@@ -135,7 +136,6 @@ define([
 					var dragDistanceY = parseFloat(event.target.getAttribute("data-dragDistanceY")) || 0;
 					event.target.setAttribute("data-dragDistanceX", dragDistanceX += event.dx);
 					event.target.setAttribute("data-dragDistanceY", dragDistanceY += event.dy);
-					
 					Utils.setElementTranslation(event.target, dragDistanceX, dragDistanceY);
 				},
 				/**
@@ -189,19 +189,31 @@ define([
 						if (Utils.isOfClass(event.relatedTarget.parentNode, "puzzleGap")) {
 							// A puzzle option is being dragged from a puzzle gap
 							var originGapId = parseInt(event.relatedTarget.parentNode.getAttribute("data-id"));
-							self.shownPuzzle.getGapById(originGapId).currentChoice = null;
+							var originGap = self.shownPuzzle.getSentenceFragmentById(originGapId);
+							if (!Objects.isInstanceOf(originGap, Gap)) {
+								throw "SentenceFragment with ID [" + originGapId + "] is not a gap: " + originGap;
+							}
+							originGap.currentChoice = null;
 						}
 						
 						if (Utils.isOfClass(event.target, "puzzleGap")) {
 							// A puzzle option is being dropped into a puzzle gap
 							var destinationGapId = parseInt(event.target.getAttribute("data-id"));
-							self.shownPuzzle.getGapById(destinationGapId).currentChoice = option;
+							var destinationGap = self.shownPuzzle.getSentenceFragmentById(destinationGapId);
+							if (!Objects.isInstanceOf(destinationGap, Gap)) {
+								throw "SentenceFragment with ID [" + destinationGapId + "] is not a gap: " + destinationGap;
+							}
+							destinationGap.currentChoice = option;
 							
 						} else if (Utils.isOfClass(event.target, "puzzleOption")
 								&& Utils.isOfClasses(event.target.parentNode, "puzzleGap")) {
 							// A puzzle option is being dropped into an already-populated gap
 							var destinationGapId = parseInt(event.target.parentNode.getAttribute("data-id"));
-							self.shownPuzzle.getGapById(destinationGapId).currentChoice = option;
+							var destinationGap = self.shownPuzzle.getSentenceFragmentById(destinationGapId);
+							if (!Objects.isInstanceOf(destinationGap, Gap)) {
+								throw "SentenceFragment with ID [" + destinationGapId + "] is not a gap: " + destinationGap;
+							}
+							destinationGap.currentChoice = option;
 						}
 					}
 				},

@@ -213,7 +213,10 @@ define([
 				// From
 				if (draggedFromPuzzleGap) {
 					var originGapId = parseInt(draggedElement.parentNode.getAttribute("data-id"));
-					var originGap = self.puzzle.getGapById(originGapId);
+					var originGap = self.puzzle.getSentenceFragmentById(originGapId);
+					if (!Objects.isInstanceOf(originGap, Gap)) {
+						throw "SentenceFragment with ID [" + originGapId + "] is not a gap: " + originGap;
+					}
 					draggedOption = originGap.solution;
 					originGap.solution = null;
 					
@@ -232,16 +235,17 @@ define([
 				
 				// To
 				if (droppedIntoPuzzleSentence) {
-					var position = getGapPosition(dropzone);
-					if (self.puzzle.getGapAtPosition(position) === null) {
-						var gap = Gap.create(position, Option.create(draggedOption.value));
-						self.puzzle.gaps.push(gap);
-					}
+					var position = Utils.indexOfElement(dropzone);
+					var gap = Gap.create(Option.create(draggedOption.value));
+					self.puzzle.sentenceFragments.splice(position, 0, gap); // insert
 					
 				} else if (droppedIntoPuzzleGap || droppedOntoPopulatedPuzzleGap) {
 					var gapElement = (droppedIntoPuzzleGap) ? dropzone : dropzone.parentNode;
 					var gapId = parseInt(gapElement.getAttribute("data-id"));
-					var gap = self.puzzle.getGapById(gapId);
+					var gap = self.puzzle.getSentenceFragmentById(gapId);
+					if (!Objects.isInstanceOf(gap, Gap)) {
+						throw "SentenceFragment with ID [" + gapId + "] is not a gap: " + gap;
+					}
 					gap.solution = draggedOption;
 					
 				} else if (droppedIntoPuzzleOptions || droppedOntoOtherPuzzleOption) {
@@ -254,17 +258,6 @@ define([
 						options.push(draggedOption);
 					}
 				}
-			}
-			
-			function getGapPosition(characterElement) {
-				var position = Utils.indexOfElement(characterElement);
-				for (var i = 0; i < position; i++) {
-					if (self.puzzle.getGapAtPosition(i)) {
-						// Other gaps don't count as a position, but do take up a table cell
-						position--;
-					}
-				}
-				return position;
 			}
 		},
 		/**
