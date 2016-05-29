@@ -206,7 +206,7 @@ define([
 							destinationGap.currentChoice = option;
 							
 						} else if (Utils.isOfClass(event.target, "puzzleOption")
-								&& Utils.isOfClasses(event.target.parentNode, "puzzleGap")) {
+								&& Utils.isOfClass(event.target.parentNode, "puzzleGap")) {
 							// A puzzle option is being dropped into an already-populated gap
 							var destinationGapId = parseInt(event.target.parentNode.getAttribute("data-id"));
 							var destinationGap = self.shownPuzzle.getSentenceFragmentById(destinationGapId);
