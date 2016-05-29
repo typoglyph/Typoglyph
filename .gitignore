@@ -1,10 +1,14 @@
-# Ignore any log files
+### Application output ###
 *.log
 
 
-# Generated files
+### Build output ###
 out/*
 
 
-# Sass generated files
+### IDE configuration ###
+.idea/*
+
+
+### SASS build cache ###
 .sass-cache/*
