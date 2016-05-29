@@ -19,12 +19,46 @@ define([], function() {
 			for (var i = (arguments.length - 1); i >= 1; i--) {
 				var extension = arguments[i];
 				for (var property in extension) {
+					if (property === "__clones__") {
+						continue;
+					}
 					if (Object.hasOwnProperty.call(extension, property) || typeof object[property] === "undefined") {
 						object[property] = extension[property];
 					}
 				}
+
+				// Add to __clones__ to allow for #instanceOf checks
+				if (Object.hasOwnProperty.call(extension, "__clones__")) {
+					extension["__clones__"].unshift(object);
+				} else {
+					extension["__clones__"] = [object];
+				}
 			}
 			return object;
+		},
+
+		/**
+		 * Emulates the <code>instanceof</code> operator when using #subclass style inheritance
+		 *
+		 * @param {Object} object
+		 * @param {Object} clazz
+         * @returns {boolean}
+		 * @see http://aaditmshah.github.io/why-prototypal-inheritance-matters/#toc_13
+         */
+		isInstanceOf: function(object, clazz) {
+			var clones = Object.hasOwnProperty.call(clazz, "__clones__") ? clazz["__clones__"] : null;
+			var prototype = object;
+			do {
+				if (prototype === clazz) {
+					return true;
+				}
+				if (clones !== null && clones.indexOf(prototype) !== -1) {
+					return true;
+				}
+				prototype = Object.getPrototypeOf(prototype);
+			} while (prototype);
+			
+			return false;
 		},
 
 		/**
@@ -36,6 +70,9 @@ define([], function() {
 		equals: function(a, b) {
 			if (a === null || typeof a === "undefined")
 				return b === null || typeof b === "undefined";
+			
+			if (typeof a === "boolean")
+				return a === b;
 			
 			if (typeof a === "number")
 				return a === b;
