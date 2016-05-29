@@ -14,7 +14,7 @@ $incorrectGraphics = ($which === "both" || $which === "incorrect")
 		: array();
 		
 $graphics = array("correct" => $correctGraphics, "incorrect" => $incorrectGraphics);
-sendJsonReply($graphics, $HTTP_STATUS_SUCCESS);
+sendReply(json_encode($graphics), $CONTENT_TYPE_JSON, $HTTP_STATUS_SUCCESS);
 
 
 /**

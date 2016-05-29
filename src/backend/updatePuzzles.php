@@ -4,7 +4,7 @@ require_once("puzzle.php");
 
 // Parse query parameters
 $puzzlesJson = getStringRequestParam("puzzles", True);
-$puzzles = PuzzleParser::fromJsonArray($puzzlesJson);
+$puzzles = PuzzleDecoder::fromJsonArray($puzzlesJson);
 
 if ($puzzles === Null || count($puzzles) === 0) {
 	throw new Exception("No puzzles to update");
@@ -17,5 +17,5 @@ try {
     $db = Null;
 }
 
-sendReply("", "text/plain", $HTTP_STATUS_SUCCESS);
+sendReply("", $CONTENT_TYPE_TEXT, $HTTP_STATUS_SUCCESS);
 ?>

@@ -4,25 +4,20 @@
  * 
  * @author jakemarsden
  */
-define(["util/Objects"], function(Objects) {
-	var nextId = 0;
-	return {
+define(["./SentenceFragment", "util/Objects"], function(SentenceFragment, Objects) {
+	
+	return Objects.subclass(SentenceFragment, {
 		/**
-		 * @param {int} position Where in a puzzle this gap should lie:
-		 *     0: just before the first character of a puzzle's sentence
-		 *     1: just after the first character of a puzzle's sentence
-		 *     sentence.length: just after the last character of a puzzle's sentence
 		 * @param {Option} solution The value this gap must be filled with if it is to be considered
 		 *     "correct". If null, the gap will be correct if it hasn't been filled.
+		 * @param {Option} [initialChoice=null] The option to initially fill this gap with. By
+		 *     default, or if null is passed, the gap will start unfilled.
 		 * @constructor
 		 */
-		create: function(position, solution) {
-			var self = Objects.subclass(this, {
-				id: nextId++,
-				position: position,
-				solution: solution,
-				currentChoice: null
-			});
+		create: function(solution, initialChoice) {
+			var self = SentenceFragment.create.call(this);
+			self.solution = solution;
+			self.currentChoice = initialChoice || null;
 			return self;
 		},
 		
@@ -51,9 +46,8 @@ define(["util/Objects"], function(Objects) {
 		 */
 		equals: function(other) {
 			return other !== null
-				&& Objects.equals(this.position, other.position)
 				&& Objects.equals(this.solution, other.solution)
 				&& Objects.equals(this.currentChoice, other.currentChoice);
 		}
-	};
+	});
 });

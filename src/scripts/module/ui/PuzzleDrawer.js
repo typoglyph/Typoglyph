@@ -3,7 +3,13 @@
  * 
  * @author jakemarsden
  */
-define(["util/Objects", "./Drawer"], function(Objects, Drawer) {
+define([
+	"./Drawer",
+	"puzzle/Character",
+	"puzzle/Gap",
+	"util/Objects"
+], function(Drawer, Character, Gap, Objects) {
+
 	return Objects.subclass(Drawer, {
 		/**
 		 * @param {PuzzleGapDrawer} gapDrawer
@@ -31,25 +37,29 @@ define(["util/Objects", "./Drawer"], function(Objects, Drawer) {
 		 * @override
 		 */
 		drawInto: function(p, puzzle) {
-			var sentenceFragment = null;
-			
-			// Iterate length+1 in case there's a gap after the last character
-			for (var i = 0; i < puzzle.sentence.length + 1; i++) {
-				
-				var gap = puzzle.getGapAtPosition(i);
-				if (gap !== null) {
-					var sentenceFragment = null; // a new one will be started for the next character
-					var drawnGap = this.gapDrawer.draw(gap);
-					p.appendChild(drawnGap);
+			// Bundle sequential characters into the same text node as an optimisation
+			var textNode = null;
+
+			for (var i = 0; i < puzzle.length(); i++) {
+				var fragment = puzzle.getSentenceFragmentAt(i);
+
+				if (Objects.isInstanceOf(fragment, Character)) {
+					if (textNode === null) {
+						// Start a new chain of sequential characters
+						textNode = this.newTextNode("");
+						p.appendChild(textNode);
+					}
+					textNode.textContent += fragment.value;
+
+				} else if (Objects.isInstanceOf(fragment, Gap)) {
+					// This gap has broken the chain of sequential characters
+					// We'll need to start a new one when the next character comes around
+					textNode = null;
+					p.appendChild(this.gapDrawer.draw(fragment));
+
+				} else {
+					throw "Unknown SentenceFragment type: " + fragment;
 				}
-				
-				// Start a new sentence fragment if necessary
-				if (sentenceFragment === null) {
-					sentenceFragment = this.newTextNode("");
-					p.appendChild(sentenceFragment);
-				}
-				// Append character to the sentence fragment
-				sentenceFragment.textContent += puzzle.sentence.charAt(i);
 			}
 		}
 	});

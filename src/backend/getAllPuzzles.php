@@ -1,5 +1,6 @@
 <?php
 require_once("common.php");
+require_once("puzzle.php");
 
 
 try {
@@ -9,5 +10,6 @@ try {
     $db = Null;
 }
 
-sendJsonReply($puzzles, $HTTP_STATUS_SUCCESS)
+$jsonPuzzles = PuzzleEncoder::toJsonArray($puzzles);
+sendReply($jsonPuzzles, $CONTENT_TYPE_JSON, $HTTP_STATUS_SUCCESS)
 ?>

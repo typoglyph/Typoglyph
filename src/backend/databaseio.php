@@ -36,10 +36,10 @@ class DatabaseWrapper {
 		$statement = $this->connection->prepare('
 			SELECT *
 			FROM `puzzles`;');
-		static::$logger->debug("Executing statement on '{$this->connectionString}': {$statement->queryString}");
+		$this->logPreparedStatement($statement, array());
 		$statement->execute();
 		$puzzles = $statement->fetchAll(PDO::FETCH_OBJ);
-		return PuzzleDecoder::decodePuzzles($puzzles);
+		return DbPuzzleDecoder::decodePuzzles($puzzles);
 	}
 	
 	/**
@@ -53,12 +53,12 @@ class DatabaseWrapper {
 			SELECT *
 			FROM `puzzles`
 			ORDER BY RAND()
-			LIMIT ?;');
-		$statement->bindParam(1, $count, PDO::PARAM_INT);
-		static::$logger->debug("Executing statement on '{$this->connectionString}': {$statement->queryString}");
+			LIMIT :limit;');
+		$statement->bindParam(":limit", $count, PDO::PARAM_INT);
+		$this->logPreparedStatement($statement, array(":limit" => $count));
 		$statement->execute();
 		$puzzles = $statement->fetchAll(PDO::FETCH_OBJ);
-		return PuzzleDecoder::decodePuzzles($puzzles);
+		return DbPuzzleDecoder::decodePuzzles($puzzles);
 	}
 	
 	/**
@@ -71,11 +71,13 @@ class DatabaseWrapper {
 			SET `sentence`=:sentence, `options`=:options
 			WHERE `_id`=:id;');
 		foreach ($puzzles as $puzzle) {
-			$statement->bindParam(":id", $puzzle->id);
-			$statement->bindParam(":sentence", PuzzleEncoder::encodePuzzleSentence($puzzle));
-			$statement->bindParam(":options", PuzzleEncoder::encodePuzzleOptions($puzzle));
-			static::$logger->debug("Executing statement on '{$this->connectionString}': {$statement->queryString}");
-			$statement->execute();
+			$params = array(
+				":id" => DbPuzzleEncoder::encodePuzzleId($puzzle),
+				":sentence" => DbPuzzleEncoder::encodePuzzleSentence($puzzle),
+				":options" => DbPuzzleEncoder::encodePuzzleOptions($puzzle)
+			);
+			$this->logPreparedStatement($statement, $params);
+			$statement->execute($params);
 		}
 	}
 	
@@ -87,10 +89,12 @@ class DatabaseWrapper {
 			INSERT INTO `puzzles` (`sentence`, `options`)
 			VALUES (:sentence, :options)');
 		foreach ($puzzles as $puzzle) {
-			$statement->bindParam(":sentence", PuzzleEncoder::encodePuzzleSentence($puzzle));
-			$statement->bindParam(":options", PuzzleEncoder::encodePuzzleOptions($puzzle));
-			static::$logger->debug("Executing statement on '{$this->connectionString}': {$statement->queryString}");
-			$statement->execute();
+			$params = array(
+				":sentence" => DbPuzzleEncoder::encodePuzzleSentence($puzzle),
+				":options" => DbPuzzleEncoder::encodePuzzleOptions($puzzle)
+			);
+			$this->logPreparedStatement($statement, $params);
+			$statement->execute($params);
 		}
 	}
 	
@@ -102,41 +106,64 @@ class DatabaseWrapper {
 			DELETE FROM `puzzles`
 			WHERE `_id`=:id');
 		foreach ($puzzleIds as $puzzleId) {
-			$statement->bindParam(":id", $puzzleId);
-			static::$logger->debug("Executing statement on '{$this->connectionString}': {$statement->queryString}");
-			$statement->execute();
+			$params = array( ":id" => $puzzleId );
+			$this->logPreparedStatement($statement, $params);
+			$statement->execute($params);
 		}
+	}
+	
+	
+	private function logPreparedStatement($statement, $params) {
+		$connStr = $this->connectionString;
+		
+		$statementStr = $statement->queryString;
+		$statementStr = preg_replace("/\s+/", " ", $statementStr);
+		$statementStr = trim($statementStr);
+		
+		$paramsStr = array();
+		foreach ($params as $paramKey => $paramValue) {
+			array_push($paramsStr, "$paramKey => $paramValue");
+		}
+		$paramsStr = implode(", ", $paramsStr);
+		
+		$logMsg = "Connection [$connStr] is executing prepared statement [$statementStr] using parameters [$paramsStr]";
+		static::$logger->debug($logMsg);
 	}
 }
 DatabaseWrapper::staticInit();
 
 
 /**
- * Translates from a puzzle object into database format
+ * Utilities to encode Puzzle objects into database format
  */
-class PuzzleEncoder {
+class DbPuzzleEncoder {
+	/**
+	 * @param Puzzle $puzzle
+	 * @return int The puzzle's ID as stored in the database
+	 */
+	static function encodePuzzleId($puzzle) {
+		return $puzzle->id;
+	}
+	
 	/**
 	 * @param Puzzle $puzzle
 	 * @return string The puzzle's sentence as stored in the database
 	 */
 	static function encodePuzzleSentence($puzzle) {		
 		$encodedSentence = "";
-		for ($i = 0; $i <= strlen($puzzle->sentence); $i++) {
-			$gap = static::getGapAtPosition($puzzle, $i);
-			if ($gap !== Null) {
-				$encodedSentence .= "{";
-				$option = $gap->solution;
-				if ($option !== Null) {
-					for ($j = 0; $j < strlen($option->value); $j++) {
-						$encodedSentence .= static::escapeSentenceChar($option->value[$j]);
-					}
-				}
-				$encodedSentence .= "}";
-			}
-			
-			if ($i < strlen($puzzle->sentence)) {
-				$char = $puzzle->sentence[$i];
-				$encodedSentence .= static::escapeSentenceChar($char);
+		foreach ($puzzle->sentenceFragments as $fragment) {
+			if ($fragment instanceof Character) {
+				$value = $fragment->value;
+				$escaped = static::escapeForSentence($value);
+				$encodedSentence .= $escaped;
+				
+			} else if ($fragment instanceof Gap) {
+				$value = ($fragment->solution === null) ? "" : $fragment->solution->value;
+				$escaped = static::escapeForSentence($value);
+				$encodedSentence .= "{{$escaped}}";
+				
+			} else {
+				throw new Exception("Unknown type of SentenceFragment: $fragment");
 			}
 		}
 		return $encodedSentence;
@@ -149,33 +176,31 @@ class PuzzleEncoder {
 	static function encodePuzzleOptions($puzzle) {
 		$encodedOptions = "";
 		foreach ($puzzle->options as $option) {
-			$optionValue = $option->value;
-			if (strlen($optionValue) !== 1)
-				throw new Exception("Unexpected option value: " . $optionValue);
-			
-			$encodedOptions .= $optionValue;
+			if ($strlen($option->value) !== 1) {
+				throw new Exception("Unexpected option value: " . $option->value);
+			}
+			$encodedOptions .= $option->value;
 		}
 		return $encodedOptions;
 	}
 	
-	
-	private static function getGapAtPosition($puzzle, $position) {
-		foreach ($puzzle->gaps as $gap) {
-			if ($gap->position === $position) {
-				return $gap;
+	private static function escapeForSentence($str) {
+		$escaped = "";
+		foreach ($str as $char) {
+			switch ($char) {
+				case "\\":
+					$char = "\\\\";
+					break;
+				case "{":
+					$char = "\\{";
+					break;
+				case "}":
+					$char = "\\}";
+					break;
 			}
+			$escaped .= $char;
 		}
-		return Null;
-	}
-	
-	private static function escapeSentenceChar($char) {
-		if ($char === "{")
-			return "\\{";
-		if ($char === "}")
-			return "\\}";
-		if ($char === "\\")
-			return "\\\\";
-		return $char;
+		return $escaped;
 	}
 	
 	
@@ -186,98 +211,101 @@ class PuzzleEncoder {
 
 
 /**
- * Translates from database format into a puzzle object
+ * Utilities to decode from database format into Puzzle objects
  */
-class PuzzleDecoder {	
+class DbPuzzleDecoder {
 	/**
-	 * @param Array<object> $dbPuzzles The puzzles as stored in the database
+	 * @param Array<object> $puzzles The puzzles to decode, as stored in the database
 	 * @return Array<Puzzle> The puzzles as represented by the Puzzle class
 	 */
-	static function decodePuzzles($dbPuzzles) {
-		$results = array();
-		foreach ($dbPuzzles as $dbPuzzle) {
-			$result = static::decodePuzzle($dbPuzzle);
-			array_push($results, $result);
+	static function decodePuzzles($puzzles) {
+		$decodedPuzzles = array();
+		foreach ($puzzles as $puzzle) {
+			$decodedPuzzle = static::decodePuzzle($puzzle);
+			array_push($decodedPuzzles, $decodedPuzzle);
 		}
-		return $results;
+		return $decodedPuzzles;
 	}
 	
 	/**
-	 * @param object $dbPuzzle The puzzle as stored in the database
+	 * @param object $puzzle The puzzle to decode, as stored in the database
 	 * @return Puzzle The puzzle as represented by the Puzzle class
 	 */
-	static function decodePuzzle($dbPuzzle) {
-		$puzzle = new Puzzle();
-		$puzzle->id = $dbPuzzle->_id;
+	static function decodePuzzle($puzzle) {
+		$decodedId = $puzzle->_id;
+		$decodedFragments = static::decodeSentence($puzzle->sentence);
+		$decodedOptions = static::decodeOptions($puzzle->options);
+		return new Puzzle($decodedId, $decodedFragments, $decodedOptions);
+	}
+	
+	/**
+	 * @param string $sentence The sentence to decode, as stored in the database
+	 * @return Array<SentenceFragment>
+	 */
+	private static function decodeSentence($sentence) {	
+		// True if the previous character was an escape character
+		// True if the current character should be interpreted literally (ie. if it's a special char such as {, }, \)
+		$nextCharIsEscaped = false;
 		
-		// Sort out the options
-		// For each character
-		foreach (str_split($dbPuzzle->options) as $dbOption) {
-			// str_split returns an array containing only "" when given "" as parameter
-			if (strlen($dbOption) === 0)
-				continue;
-			
-			$option = new Option();
-			$option->value = $dbOption;
-			array_push($puzzle->options, $option);
-		}
+		// If we are currently inside a set of unescaped {braces}, this represents the gap being parsed
+		$openGap = null;
 		
-		// Sort out the sentence and the gaps
-		// For each character
-		$escaped = False;
-		$gap = Null;
-		$specialChars = 0;
-		foreach (str_split($dbPuzzle->sentence) as $i=>$char) {
-			// str_split returns an array containing only "" when given "" as parameter
-			if (strlen($char) === 0)
-				continue;
+		$decodedFragments = array();
+		
+		for ($i = 0; $i < strlen($sentence); $i++) {
+			$char = $sentence[$i];
 			
-			// Set the flag so that the next character is properly escaped
-			if (!$escaped && $char === "\\") {
-				$escaped = True;
-				$specialChars++;
+			if ($char === "\\" && !$nextCharIsEscaped) {
+				// Next char should be interpreted literally
+				$nextCharIsEscaped = true;
+				continue; // Must skip clearing the flag at the end of the loop
 				
-			} elseif (!$escaped && $char === "{") {
-				if ($gap !== Null) {
-					// The input was something like "Hello {{} world" instead of "Hello {\{} world"
-					throw new Exception("Char<$i>: Non-escaped '{' found before the current '{' was closed: '{$dbPuzzle->sentence}'");
+			} else if ($char === "{" && !$nextCharIsEscaped) {
+				// A new gap has been opened
+				if ($openGap !== null) {
+					throw new Exception("Found an unescaped '$char' nested inside braces [index=$i]: $sentence");
 				}
-				// We have hit the start of a gap - create an object to represent it
-				$gap = new Gap();
-				$gap->position = ($i - $specialChars);
-				$specialChars++;
+				$openGap = new Gap(null); // Keep solution null for now as the braces may be empty
+				array_push($decodedFragments, $openGap);
 				
-			} elseif (!$escaped && $char === "}") {
-				if ($gap === Null) {
-					// The input was something like "Hello {}} world" instead of "Hello {\}} world", or maybe "Hello } world" instead of "Hello \} world"
-					throw new Exception("Char<$i>: Non-escaped '}' found before any '{' was opened: '{$dbPuzzle->sentence}'");
+			} else if ($char === "}" && !$nextCharIsEscaped) {
+				// Current gap has been closed
+				if ($openGap === null) {
+					throw new Exception("Found an unescaped '$char' not nested inside braces [index=$i]: $sentence");
 				}
-				$specialChars++;
-				
-				// We have reached the end of a gap - add it to the puzzle and clear our reference of it
-				array_push($puzzle->gaps, $gap);
-				$gap = Null;
+				$openGap = null;
 				
 			} else {
-				// It's just a normal, bogstandard character (or has been escaped, so we must treat it like one)
-				if ($gap === Null) {
-					// We are not inside a gap - just add the character to the end of the sentence!
-					$puzzle->sentence .= $char;
-				} else {
-					// We are inside a gap and this character is part of the solution
-					if ($gap->solution === Null) {
-						$gap->solution = new Option();
-						$gap->solution->value = "";
-						$specialChars++;
+				if ($openGap !== null) {
+					// The char is inside the currently open gap
+					if ($openGap->solution === null) {
+						$openGap->solution = new Option("");
 					}
-					$gap->solution->value .= $char;
+					$openGap->solution->value .= $char;
+					
+				} else {
+					$character = new Character($char);
+					array_push($decodedFragments, $character);
 				}
-				
-				// If this character was escaped, clear the flag so the next character is treated normally
-				$escaped = False;
 			}
+			
+			$nextCharIsEscaped = false;
 		}
-		return $puzzle;
+		
+		return $decodedFragments;
+	}
+	
+	/**
+	 * @param string $options The options to decode, as stored in the database
+	 * @return Array<Option>
+	 */
+	private static function decodeOptions($options) {
+		$decodedOptions = array();
+		for ($i = 0; $i < strlen($options); $i++) {
+			$decodedOption = new Option($options[$i]);
+			array_push($decodedOptions, $decodedOption);
+		}
+		return $decodedOptions;
 	}
 	
 	

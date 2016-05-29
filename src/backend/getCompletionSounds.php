@@ -17,7 +17,7 @@ $incorrectSounds = ($which === "both" || $which === "incorrect")
 		: array();
 		
 $sounds = array("correct" => $correctSounds, "incorrect" => $incorrectSounds);
-sendJsonReply($sounds, $HTTP_STATUS_SUCCESS);
+sendReply(json_encode($sounds), $CONTENT_TYPE_JSON, $HTTP_STATUS_SUCCESS);
 
 
 /**

@@ -1,21 +1,21 @@
 /**
- * A value which can be used to populate one of the gaps of a puzzle 
+ * A value which can be used to populate one of the gaps of a puzzle
  * 
  * @author jakemarsden
  */
 define(["util/Objects"], function(Objects) {
-	var nextId = 0;
+	
+	var previousId = 0;
 	return {
 		/**
 		 * @param {String} value
 		 * @constructor
 		 */
 		create: function(value) {
-			var self = Objects.subclass(this, {
-				id: nextId++,
+			return Objects.subclass(this, {
+				id: previousId++,
 				value: value
 			});
-			return self;
 		},
 		
 		/**

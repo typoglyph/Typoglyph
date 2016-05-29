@@ -3,6 +3,8 @@ require_once("configuration.php");
 require_once("databaseio.php");
 
 $HTTP_STATUS_SUCCESS = 200;
+$CONTENT_TYPE_JSON = "application/json";
+$CONTENT_TYPE_TEXT = "text/plain";
 
 
 /**
@@ -73,20 +75,6 @@ function getBooleanRequestParam($name, $required) {
 }
 
 /**
- * Sets the content type header to "application/json", converts the given reply to JSON and prints
- * it and then exits the script with the given HTTP status code
- *
- * IMPORTANT: No further code will be executed after this function has returned
- * 
- * @param mixed $reply
- * @param int $statusCode
- */
-function sendJsonReply($reply, $statusCode) {
-	$json = toJson($reply, False);
-	sendReply($json, "application/json", $statusCode);
-}
-
-/**
  * Sets the HTTP content type header, prints the given reply and then exits the script with the
  * given HTTP status code
  *
@@ -100,29 +88,5 @@ function sendReply($reply, $contentType, $statusCode) {
 	header("Content-type:" . $contentType);
 	print($reply);
 	exit($statusCode);
-}
-
-/**
- * @param mixed $value
- * @param boolean $prettyHtml Should usually be false. Setting to true can make debugging easier as
- *     new lines will be replaced with <br/> tags etc. The result of this function with $prettyHtml
- *     as true is not compatible with the fromJson function.
- * @return string
- */
-function toJson($value, $prettyHtml) {
-	$json = $prettyHtml ? json_encode($value, JSON_PRETTY_PRINT) : json_encode($value);
-	if ($prettyHtml) {
-		$json = str_replace(" ", "&nbsp;", $json);
-		$json = nl2br($json);
-	}
-	return $json;
-}
-
-/**
- * @param string $json
- * @return mixed
- */
-function fromJson($json) {
-	return json_decode($json);
 }
 ?>
