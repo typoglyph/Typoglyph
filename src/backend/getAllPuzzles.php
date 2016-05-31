@@ -1,15 +1,10 @@
 <?php
-require_once("common.php");
-require_once("puzzle.php");
+require_once("endpoint/GetAllPuzzlesEndpoint.php");
+require_once("endpoint/Request.php");
 
 
-try {
-    $db = getDatabaseConnection();
-    $puzzles = $db->fetchAllPuzzles();
-} finally {
-    $db = Null;
-}
-
-$jsonPuzzles = PuzzleEncoder::toJsonArray($puzzles);
-sendReply($jsonPuzzles, $CONTENT_TYPE_JSON, $HTTP_STATUS_SUCCESS)
+$endpoint = new GetAllPuzzlesEndpoint();
+$request = new Request($_GET);
+$response = $endpoint->handleRequest($request);
+$response->send();
 ?>

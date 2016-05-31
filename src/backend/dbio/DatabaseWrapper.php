@@ -1,6 +1,7 @@
 <?php
-require_once("logger.php");
-require_once("puzzle.php");
+require_once("dbio/DbPuzzleDecoder.php");
+require_once("dbio/DbPuzzleEncoder.php");
+require_once("logging/LoggerFactory.php");
 
 
 /**
@@ -137,67 +138,4 @@ class DatabaseWrapper {
 	}
 }
 DatabaseWrapper::staticInit();
-
-
-/**
- * Utilities to encode Puzzle objects into database format
- */
-class DbPuzzleEncoder {
-	/**
-	 * @param Puzzle $puzzle
-	 * @return int The puzzle's ID as stored in the database
-	 */
-	static function encodePuzzleId($puzzle) {
-		return $puzzle->id;
-	}
-	
-	/**
-	 * @param Puzzle $puzzle
-	 * @return string The puzzle's data as stored in the database
-	 */
-	static function encodePuzzleData($puzzle) {
-		return PuzzleEncoder::toJson($puzzle);
-	}
-	
-	
-	private function __construct() {
-		throw new Exception("Use the static methods instead");
-	}
-}
-
-
-/**
- * Utilities to decode from database format into Puzzle objects
- */
-class DbPuzzleDecoder {
-	/**
-	 * @param Array<object> $puzzles The puzzles to decode, as stored in the database
-	 * @return Array<Puzzle> The puzzles as represented by the Puzzle class
-	 */
-	static function decodePuzzles($puzzles) {
-		$decodedPuzzles = array();
-		foreach ($puzzles as $puzzle) {
-			$decodedPuzzle = static::decodePuzzle($puzzle);
-			array_push($decodedPuzzles, $decodedPuzzle);
-		}
-		return $decodedPuzzles;
-	}
-	
-	/**
-	 * @param object $puzzle The puzzle to decode, as stored in the database
-	 * @return Puzzle The puzzle as represented by the Puzzle class
-	 */
-	static function decodePuzzle($puzzle) {
-		$decodedPuzzle = PuzzleDecoder::fromJson($puzzle->data);
-		if ((int) $puzzle->id !== $decodedPuzzle->id) {
-			throw new Exception("puzzle.id [{$puzzle->id}] doesn't match puzzle.data.id [{$decodedPuzzle->id}]");
-		}
-		return $decodedPuzzle;
-	}
-	
-	
-	private function __construct() {
-		throw new Exception("Use the static methods instead");
-	}
-}
 ?>

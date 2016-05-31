@@ -1,21 +1,10 @@
 <?php
-require_once("common.php");
-require_once("puzzle.php");
+require_once("endpoint/PutPuzzlesEndpoint.php");
+require_once("endpoint/Request.php");
 
-// Parse query parameters
-$puzzlesJson = getStringRequestParam("puzzles", True);
-$puzzles = PuzzleDecoder::fromJsonArray($puzzlesJson);
 
-if ($puzzles === Null || count($puzzles) === 0) {
-	throw new Exception("No puzzles to update");
-}
-
-try {
-    $db = getPrivilegedDatabaseConnection();
-    $db->insertPuzzles($puzzles);
-} finally {
-    $db = Null;
-}
-
-sendReply("", $CONTENT_TYPE_TEXT, $HTTP_STATUS_SUCCESS);
+$endpoint = new PutPuzzlesEndpoint();
+$request = new Request($_GET);
+$response = $endpoint->handleRequest($request);
+$response->send();
 ?>
