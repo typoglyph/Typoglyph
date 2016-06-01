@@ -71,8 +71,6 @@ define([
 				var inputElement = self.element.querySelector("#globalOptions #custom input");
 				var value = inputElement.value;
 				if (value.length !== 0) {
-					value = value.charAt(0);
-					
 					// see if there's already an option with the same value
 					if (Arrays.findIndex(self.globalOptions, function(item, index, array) { return value === item.value; }) === -1) {
 						var option = Option.create(value);
@@ -80,12 +78,6 @@ define([
 						self.redrawGlobalOptions();
 					}
 					inputElement.value = "";
-				}
-			});
-			self.element.querySelector("#globalOptions #custom input").addEventListener("input", function(event) {
-				// Make sure there's never more than one character
-				if (event.target.value.length > 1) {
-					event.target.value = event.target.value.charAt(0);
 				}
 			});
 		},
