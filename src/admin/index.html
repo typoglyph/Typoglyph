@@ -4,18 +4,25 @@
 	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 	<meta content="utf-8" http-equiv="encoding">
 	<meta content='width=device-width, initial-scale=1.0' name='viewport'>
-	
+
 	<title>Typoglyph Administration</title>
 	<link rel="icon" type="image/ico" href="../images/favicon.ico">
-	
+
 	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Droid+Sans:700">
 	<link rel="stylesheet" type="text/css" href="../styles/admin.css">
-	
+
 	<script src="../scripts/lib/require-v2.2.0/require.min.js"></script>
 	<script src="../scripts/requireConfig.js" data-main="admin"></script>
-	
+
 </head>
 <body>
+	<div id="tabBar">
+		<button id="editBtn">Edit Puzzles</button>
+		<button id="importExportBtn">Import/Export</button>
+	</div>
+
+	<hr>
+
 	<div id="masterContent">
 		<div id="puzzleSelector" class="content">
 			<table id="puzzles">
@@ -26,7 +33,7 @@
 				</tr>
 			</table>
 		</div>
-		
+
 		<div id="puzzleEditor" class="content">
 			<table id="puzzles">
 				<tr>
@@ -40,7 +47,7 @@
 					<td id="puzzleOptions" class="puzzleOptions"></td>
 				</tr>
 			</table>
-			
+
 			<h4>Global options:</h4>
 			<div id="globalOptions">
 				<span id="list"></span>
@@ -50,6 +57,17 @@
 				</span>
 			</div>
 			<button id="backButton">Menu</button>
+		</div>
+
+		<div id="importExport" class="content">
+			<h3>Export</h3>
+			<p>
+				<input type="radio" name="exportType" id="exportTypeCsv" checked="checked"/>CSV<br>
+				<input type="radio" name="exportType" id="exportTypeJson"/>JSON<br>
+				<input type="radio" name="exportType" id="exportTypeXml"/>XML
+			</p>
+			<!-- HREF and DOWNLOAD attributes dynamically populated by click listener -->
+			<a id="doExportBtn" download><button>Export All Puzzles</button></a>
 		</div>
 	</div>
 </body>

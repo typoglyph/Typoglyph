@@ -51,8 +51,26 @@ class Request {
 	}
 	
 	public function __toString() {
-		$paramsStr = "[" . implode(", ", $this->params) . "]";
+		$paramsStr = static::arrayToString($this->params, True);
 		return get_class() . "[params=$paramsStr]";
+	}
+	
+	/**
+	 * @param Array<string> $array
+	 * @param boolean [$assoc]
+	 * @return string
+	 */
+	private static function arrayToString($array, $assoc=False) {
+		$str = "[";
+		$first = True;
+		foreach ($array as $key => $value) {
+			if (!$first) {
+				$str .= ", ";
+			}
+			$first = False;
+			$str .= ($assoc ? "$key=$value" : $value);
+		}
+		return $str . "]";
 	}
 }
 ?>

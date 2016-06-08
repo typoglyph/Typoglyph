@@ -32,7 +32,7 @@ define(["util/Objects"], function(Objects) {
 		 */
 		create: function(controllers) {
 			var self = Objects.subclass(this, {
-				controllers: controllers,
+				controllers: controllers
 			});
 			self.hideAll();
 			return self;

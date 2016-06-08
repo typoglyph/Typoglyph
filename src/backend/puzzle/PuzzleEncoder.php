@@ -1,4 +1,8 @@
 <?php
+require_once("puzzle/Character.php");
+require_once("puzzle/Gap.php");
+
+
 /**
  * Translation of PuzzleEncoder.js. Look there for documentation.
  * <p>
@@ -8,24 +12,35 @@
 class PuzzleEncoder {
 	/**
 	 * @param Puzzle $puzzle
+	 * @param boolean [$pretty]
 	 * @return string
 	 */
-	static function toJson($puzzle) {
+	static function toJson($puzzle, $pretty=False) {
 		$data = static::encodePuzzle($puzzle);
-		return json_encode($data);
+		return static::dataToString($data, $pretty);
 	}
 	
 	/**
 	 * @param Array<Puzzle> $puzzles
+	 * @param boolean [$pretty]
 	 * @return string
 	 */
-	static function toJsonArray($puzzles) {
+	static function toJsonArray($puzzles, $pretty=False) {
 		$dataArray = array();
 		foreach ($puzzles as $puzzle) {
 			$data = static::encodePuzzle($puzzle);
 			array_push($dataArray, $data);
 		}
-		return json_encode($dataArray);
+		return static::dataToString($dataArray, $pretty);
+	}
+	
+	/**
+	 * @param object $data
+	 * @param boolean $pretty
+	 * @return string
+	 */
+	private static function dataToString($data, $pretty) {
+		return json_encode($data, ($pretty) ? JSON_PRETTY_PRINT : 0);
 	}
 	
 	/**

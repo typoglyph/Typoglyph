@@ -15,9 +15,9 @@ abstract class Endpoint {
 	 * @return Response
 	 */
 	public function handleRequest($req) {
-		$this->logger->info("Handling request: {(string) $req}");
+		$this->logger->info("Handling request: $req");
 		$resp = $this->_handleRequest($req);
-		$this->logger->debug("Returning response: {(string) $resp}");
+		$this->logger->debug("Returning response: $resp");
 		return $resp;
 	}
 	
