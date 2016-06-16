@@ -5,6 +5,7 @@ var gulp = require("gulp");
 var mergeStream = require("merge-stream");
 var removeFiles = require("gulp-remove-files");
 var sass = require("gulp-sass");
+var uglify = require("gulp-uglify");
 
 
 gulp.task("clean", function() {
@@ -77,7 +78,23 @@ gulp.task("compile", [
     "compileRes"
 ]);
 
-gulp.task("default", [
-    "clean",
+gulp.task("compressJs", ["compileJs"], function () {
+    return gulp.src("out/**/*.js")
+        .pipe(uglify())
+        .pipe(gulp.dest("out/"));
+});
+
+gulp.task("compress", [
+    "compressJs"
+]);
+
+gulp.task("build", [
     "compile"
 ]);
+
+gulp.task("build-for-prod", [
+    "compile",
+    "compress"
+]);
+
+gulp.task("default", ["build"]);
