@@ -1,0 +1,25 @@
+{
+  "name": "typoglyph",
+  "version": "0.0.1",
+  "license": "GPL-3.0",
+  "author": {
+    "name": "Jake Marsden",
+    "url": "https://github.com/jakemarsden"
+  },
+  "homepage": "http://typoglyph.net",
+  "bugs": {
+    "url": "https://github.com/typoglyph/typoglyph/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/typoglyph/typoglyph.git"
+  },
+  "devDependencies": {
+    "amd-optimize": "^0.6.1",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-remove-files": "0.0.3",
+    "gulp-sass": "^2.3.1",
+    "merge-stream": "^1.0.0"
+  }
+}

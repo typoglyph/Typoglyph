@@ -10,5 +10,14 @@ out/*
 .idea/*
 
 
-### SASS build cache ###
+### Deployment-specific configuration ###
+config/*.ini
+
+
+### Build output ###
+out/*
 .sass-cache/*
+
+
+### NPM modules ###
+node_modules/*
