@@ -7,9 +7,9 @@ class Response {
 	public static $CONTENT_TYPE_TEXT = "text/plain";
 	public static $CONTENT_TYPE_XML = "application/xml";
 	
-	private $contentType;
-	private $status;
-	private $data;
+	protected $contentType;
+	protected $status;
+	protected $data;
 	
 	
 	public function send() {

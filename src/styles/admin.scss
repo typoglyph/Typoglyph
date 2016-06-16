@@ -119,3 +119,14 @@ table#puzzles {
 	}
 	margin: 1.2vw;
 }
+
+
+#importExport.content {
+	#exportPreview {
+		overflow-x: scroll;
+		overflow-y: scroll;
+
+		// Don't wrap long lines or the user could end up with rogue \n in their data
+		white-space: pre;
+	}
+}

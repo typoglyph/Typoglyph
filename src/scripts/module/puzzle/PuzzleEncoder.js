@@ -17,11 +17,14 @@ define([
 		 * documentation there for an example of the output produced by this function.
 		 * 
 		 * @param {Puzzle} puzzle
+		 * @param {boolean=} pretty
 		 * @return {String}
 		 */
-		toJson: function(puzzle) {
+		toJson: function(puzzle, pretty) {
+			pretty = pretty || false;
+
 			var data = encodePuzzle(puzzle);
-			return JSON.stringify(data);
+			return JSON.stringify(data, null, pretty ? 2 : 0);
 		},
 		
 		/**
@@ -29,15 +32,18 @@ define([
 		 * documentation there for an example of the output produced by this function.
 		 * 
 		 * @param {Array<Puzzle>} puzzles
+		 * @param {boolean=} pretty
 		 * @return {String}
 		 */
-		toJsonArray: function(puzzles) {
+		toJsonArray: function(puzzles, pretty) {
+			pretty = pretty || false;
+
 			var dataArray = [];
 			for (var i = 0; i < puzzles.length; i++) {
 				var data = encodePuzzle(puzzles[i]);
 				dataArray.push(data);
 			}
-			return JSON.stringify(dataArray);
+			return JSON.stringify(dataArray, null, pretty ? 2 : 0);
 		}
 	};
 	

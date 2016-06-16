@@ -77,6 +77,7 @@ require([
     }
 
     function showImportExportTab() {
+        importExportController.showPuzzles(puzzles);
         masterController.show(importExportController);
     }
 

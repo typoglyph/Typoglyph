@@ -7,7 +7,15 @@ require.config({
 
 		// Libraries
 		howler: "../lib/howler-v1.1.29/howler.min",
-		interact: "../lib/interact-v1.2.6/interact.min"
+		interact: "../lib/interact-v1.2.6/interact.min",
+		"jquery-csv": "../lib/jquery-csv-v0.8.1/jquery.csv" // Doesn't actually depend on JQuery, even though it pretends it does
+	},
+	shim: {
+		// Go look at lib/jQueryCsvInit if you want your eyes to bleed
+		"jquery-csv": {
+			deps: ["lib/jQueryCsvInit"],
+			exports: "(window.jQuery || window.$).csv"
+		}
 	}
 });
 

@@ -66,8 +66,14 @@
 				<input type="radio" name="exportType" id="exportTypeJson"/>JSON<br>
 				<input type="radio" name="exportType" id="exportTypeXml"/>XML
 			</p>
-			<!-- HREF and DOWNLOAD attributes dynamically populated by click listener -->
-			<a id="doExportBtn" download><button>Export All Puzzles</button></a>
+			<p>
+				<textarea id="exportPreview" cols="80" rows="12" readonly></textarea>
+			</p>
+			<p>
+				<!-- HREF and DOWNLOAD attributes dynamically populated by click listener -->
+				<a id="doExportBtn" download><button>Save to file</button></a>
+				<button id="exportCopyToClip">Copy to clipboard</button>
+			</p>
 		</div>
 	</div>
 </body>
