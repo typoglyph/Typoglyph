@@ -34,7 +34,8 @@ gulp.task("compileJs", function() {
 
     var amdOptions = {
         configFile: srcPath + "requireConfig.js",
-        baseUrl: srcPath + "/module/"
+        baseUrl: srcPath + "/module/",
+        wrapShim: true
     };
 
     var admin = gulp.src(srcPath + "**/*.js")

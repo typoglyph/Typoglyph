@@ -4,18 +4,25 @@
 	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 	<meta content="utf-8" http-equiv="encoding">
 	<meta content='width=device-width, initial-scale=1.0' name='viewport'>
-	
+
 	<title>Typoglyph Administration</title>
 	<link rel="icon" type="image/ico" href="../images/favicon.ico">
-	
+
 	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Droid+Sans:700">
 	<link rel="stylesheet" type="text/css" href="../styles/admin.css">
-	
+
 	<script src="../scripts/lib/require-v2.2.0/require.min.js"></script>
 	<script src="../scripts/requireConfig.js" data-main="admin"></script>
-	
+
 </head>
 <body>
+	<div id="tabBar">
+		<button id="editBtn">Edit Puzzles</button>
+		<button id="importExportBtn">Import/Export</button>
+	</div>
+
+	<hr>
+
 	<div id="masterContent">
 		<div id="puzzleSelector" class="content">
 			<table id="puzzles">
@@ -26,7 +33,7 @@
 				</tr>
 			</table>
 		</div>
-		
+
 		<div id="puzzleEditor" class="content">
 			<table id="puzzles">
 				<tr>
@@ -40,7 +47,7 @@
 					<td id="puzzleOptions" class="puzzleOptions"></td>
 				</tr>
 			</table>
-			
+
 			<h4>Global options:</h4>
 			<div id="globalOptions">
 				<span id="list"></span>
@@ -50,6 +57,42 @@
 				</span>
 			</div>
 			<button id="backButton">Menu</button>
+		</div>
+
+		<div id="importExport" class="content">
+			<div id="exportPane">
+				<h3>Export</h3>
+				<h4>Format</h4>
+				<p>
+					<input type="radio" name="exportType" id="exportTypeCsv" checked="checked"/>CSV<br>
+					<input type="radio" name="exportType" id="exportTypeJson"/>JSON<br>
+					<input type="radio" name="exportType" id="exportTypeXml"/>XML
+				</p>
+				<p><textarea id="exportPreview" rows="12" readonly></textarea></p>
+				<p>
+					<!-- HREF and DOWNLOAD attributes dynamically populated by click listener -->
+					<a id="doExportBtn" download><button>Save to file</button></a>
+					<button id="exportCopyToClip">Copy to clipboard</button>
+				</p>
+			</div>
+			<div id="importPane">
+				<h3>Import</h3>
+				<h4>Format</h4>
+				<div id="importTypeRadios">
+					<input type="radio" name="importType" id="importTypeCsv" checked="checked"/>CSV<br>
+					<input type="radio" name="importType" id="importTypeJson"/>JSON<br>
+					<input type="radio" name="importType" id="importTypeXml"/>XML
+				</div>
+				<h4>Mode</h4>
+				<div id="importModeRadios">
+					<input type="radio" name="importMode" id="importModeMerge" checked="checked"/>Merge<br>
+					<input type="radio" name="importMode" id="importModeInsert"/>Insert<br>
+					<input type="radio" name="importMode" id="importModeReplace"/>Replace<br>
+				</div>
+				<p>Open file: <input type="file" id="importFilePicker" accept=".csv,.json,.txt,.xml" /></p>
+				<p><textarea id="importPreview" rows="12"></textarea></p>
+				<p><button id="doImportBtn">Import puzzles</button></p>
+			</div>
 		</div>
 	</div>
 </body>

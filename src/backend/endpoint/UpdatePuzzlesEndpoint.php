@@ -4,22 +4,33 @@ require_once("endpoint/DatabaseAwareEndpoint.php");
 require_once("puzzle/PuzzleDecoder.php");
 
 
-class PutPuzzlesEndpoint extends DatabaseAwareEndpoint {
+class UpdatePuzzlesEndpoint extends DatabaseAwareEndpoint {
 	
 	/**
 	 * @override
 	 */
 	public function _handleRequest($req) {
-		$puzzlesJson = $req->getStringParameter("puzzles");
-		$puzzles = PuzzleDecoder::fromJsonArray($puzzles);
+		$puzzlesJson = $req->getPostData();
+		$puzzles = PuzzleDecoder::fromJsonArray($puzzlesJson);
 		
-		if ($puzzles === Null || count($puzzles) === 0) {
-			throw new Exception("Invalid 'puzzles' parameter: $puzzlesJson");
-		}
+		$mode = $req->getStringParameter("mode");
+		$mode = strtolower($mode);
 		
 		try {
 			$dbConn = $this->getPrivilegedDatabaseConnection();
-			$dbConn->updatePuzzles($puzzles);
+			switch (strtolower($mode)) {
+				case "merge":
+					$dbConn->mergePuzzles($puzzles);
+					break;
+				case "insert":
+					$dbConn->insertPuzzles($puzzles);
+					break;
+				case "replace":
+					$dbConn->replacePuzzles($puzzles);
+					break;
+				default:
+					throw new Exception("Unknown update mode: $mode");
+			}
 		} finally {
 			$dbConn = Null;
 		}

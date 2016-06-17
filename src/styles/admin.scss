@@ -119,3 +119,34 @@ table#puzzles {
 	}
 	margin: 1.2vw;
 }
+
+
+#importExport.content {
+	#exportPreview, #importPreview {
+		overflow-x: scroll;
+		overflow-y: scroll;
+		width: 100%;
+
+		// Don't wrap long lines or the user could end up with rogue \n in their data
+		white-space: pre;
+
+		// Don't let the user resize it horizontally as it messes up the UI
+		resize: vertical;
+	}
+
+	#exportPane,
+	#importPane {
+		box-sizing: border-box;
+		padding: 0.2vw;
+	}
+
+	#exportPane {
+		float: left;
+		width: 45%;
+	}
+
+	#importPane {
+		float: right;
+		width: 45%;
+	}
+}

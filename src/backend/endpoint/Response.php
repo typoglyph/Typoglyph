@@ -2,12 +2,14 @@
 class Response {
 	public static $STATUS_SUCCESS = 200;
 	
+	public static $CONTENT_TYPE_CSV = "text/csv";
 	public static $CONTENT_TYPE_JSON = "application/json";
 	public static $CONTENT_TYPE_TEXT = "text/plain";
+	public static $CONTENT_TYPE_XML = "application/xml";
 	
-	private $contentType;
-	private $status;
-	private $data;
+	protected $contentType;
+	protected $status;
+	protected $data;
 	
 	
 	public function send() {
@@ -32,7 +34,23 @@ class Response {
 	}
 	
 	public function __toString() {
-		return get_class() . "[contentType={$this->contentType}, status={$this->status}, data={$this->data}]";
+		$dataStr = static::truncateStr($this->data, 50);
+		return get_class() . "[contentType={$this->contentType}, status={$this->status}, data=$dataStr]";
+	}
+	
+	/**
+	 * @param string $str
+	 * @param int $maxLen
+	 * @param string [$ellipses]
+	 * @return string
+	 */
+	private static function truncateStr($str, $maxLen, $ellipses="...") {
+		$sLen = strlen($str);
+		$eLen = strlen($ellipses);
+		if ($sLen > $maxLen) {
+			return substr($str, 0, $maxLen - $eLen) . $ellipses;
+		}
+		return $str;
 	}
 }
 ?>

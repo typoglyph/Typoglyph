@@ -9,15 +9,19 @@ class GetAllPuzzlesEndpoint extends DatabaseAwareEndpoint {
 	/**
 	 * @override
 	 */
-	 public function _handleRequest($req) {
-		 try {
-			 $dbConn = $this->getDatabaseConnection();
-			 $puzzles = $dbConn->fetchAllPuzzles();
-		 } finally {
-			 $dbConn = Null;
-		 }
-		 $jsonPuzzles = PuzzleEncoder::toJsonArray($puzzles);
-		 return new JsonResponse($jsonPuzzles);
-	 }
+	public function _handleRequest($req) {
+		$pretty = $req->getBooleanParameter("pretty", False);
+		$pretty = ($pretty === Null) ? False : $pretty;
+
+		try {
+			$dbConn = $this->getDatabaseConnection();
+			$puzzles = $dbConn->fetchAllPuzzles();
+		} finally {
+			$dbConn = Null;
+		}
+
+		$encoded = PuzzleEncoder::toJsonArray($puzzles, $pretty);
+		return new JsonResponse($encoded);
+	}
 }
 ?>

@@ -1,5 +1,6 @@
 <?php
 class Request {
+	private $postData;
 	private $params;
 	
 	
@@ -44,15 +45,46 @@ class Request {
 			return False;
 		throw new Exception("The '$name' parameter must be a boolean: $param");
 	}
-	
-	
-	public function __construct($params) {
+
+	/**
+	 * @return string
+	 */
+	public function getPostData() {
+		return $this->postData;
+	}
+
+
+	/**
+	 * @param Array<string> $params
+	 * @param string [$postData]
+	 */
+	public function __construct($params, $postData = Null) {
 		$this->params = $params;
+		$this->postData = $postData;
 	}
 	
 	public function __toString() {
-		$paramsStr = "[" . implode(", ", $this->params) . "]";
-		return get_class() . "[params=$paramsStr]";
+		$dataStr = "" . $this->postData;
+		$paramsStr = static::arrayToString($this->params, True);
+		return get_class() . "[params=$paramsStr, postData=$dataStr]";
+	}
+	
+	/**
+	 * @param Array<string> $array
+	 * @param boolean [$assoc]
+	 * @return string
+	 */
+	private static function arrayToString($array, $assoc=False) {
+		$str = "[";
+		$first = True;
+		foreach ($array as $key => $value) {
+			if (!$first) {
+				$str .= ", ";
+			}
+			$first = False;
+			$str .= ($assoc ? "$key=$value" : $value);
+		}
+		return $str . "]";
 	}
 }
 ?>

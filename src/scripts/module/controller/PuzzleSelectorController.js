@@ -70,7 +70,8 @@ define([
 						self.puzzleSelectedListener(puzzle);
 				});
 			}
-			
+			this.clearShownPuzzles();
+
 			// append each puzzle to the table
 			var table = this.element.querySelector("#puzzles");
 			for (var i = 0; i < puzzles.length; i++) {
@@ -79,6 +80,16 @@ define([
 				table.appendChild(row);
 			}
 		},
+
+		clearShownPuzzles: function() {
+			// Remove all rows except the header
+			var table = this.element.querySelector("#puzzles");
+			var headerRow = table.rows[0];
+			Utils.removeAllChildren(table);
+
+			// Replace header
+			table.insertBefore(headerRow, table.firstChild);
+		},
 		
 		/**
 		 * @param {function(puzzle/Puzzle)} listener
@@ -86,19 +97,12 @@ define([
 		setOnPuzzleSelectedListener: function(listener) {
 			this.puzzleSelectedListener = listener;
 		},
-		
-		
+
 		/**
 		 * @override
 		 */
 		onDestroy: function() {
-			// Remove all rows except the header
-			var table = this.element.querySelector("#puzzles");
-			var headerRow = table.rows[0];
-			Utils.removeAllChildren(table);
-			
-			// Replace header
-			table.insertBefore(headerRow, table.firstChild);
+			this.clearShownPuzzles();
 		}
 	});
 });
