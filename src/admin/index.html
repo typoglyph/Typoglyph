@@ -60,20 +60,39 @@
 		</div>
 
 		<div id="importExport" class="content">
-			<h3>Export</h3>
-			<p>
-				<input type="radio" name="exportType" id="exportTypeCsv" checked="checked"/>CSV<br>
-				<input type="radio" name="exportType" id="exportTypeJson"/>JSON<br>
-				<input type="radio" name="exportType" id="exportTypeXml"/>XML
-			</p>
-			<p>
-				<textarea id="exportPreview" cols="80" rows="12" readonly></textarea>
-			</p>
-			<p>
-				<!-- HREF and DOWNLOAD attributes dynamically populated by click listener -->
-				<a id="doExportBtn" download><button>Save to file</button></a>
-				<button id="exportCopyToClip">Copy to clipboard</button>
-			</p>
+			<div id="exportPane">
+				<h3>Export</h3>
+				<h4>Format</h4>
+				<p>
+					<input type="radio" name="exportType" id="exportTypeCsv" checked="checked"/>CSV<br>
+					<input type="radio" name="exportType" id="exportTypeJson"/>JSON<br>
+					<input type="radio" name="exportType" id="exportTypeXml"/>XML
+				</p>
+				<p><textarea id="exportPreview" rows="12" readonly></textarea></p>
+				<p>
+					<!-- HREF and DOWNLOAD attributes dynamically populated by click listener -->
+					<a id="doExportBtn" download><button>Save to file</button></a>
+					<button id="exportCopyToClip">Copy to clipboard</button>
+				</p>
+			</div>
+			<div id="importPane">
+				<h3>Import</h3>
+				<h4>Format</h4>
+				<div id="importTypeRadios">
+					<input type="radio" name="importType" id="importTypeCsv" checked="checked"/>CSV<br>
+					<input type="radio" name="importType" id="importTypeJson"/>JSON<br>
+					<input type="radio" name="importType" id="importTypeXml"/>XML
+				</div>
+				<h4>Mode</h4>
+				<div id="importModeRadios">
+					<input type="radio" name="importMode" id="importModeMerge" checked="checked"/>Merge<br>
+					<input type="radio" name="importMode" id="importModeInsert"/>Insert<br>
+					<input type="radio" name="importMode" id="importModeReplace"/>Replace<br>
+				</div>
+				<p>Open file: <input type="file" id="importFilePicker" accept=".csv,.json,.txt,.xml" /></p>
+				<p><textarea id="importPreview" rows="12"></textarea></p>
+				<p><button id="doImportBtn">Import puzzles</button></p>
+			</div>
 		</div>
 	</div>
 </body>

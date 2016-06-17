@@ -61,6 +61,39 @@ class DatabaseWrapper {
 		$puzzles = $statement->fetchAll(PDO::FETCH_OBJ);
 		return DbPuzzleDecoder::decodePuzzles($puzzles);
 	}
+
+	/**
+	 * @param Array<Puzzle> $puzzles
+	 */
+	function mergePuzzles($puzzles) {
+		$puzzlesToUpdate = array();
+		$puzzlesToInsert = array();
+		$statement = $this->connection->prepare('
+			SELECT p.id
+			FROM   puzzles p
+			WHERE  p.id=:id');
+		foreach ($puzzles as $puzzle) {
+			$params = array( ":id" => DbPuzzleEncoder::encodePuzzleId($puzzle) );
+			$this->logPreparedStatement($statement, $params);
+			$statement->execute($params);
+
+			$results = $statement->fetchAll(PDO::FETCH_ASSOC);
+			if (count($results) > 0) {
+				// Puzzle with that ID already exists
+				array_push($puzzlesToUpdate, $puzzle);
+			} else {
+				// Puzzle with that ID doesn't yet exist
+				array_push($puzzlesToInsert, $puzzle);
+			}
+		}
+
+		if (count($puzzlesToUpdate) > 0) {
+			$this->updatePuzzles($puzzlesToUpdate);
+		}
+		if (count($puzzlesToInsert) > 0) {
+			$this->insertPuzzles($puzzlesToInsert);
+		}
+	}
 	
 	/**
 	 * @param Array<Puzzle> $puzzles The puzzles to update. Only puzzles with an ID matching a
@@ -104,19 +137,21 @@ class DatabaseWrapper {
 		// Populate the newly-inserted puzzles with actual data
 		$this->updatePuzzles($puzzles);
 	}
-	
+
 	/**
-	 * @param Array<int> $puzzleIds The IDs of the puzzles to remove
+	 * @param Array<Puzzle> $puzzles
 	 */
-	function removePuzzles($puzzleIds) {
+	function replacePuzzles($puzzles) {
+		$this->truncatePuzzles();
+		$this->insertPuzzles($puzzles);
+	}
+	
+	function truncatePuzzles() {
 		$statement = $this->connection->prepare('
-			DELETE FROM puzzles p
-			WHERE       p.id=:id;');
-		foreach ($puzzleIds as $puzzleId) {
-			$params = array( ":id" => $puzzleId );
-			$this->logPreparedStatement($statement, $params);
-			$statement->execute($params);
-		}
+			TRUNCATE puzzles;');
+		$params = array();
+		$this->logPreparedStatement($statement, $params);
+		$statement->execute($params);
 	}
 	
 	

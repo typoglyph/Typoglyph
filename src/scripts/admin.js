@@ -12,8 +12,6 @@ require([
     var selectorController = null;
     var importExportController = null;
 
-    var puzzles = null;
-
 
     /**
      * Called when the browser has finished (re)loading the document
@@ -24,11 +22,7 @@ require([
         importExportController = ImportExportPuzzlesController.create(document.querySelector(".content#importExport"));
         masterController = MasterController.create([selectorController, editorController, importExportController]);
 
-        PuzzleManager.fetchAllPuzzles(function (fetchedPuzzles) {
-            puzzles = fetchedPuzzles;
-            puzzles.sort(alphabeticalPuzzleComparator);
-            showPuzzleSelector();
-        });
+        showPuzzleSelector();
         PuzzleManager.getDefaultGlobalOptions(function (options) {
             editorController.setGlobalOptions(options);
         });
@@ -54,9 +48,11 @@ require([
 			console.debug("onPuzzleSelected: puzzle=" + puzzle);
 			showPuzzleEditor(puzzle);
 		}
-		selectorController.setOnPuzzleSelectedListener(onPuzzleSelected);
-        selectorController.showPuzzlesForSelection(puzzles);
-        masterController.show(selectorController);
+        fetchPuzzles(function(puzzles) {
+            selectorController.setOnPuzzleSelectedListener(onPuzzleSelected);
+            selectorController.showPuzzlesForSelection(puzzles);
+            masterController.show(selectorController);
+        });
     }
 
     /**
@@ -77,8 +73,34 @@ require([
     }
 
     function showImportExportTab() {
-        importExportController.showPuzzles(puzzles);
-        masterController.show(importExportController);
+        /**
+         * Called when the user has imported some puzzles
+         */
+        function onPuzzlesImported() {
+            // Refresh the "export" bit to reflect the newly imported puzzles
+            // Also clears out the "import" bit
+            showImportExportTab();
+        }
+
+        fetchPuzzles(function(puzzles) {
+            importExportController.setOnPuzzlesImportedListener(onPuzzlesImported);
+            importExportController.showPuzzles(puzzles);
+            masterController.show(importExportController);
+        });
+    }
+
+    /**
+     * Puzzles are reloaded from the backend every single time just to make sure we always have the
+     * latest changes. What if someone else's updating at the same time?
+     *
+     * @param {function(Array<puzzle/Puzzle>)} callback
+     */
+    function fetchPuzzles(callback) {
+        PuzzleManager.fetchAllPuzzles(function (fetchedPuzzles) {
+            var puzzles = fetchedPuzzles;
+            puzzles.sort(alphabeticalPuzzleComparator);
+            callback(puzzles);
+        });
     }
 
     /**
